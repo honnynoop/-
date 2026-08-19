@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가설검정 완전정복 — 빅데이터분석·통계분석·머신러닝의 검정</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css"></script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+:root{
+  --paper:#f7f1e6;
+  --paper-2:#efe6d3;
+  --ink:#2c2620;
+  --ink-soft:#5a5044;
+  --line:#dcd0b8;
+  --accent:#b5652f;
+  --accent-2:#8a7048;
+  --accent-soft:#e8d3b8;
+  --good:#3f7d5c;
+  --bad:#b5432f;
+  --card:#fffaf0;
+  --shadow: 0 2px 10px rgba(60,45,20,0.08);
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Pretendard', -apple-system, sans-serif;
+  line-height:1.75;
+  font-size:16px;
+}
+h1,h2,h3,h4{
+  font-family:'Spectral', serif;
+  font-weight:700;
+  color:var(--ink);
+  line-height:1.3;
+}
+.layout{display:flex; max-width:1400px; margin:0 auto;}
+.sidebar{
+  width:270px; flex-shrink:0; position:sticky; top:0; height:100vh;
+  overflow-y:auto; padding:28px 18px; border-right:1px solid var(--line);
+  background:var(--paper-2);
+}
+.sidebar h2{font-size:1.05rem; margin:0 0 4px; color:var(--accent);}
+.sidebar .sub{font-size:0.78rem; color:var(--ink-soft); margin-bottom:20px;}
+.sidebar nav a{
+  display:block; padding:7px 10px; margin:2px 0; border-radius:8px;
+  color:var(--ink-soft); text-decoration:none; font-size:0.86rem;
+  border-left:3px solid transparent;
+}
+.sidebar nav a.lvl2{padding-left:22px; font-size:0.8rem;}
+.sidebar nav a:hover{background:var(--accent-soft); color:var(--ink);}
+.sidebar nav a.active{
+  background:var(--accent-soft); color:var(--accent); font-weight:600;
+  border-left:3px solid var(--accent);
+}
+main{flex:1; min-width:0; padding:40px 56px 120px;}
+.hero{
+  padding:36px 40px; background:linear-gradient(135deg,var(--card),var(--accent-soft));
+  border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:44px;
+  border:1px solid var(--line);
+}
+.hero h1{font-size:2.1rem; margin:0 0 10px;}
+.hero p{color:var(--ink-soft); font-size:1rem; margin:6px 0;}
+section.chapter{margin-bottom:70px; scroll-margin-top:20px;}
+section.chapter > h2{
+  font-size:1.55rem; padding-bottom:10px; border-bottom:3px solid var(--accent);
+  display:flex; align-items:center; gap:10px;
+}
+.chnum{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:34px; height:34px; border-radius:50%; background:var(--accent);
+  color:#fff; font-family:'JetBrains Mono',monospace; font-size:0.85rem; flex-shrink:0;
+}
+h3{font-size:1.2rem; margin-top:32px; color:var(--accent-2); border-left:4px solid var(--accent-soft); padding-left:10px;}
+h4{font-size:1.02rem; color:var(--ink);}
+p{margin:10px 0;}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:22px 26px; margin:18px 0; box-shadow:var(--shadow);
+}
+.callout{
+  border-left:4px solid var(--accent); background:var(--accent-soft);
+  padding:14px 18px; border-radius:0 10px 10px 0; margin:16px 0; font-size:0.94rem;
+}
+.callout.tip{border-left-color:var(--good); background:#e5efe4;}
+.callout.warn{border-left-color:var(--bad); background:#f4e2dc;}
+.formula-box{
+  background:#fffdf7; border:1px dashed var(--accent-2); border-radius:10px;
+  padding:16px 20px; margin:16px 0; overflow-x:auto;
+}
+.calc-steps{
+  background:#2c2620; color:#f7f1e6; border-radius:10px; padding:18px 22px;
+  font-family:'JetBrains Mono', monospace; font-size:0.85rem; margin:16px 0;
+  overflow-x:auto; line-height:1.9;
+}
+.calc-steps .step-label{color:#e0a458; font-weight:700;}
+.calc-steps .result{color:#8fd19e;}
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;}
+th,td{border:1px solid var(--line); padding:9px 12px; text-align:center;}
+th{background:var(--accent-soft); color:var(--ink);}
+tr:nth-child(even) td{background:#faf5e8;}
+.tag{
+  display:inline-block; font-size:0.72rem; padding:2px 9px; border-radius:20px;
+  background:var(--accent-2); color:#fff; margin-right:6px; font-family:'JetBrains Mono',monospace;
+}
+.tag.param{background:var(--good);}
+.tag.nonparam{background:var(--accent);}
+.diagram-wrap{
+  background:#fffdf7; border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px; margin:18px 0; overflow-x:auto; text-align:center;
+}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media (max-width:900px){.grid2{grid-template-columns:1fr;}}
+.quiz{
+  background:var(--card); border:2px solid var(--accent-soft); border-radius:var(--radius);
+  padding:20px 24px; margin:16px 0;
+}
+.quiz .q{font-weight:600; margin-bottom:10px;}
+.quiz label{
+  display:block; padding:8px 12px; margin:5px 0; border-radius:8px; cursor:pointer;
+  border:1px solid var(--line); background:#fffdf7; font-size:0.92rem;
+}
+.quiz label:hover{background:var(--accent-soft);}
+.quiz .feedback{
+  margin-top:10px; padding:10px 14px; border-radius:8px; font-size:0.9rem; display:none;
+}
+.quiz .feedback.correct{display:block; background:#e5efe4; color:var(--good); border:1px solid var(--good);}
+.quiz .feedback.wrong{display:block; background:#f4e2dc; color:var(--bad); border:1px solid var(--bad);}
+.badge-correct{color:var(--good); font-weight:700;}
+.badge-wrong{color:var(--bad); font-weight:700;}
+.flow-note{font-size:0.82rem; color:var(--ink-soft); text-align:center; margin-top:6px;}
+code{
+  background:#efe6d3; padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:0.86rem;
+}
+.top-btn{
+  position:fixed; bottom:26px; right:26px; width:44px; height:44px; border-radius:50%;
+  background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:var(--shadow); font-size:1.2rem; text-decoration:none; opacity:0.85;
+}
+.progress-bar{position:fixed; top:0; left:0; height:3px; background:var(--accent); z-index:99; transition:width .1s;}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="layout">
+<aside class="sidebar">
+  <h2>검정 완전정복</h2>
+  <div class="sub">빅데이터분석 · 통계분석 · 머신러닝의 가설검정</div>
+  <nav id="toc"></nav>
+</aside>
+<main id="main">
+
+<div class="hero">
+  <h1>가설검정(Hypothesis Testing) 완전정복</h1>
+  <p>빅데이터분석 · 통계분석 · 머신러닝에서 <b>검정(Test)</b>이 어떻게 하나로 연결되는가</p>
+  <p>원리 → 이론 → 수식 → 손계산 → 실전 문제까지, 검정의 전체 지도를 그린다.</p>
+</div>
+
+<!-- ================= CH0 개관 ================= -->
+<section class="chapter" id="ch0">
+<h2><span class="chnum">0</span>검정의 큰 그림 — 세 분야는 왜 만나는가</h2>
+
+<div class="card">
+<p><b>통계분석</b>은 "표본으로 모집단을 추론"하는 학문이고, <b>가설검정</b>은 그 추론에 <b>객관적 기준(유의수준)</b>을 부여하는 도구다. <b>빅데이터분석</b>은 대용량 데이터에서 패턴·차이·관계를 찾아내는데, 그 패턴이 <b>우연인지 실제인지</b>를 판별할 때 검정이 필요하다. <b>머신러닝</b>은 예측 모델을 만들지만, "이 모델이 저 모델보다 정말 좋은가?", "이 변수가 정말 유의한가?"를 판단할 때 결국 통계적 검정으로 되돌아온다.</p>
+<p>즉 세 분야는 <b>"데이터 → 추정 → 검정 → 의사결정"</b>이라는 동일한 파이프라인을 공유한다.</p>
+</div>
+
+<div class="diagram-wrap">
+<svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;">
+  <defs>
+    <marker id="arrow0" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#8a7048"/></marker>
+  </defs>
+  <rect x="20" y="30" width="230" height="90" rx="14" fill="#e8d3b8" stroke="#b5652f" stroke-width="1.5"/>
+  <text x="135" y="65" text-anchor="middle" font-family="Spectral" font-weight="700" font-size="16" fill="#2c2620">빅데이터분석</text>
+  <text x="135" y="88" text-anchor="middle" font-size="12" fill="#5a5044">대용량 데이터에서</text>
+  <text x="135" y="104" text-anchor="middle" font-size="12" fill="#5a5044">패턴·차이 탐색</text>
+
+  <rect x="335" y="30" width="230" height="90" rx="14" fill="#e5efe4" stroke="#3f7d5c" stroke-width="1.5"/>
+  <text x="450" y="65" text-anchor="middle" font-family="Spectral" font-weight="700" font-size="16" fill="#2c2620">통계분석</text>
+  <text x="450" y="88" text-anchor="middle" font-size="12" fill="#5a5044">표본 → 모집단 추론</text>
+  <text x="450" y="104" text-anchor="middle" font-size="12" fill="#5a5044">추정 + 검정</text>
+
+  <rect x="650" y="30" width="230" height="90" rx="14" fill="#f4e2dc" stroke="#b5432f" stroke-width="1.5"/>
+  <text x="765" y="65" text-anchor="middle" font-family="Spectral" font-weight="700" font-size="16" fill="#2c2620">머신러닝</text>
+  <text x="765" y="88" text-anchor="middle" font-size="12" fill="#5a5044">모델 성능·변수 유의성</text>
+  <text x="765" y="104" text-anchor="middle" font-size="12" fill="#5a5044">모델 간 비교 검정</text>
+
+  <rect x="270" y="160" width="360" height="70" rx="14" fill="#2c2620"/>
+  <text x="450" y="188" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#e0a458" font-weight="700">가설검정 (Hypothesis Testing)</text>
+  <text x="450" y="210" text-anchor="middle" font-size="11.5" fill="#f7f1e6">H0 / H1, 검정통계량, p-value, 유의수준 α</text>
+
+  <line x1="135" y1="120" x2="380" y2="160" stroke="#8a7048" stroke-width="1.6" marker-end="url(#arrow0)"/>
+  <line x1="450" y1="120" x2="450" y2="160" stroke="#8a7048" stroke-width="1.6" marker-end="url(#arrow0)"/>
+  <line x1="765" y1="120" x2="520" y2="160" stroke="#8a7048" stroke-width="1.6" marker-end="url(#arrow0)"/>
+
+  <rect x="240" y="270" width="420" height="50" rx="12" fill="#b5652f"/>
+  <text x="450" y="300" text-anchor="middle" font-family="Spectral" font-weight="700" font-size="14" fill="#fff">"우연인가, 실제 효과인가?" — 의사결정</text>
+  <line x1="450" y1="230" x2="450" y2="270" stroke="#8a7048" stroke-width="1.6" marker-end="url(#arrow0)"/>
+</svg>
+</div>
+
+<h3>0.1 세 분야에서 검정이 쓰이는 구체적 장면</h3>
+<table>
+<tr><th>분야</th><th>대표 질문</th><th>사용 검정</th></tr>
+<tr><td>빅데이터분석</td><td>A/B 테스트에서 두 버전의 전환율 차이가 유의한가?</td><td>두 비율 Z검정, 카이제곱 독립성검정</td></tr>
+<tr><td>빅데이터분석</td><td>지역별 매출 분포가 정규분포를 따르는가?</td><td>Shapiro-Wilk, Kolmogorov-Smirnov</td></tr>
+<tr><td>통계분석</td><td>신약 투여군과 대조군의 평균 효과 차이가 있는가?</td><td>독립표본 t검정</td></tr>
+<tr><td>통계분석</td><td>회귀계수 β가 0이 아니라고 할 수 있는가?</td><td>회귀계수 t검정, 모형 F검정</td></tr>
+<tr><td>머신러닝</td><td>모델 A와 모델 B의 정확도 차이가 통계적으로 유의한가?</td><td>McNemar 검정, 대응표본 t검정(교차검증 fold)</td></tr>
+<tr><td>머신러닝</td><td>어떤 피처가 타겟과 통계적으로 관련이 있는가? (피처 선택)</td><td>카이제곱검정, ANOVA F검정, 상관계수 검정</td></tr>
+</table>
+
+<h3>0.2 학습서 전체 로드맵</h3>
+<div class="callout">
+1장 원리 → 2장 분류체계 → 3~10장 개별 검정(Z/t/F/카이제곱/ANOVA/상관·회귀/정규성/비모수) → 11장 머신러닝에서의 검정 → 12장 검정 선택 가이드 & 종합 체크리스트
+</div>
+</section>
+
+<!-- ================= CH1 원리 ================= -->
+<section class="chapter" id="ch1">
+<h2><span class="chnum">1</span>가설검정의 원리 — 왜, 어떻게 검정하는가</h2>
+
+<h3>1.1 왜 검정을 하는가</h3>
+<div class="card">
+<p>표본에서 관찰된 차이는 <b>① 모집단에 실제로 존재하는 차이</b>이거나 <b>② 표본 추출 과정에서 우연히 생긴 오차</b>, 둘 중 하나다. 사람의 직관은 우연과 실제 효과를 구분하지 못한다. 가설검정은 "우연이라면 이런 극단적인 결과가 나올 확률이 얼마나 되는가"를 <b>수치(p-value)</b>로 계산하여, 그 확률이 충분히 작을 때만 "실제 차이"라고 판단하는 <b>객관적 절차</b>다.</p>
+</div>
+
+<h3>1.2 핵심 용어와 논리 구조</h3>
+<div class="grid2">
+<div class="card">
+<h4>귀무가설 H0 / 대립가설 H1</h4>
+<p><b>H0(귀무가설)</b>: "차이가 없다", "효과가 없다"는 기본 전제. 검정은 항상 H0을 <b>기각할지 말지</b>를 결정하는 구조다.<br>
+<b>H1(대립가설)</b>: 연구자가 입증하고 싶은 주장. H0이 기각되면 H1을 채택(정확히는 "H0을 기각하지 못할 근거 없음"이 아니라 "채택")한다.</p>
+<p>예: H0: μ = 100 (신약 효과 없음) vs H1: μ ≠ 100 (효과 있음)</p>
+</div>
+<div class="card">
+<h4>유의수준 α / 검정통계량 / p-value</h4>
+<p><b>α</b>: H0이 참인데도 기각할 위험을 허용하는 한계(보통 0.05). <b>검정통계량</b>: 표본 데이터를 하나의 숫자(Z, t, F, χ² 등)로 요약한 값. <b>p-value</b>: H0이 참이라는 가정 하에, 관측된 검정통계량만큼 극단적인 값이 나올 확률.</p>
+<p><b>판정 규칙</b>: p-value &lt; α → H0 기각(유의함) / p-value ≥ α → H0 기각 못함(유의하지 않음)</p>
+</div>
+</div>
+
+<h3>1.3 1종 오류·2종 오류·검정력</h3>
+<table>
+<tr><th></th><th>H0이 실제로 참</th><th>H0이 실제로 거짓</th></tr>
+<tr><td><b>H0 기각 못함</b></td><td>✅ 옳은 결정 (1-α, 신뢰수준)</td><td>❌ 2종 오류 β (거짓음성)</td></tr>
+<tr><td><b>H0 기각함</b></td><td>❌ 1종 오류 α (거짓양성)</td><td>✅ 옳은 결정 (1-β, 검정력 Power)</td></tr>
+</table>
+<div class="callout warn"><b>1종 오류(α)</b>는 "없는 효과를 있다고 착각"(재판에서 무죄인 사람을 유죄로), <b>2종 오류(β)</b>는 "있는 효과를 놓침"(유죄인 사람을 무죄로)이다. 둘은 <b>trade-off</b> 관계이며, α를 낮추면 β가 커지는 경향이 있어 표본크기를 늘려 둘 다 줄이는 것이 이상적이다.</div>
+
+<h3>1.4 검정의 표준 절차 (6단계)</h3>
+<div class="diagram-wrap">
+<svg viewBox="0 0 950 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:950px;">
+<defs><marker id="a1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#b5652f"/></marker></defs>
+<g font-family="Pretendard" font-size="12.5">
+<!-- boxes -->
+<g>
+<rect x="10" y="60" width="140" height="80" rx="12" fill="#fffaf0" stroke="#b5652f" stroke-width="1.5"/>
+<text x="80" y="92" text-anchor="middle" font-weight="700" fill="#b5652f">① 가설 설정</text>
+<text x="80" y="112" text-anchor="middle" fill="#5a5044">H0 / H1</text>
+</g>
+<g>
+<rect x="170" y="60" width="140" height="80" rx="12" fill="#fffaf0" stroke="#b5652f" stroke-width="1.5"/>
+<text x="240" y="92" text-anchor="middle" font-weight="700" fill="#b5652f">② 유의수준</text>
+<text x="240" y="112" text-anchor="middle" fill="#5a5044">α 결정 (보통 .05)</text>
+</g>
+<g>
+<rect x="330" y="60" width="140" height="80" rx="12" fill="#fffaf0" stroke="#b5652f" stroke-width="1.5"/>
+<text x="400" y="92" text-anchor="middle" font-weight="700" fill="#b5652f">③ 검정통계량</text>
+<text x="400" y="112" text-anchor="middle" fill="#5a5044">Z, t, F, χ² 선택</text>
+</g>
+<g>
+<rect x="490" y="60" width="140" height="80" rx="12" fill="#fffaf0" stroke="#b5652f" stroke-width="1.5"/>
+<text x="560" y="92" text-anchor="middle" font-weight="700" fill="#b5652f">④ 통계량 계산</text>
+<text x="560" y="112" text-anchor="middle" fill="#5a5044">표본 데이터 대입</text>
+</g>
+<g>
+<rect x="650" y="60" width="140" height="80" rx="12" fill="#fffaf0" stroke="#b5652f" stroke-width="1.5"/>
+<text x="720" y="92" text-anchor="middle" font-weight="700" fill="#b5652f">⑤ p-value</text>
+<text x="720" y="112" text-anchor="middle" fill="#5a5044">기각역과 비교</text>
+</g>
+<g>
+<rect x="810" y="60" width="130" height="80" rx="12" fill="#2c2620"/>
+<text x="875" y="92" text-anchor="middle" font-weight="700" fill="#e0a458">⑥ 결론</text>
+<text x="875" y="112" text-anchor="middle" fill="#f7f1e6" font-size="11.5">기각/채택</text>
+</g>
+<line x1="150" y1="100" x2="168" y2="100" stroke="#b5652f" stroke-width="2" marker-end="url(#a1)"/>
+<line x1="310" y1="100" x2="328" y2="100" stroke="#b5652f" stroke-width="2" marker-end="url(#a1)"/>
+<line x1="470" y1="100" x2="488" y2="100" stroke="#b5652f" stroke-width="2" marker-end="url(#a1)"/>
+<line x1="630" y1="100" x2="648" y2="100" stroke="#b5652f" stroke-width="2" marker-end="url(#a1)"/>
+<line x1="790" y1="100" x2="808" y2="100" stroke="#b5652f" stroke-width="2" marker-end="url(#a1)"/>
+</g>
+</svg>
+</div>
+
+<h3>1.5 양측검정 vs 단측검정</h3>
+<div class="formula-box">
+\[ \text{양측검정: } H_1: \mu \neq \mu_0 \qquad \text{단측검정: } H_1: \mu > \mu_0 \ \text{또는}\ \mu < \mu_0 \]
+</div>
+<p>양측검정은 기각역이 양쪽 꼬리에 α/2씩 나뉘고, 단측검정은 한쪽 꼬리에 α 전체가 몰린다. 방향성이 명확한 연구(예: "새 공법이 기존보다 <b>빠르다</b>")는 단측, 방향을 모르는 경우("차이가 있는가")는 양측을 사용한다.</p>
+
+<div class="quiz" data-qid="q1-1">
+<div class="q">Q1. 신약이 혈압을 낮춘다는 가설을 검정했더니 p-value = 0.03이 나왔다. α = 0.05일 때 옳은 해석은?</div>
+<label><input type="radio" name="q1-1" value="0">신약은 효과가 없다.</label>
+<label><input type="radio" name="q1-1" value="1">H0을 기각하며, 통계적으로 유의한 효과가 있다고 판단한다.</label>
+<label><input type="radio" name="q1-1" value="2">표본을 100% 신뢰할 수 없으므로 결론을 내릴 수 없다.</label>
+<label><input type="radio" name="q1-1" value="3">1종 오류가 반드시 발생했다.</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS=window.QUIZ_ANSWERS||{}; QUIZ_ANSWERS["q1-1"]={correct:1, explain:"p(0.03) < α(0.05) 이므로 H0을 기각한다. 즉 '우연히 이런 차이가 날 확률이 3%에 불과'하므로 실제 효과가 있다고 판단한다."};</script>
+
+<div class="quiz" data-qid="q1-2">
+<div class="q">Q2. 실제로는 두 그룹 간 차이가 없는데(H0 참), 검정 결과 "차이가 있다"고 잘못 판단했다. 이것은?</div>
+<label><input type="radio" name="q1-2" value="0">2종 오류 (β)</label>
+<label><input type="radio" name="q1-2" value="1">1종 오류 (α)</label>
+<label><input type="radio" name="q1-2" value="2">검정력 부족</label>
+<label><input type="radio" name="q1-2" value="3">표본편의</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q1-2"]={correct:1, explain:"H0이 실제 참인데 기각한 경우이므로 1종 오류(α)다. '없는 효과를 있다고 착각'한 거짓양성 오류."};</script>
+</section>
+
+<!-- ================= CH2 분류체계 ================= -->
+<section class="chapter" id="ch2">
+<h2><span class="chnum">2</span>검정의 분류 체계</h2>
+
+<h3>2.1 모수적 검정 vs 비모수적 검정</h3>
+<p><span class="tag param">모수(Parametric)</span> 모집단이 특정 분포(주로 정규분포)를 따른다고 가정하고, 평균·분산 같은 모수를 직접 검정. 데이터가 크고 정규성을 만족할 때 강력함.<br>
+<span class="tag nonparam">비모수(Non-parametric)</span> 분포 가정이 없거나 약함. 순위(rank) 기반으로 검정. 표본이 작거나 정규성이 깨질 때 사용.</p>
+
+<h3>2.2 전체 검정 분류 지도</h3>
+<div class="diagram-wrap">
+<svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:1000px;">
+<defs><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8a7048"/></marker></defs>
+<g font-family="Pretendard">
+<rect x="380" y="10" width="240" height="52" rx="12" fill="#2c2620"/>
+<text x="500" y="42" text-anchor="middle" fill="#e0a458" font-weight="700" font-size="15">가설검정</text>
+
+<line x1="440" y1="62" x2="220" y2="100" stroke="#8a7048" stroke-width="1.5" marker-end="url(#a2)"/>
+<line x1="560" y1="62" x2="780" y2="100" stroke="#8a7048" stroke-width="1.5" marker-end="url(#a2)"/>
+
+<rect x="80" y="100" width="280" height="46" rx="10" fill="#e5efe4" stroke="#3f7d5c"/>
+<text x="220" y="128" text-anchor="middle" font-weight="700" font-size="13.5">모수적 검정 (분포 가정 O)</text>
+
+<rect x="640" y="100" width="280" height="46" rx="10" fill="#e8d3b8" stroke="#b5652f"/>
+<text x="780" y="128" text-anchor="middle" font-weight="700" font-size="13.5">비모수적 검정 (분포 가정 X)</text>
+
+<!-- parametric branches -->
+<line x1="130" y1="146" x2="70" y2="185" stroke="#8a7048" marker-end="url(#a2)"/>
+<line x1="220" y1="146" x2="220" y2="185" stroke="#8a7048" marker-end="url(#a2)"/>
+<line x1="310" y1="146" x2="370" y2="185" stroke="#8a7048" marker-end="url(#a2)"/>
+
+<rect x="10" y="185" width="130" height="60" rx="8" fill="#fffaf0" stroke="#3f7d5c"/>
+<text x="75" y="207" text-anchor="middle" font-size="12" font-weight="700">평균 비교</text>
+<text x="75" y="223" text-anchor="middle" font-size="11" fill="#5a5044">Z검정 · t검정</text>
+<text x="75" y="237" text-anchor="middle" font-size="11" fill="#5a5044">ANOVA</text>
+
+<rect x="155" y="185" width="130" height="60" rx="8" fill="#fffaf0" stroke="#3f7d5c"/>
+<text x="220" y="207" text-anchor="middle" font-size="12" font-weight="700">분산·비율</text>
+<text x="220" y="223" text-anchor="middle" font-size="11" fill="#5a5044">F검정(등분산)</text>
+<text x="220" y="237" text-anchor="middle" font-size="11" fill="#5a5044">비율 Z검정</text>
+
+<rect x="300" y="185" width="130" height="60" rx="8" fill="#fffaf0" stroke="#3f7d5c"/>
+<text x="365" y="207" text-anchor="middle" font-size="12" font-weight="700">관계·회귀</text>
+<text x="365" y="223" text-anchor="middle" font-size="11" fill="#5a5044">상관계수 t검정</text>
+<text x="365" y="237" text-anchor="middle" font-size="11" fill="#5a5044">회귀계수 t/F검정</text>
+
+<!-- nonparametric branches -->
+<line x1="700" y1="146" x2="680" y2="185" stroke="#8a7048" marker-end="url(#a2)"/>
+<line x1="780" y1="146" x2="800" y2="185" stroke="#8a7048" marker-end="url(#a2)"/>
+<line x1="860" y1="146" x2="920" y2="185" stroke="#8a7048" marker-end="url(#a2)"/>
+
+<rect x="600" y="185" width="150" height="60" rx="8" fill="#fffaf0" stroke="#b5652f"/>
+<text x="675" y="207" text-anchor="middle" font-size="12" font-weight="700">2표본 비교</text>
+<text x="675" y="223" text-anchor="middle" font-size="11" fill="#5a5044">Mann-Whitney U</text>
+<text x="675" y="237" text-anchor="middle" font-size="11" fill="#5a5044">Wilcoxon 부호순위</text>
+
+<rect x="760" y="185" width="150" height="60" rx="8" fill="#fffaf0" stroke="#b5652f"/>
+<text x="835" y="207" text-anchor="middle" font-size="12" font-weight="700">3표본 이상</text>
+<text x="835" y="223" text-anchor="middle" font-size="11" fill="#5a5044">Kruskal-Wallis</text>
+<text x="835" y="237" text-anchor="middle" font-size="11" fill="#5a5044">Friedman</text>
+
+<rect x="850" y="270" width="150" height="60" rx="8" fill="#fffaf0" stroke="#b5652f"/>
+<text x="925" y="292" text-anchor="middle" font-size="12" font-weight="700">범주형 자료</text>
+<text x="925" y="308" text-anchor="middle" font-size="11" fill="#5a5044">카이제곱검정</text>
+<text x="925" y="322" text-anchor="middle" font-size="11" fill="#5a5044">(적합도/독립성)</text>
+<line x1="920" y1="185" x2="920" y2="270" stroke="#8a7048" marker-end="url(#a2)"/>
+
+<rect x="380" y="380" width="240" height="60" rx="10" fill="#f4e2dc" stroke="#b5432f"/>
+<text x="500" y="404" text-anchor="middle" font-size="12.5" font-weight="700">정규성·분포 적합 검정</text>
+<text x="500" y="420" text-anchor="middle" font-size="11" fill="#5a5044">Shapiro-Wilk, K-S, Q-Q plot</text>
+<line x1="500" y1="62" x2="500" y2="380" stroke="#b5432f" stroke-dasharray="4,3" marker-end="url(#a2)"/>
+
+<rect x="380" y="470" width="240" height="60" rx="10" fill="#e8d3b8" stroke="#8a7048"/>
+<text x="500" y="494" text-anchor="middle" font-size="12.5" font-weight="700">머신러닝 모델 비교 검정</text>
+<text x="500" y="510" text-anchor="middle" font-size="11" fill="#5a5044">McNemar, 대응 t검정(CV)</text>
+<line x1="500" y1="440" x2="500" y2="470" stroke="#8a7048" marker-end="url(#a2)"/>
+</g>
+</svg>
+</div>
+<div class="flow-note">데이터가 정규성을 만족하는지 먼저 확인(점선 경로) → 만족하면 모수적, 아니면 비모수적 검정을 선택하는 것이 실무 표준 흐름</div>
+
+<h3>2.3 표본 개수·데이터 형태별 요약표</h3>
+<table>
+<tr><th>비교 대상</th><th>모수적(정규성 O)</th><th>비모수적(정규성 X)</th></tr>
+<tr><td>1개 표본 평균</td><td>단일표본 t검정</td><td>부호검정, Wilcoxon 부호순위</td></tr>
+<tr><td>독립 2개 표본</td><td>독립표본 t검정</td><td>Mann-Whitney U검정</td></tr>
+<tr><td>대응 2개 표본</td><td>대응표본 t검정</td><td>Wilcoxon 부호순위검정</td></tr>
+<tr><td>3개 이상 독립 표본</td><td>일원배치 ANOVA</td><td>Kruskal-Wallis검정</td></tr>
+<tr><td>범주형 변수 관계</td><td colspan="2">카이제곱 독립성/적합도검정</td></tr>
+<tr><td>연속형 변수 관계</td><td>피어슨 상관계수 t검정</td><td>스피어만 순위상관검정</td></tr>
+</table>
+</section>
+<!-- ================= CH3 Z검정 ================= -->
+<section class="chapter" id="ch3">
+<h2><span class="chnum">3</span>Z검정 — 모분산을 아는 경우의 평균·비율 검정</h2>
+<h3>3.1 원리</h3>
+<p>모집단의 <b>분산 σ²을 알고 있거나</b> 표본크기가 충분히 커서(n≥30) 표본평균이 <b>중심극한정리</b>에 의해 정규분포에 근사할 때 사용한다. 표본평균을 표준정규분포로 변환하여 검정한다.</p>
+<div class="formula-box">
+\[ Z = \frac{\bar{x} - \mu_0}{\sigma/\sqrt{n}} \sim N(0,1) \qquad\qquad Z_{\hat p} = \frac{\hat p - p_0}{\sqrt{p_0(1-p_0)/n}} \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:640px;">
+<path d="M20,170 Q350,-10 680,170" fill="none" stroke="#8a7048" stroke-width="2"/>
+<line x1="130" y1="170" x2="130" y2="70" stroke="#b5432f" stroke-dasharray="3,3"/>
+<line x1="570" y1="170" x2="570" y2="70" stroke="#b5432f" stroke-dasharray="3,3"/>
+<path d="M20,170 L20,168 Q80,140 130,70 L130,170 Z" fill="#f4e2dc" opacity="0.8"/>
+<path d="M570,170 L570,70 Q620,140 680,168 L680,170 Z" fill="#f4e2dc" opacity="0.8"/>
+<text x="350" y="30" text-anchor="middle" font-size="12" fill="#5a5044">기각역 (α/2씩 양쪽) — |Z| &gt; 1.96 (α=.05)</text>
+<text x="75" y="190" text-anchor="middle" font-size="11" fill="#b5432f">-1.96</text>
+<text x="625" y="190" text-anchor="middle" font-size="11" fill="#b5432f">+1.96</text>
+<text x="350" y="190" text-anchor="middle" font-size="11" fill="#5a5044">0</text>
+</svg>
+</div>
+<h3>3.2 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 모집단 표준편차 σ=15로 알려진 시험점수. 표본 n=36, 표본평균 x̄=82. H0: μ=78 vs H1: μ≠78, α=.05
+
+<span class="step-label">[Step1]</span> 표준오차 SE = σ/√n = 15/√36 = 15/6 = 2.5
+<span class="step-label">[Step2]</span> Z = (82-78)/2.5 = 4/2.5 = <span class="result">1.6</span>
+<span class="step-label">[Step3]</span> 임계값 Z(0.025) = ±1.96 → |1.6| &lt; 1.96
+<span class="step-label">[결론]</span> H0 기각 못함 → 평균이 78과 유의하게 다르다고 할 수 없음
+</div>
+<div class="quiz" data-qid="q3-1">
+<div class="q">Q. 어느 공장 부품의 모표준편차가 4로 알려져 있다. n=64, x̄=51, H0: μ=50. Z값은?</div>
+<label><input type="radio" name="q3-1" value="0">0.5</label>
+<label><input type="radio" name="q3-1" value="1">2.0</label>
+<label><input type="radio" name="q3-1" value="2">1.0</label>
+<label><input type="radio" name="q3-1" value="3">4.0</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q3-1"]={correct:1, explain:"SE=4/√64=4/8=0.5, Z=(51-50)/0.5=2.0"};</script>
+</section>
+
+<!-- ================= CH4 t검정 ================= -->
+<section class="chapter" id="ch4">
+<h2><span class="chnum">4</span>t검정 — 모분산을 모를 때의 평균 비교</h2>
+<h3>4.1 원리 및 3가지 유형</h3>
+<p>모분산 σ²을 모르고 표본크기가 작을 때(n&lt;30), 표본표준편차 s로 σ를 대체하면 정규분포보다 <b>꼬리가 두꺼운 t분포</b>(자유도 df에 의존)를 따른다.</p>
+<table>
+<tr><th>유형</th><th>상황</th><th>자유도</th></tr>
+<tr><td>단일표본 t검정</td><td>표본평균 vs 특정 기준값 비교</td><td>n-1</td></tr>
+<tr><td>독립표본 t검정</td><td>서로 다른 두 그룹 평균 비교(예: 남/여)</td><td>n1+n2-2</td></tr>
+<tr><td>대응표본 t검정</td><td>같은 대상의 사전-사후 비교</td><td>n-1 (차이값 기준)</td></tr>
+</table>
+<div class="formula-box">
+\[ \text{단일표본: } t = \frac{\bar{x}-\mu_0}{s/\sqrt n} \qquad \text{독립표본: } t=\frac{\bar x_1 - \bar x_2}{\sqrt{s_p^2(\frac1{n_1}+\frac1{n_2})}},\ \ s_p^2=\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2} \]
+\[ \text{대응표본: } t = \frac{\bar d}{s_d/\sqrt n} \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;">
+<path d="M20,150 Q350,10 680,150" fill="none" stroke="#3f7d5c" stroke-width="2"/>
+<path d="M20,150 Q350,50 680,150" fill="none" stroke="#8a7048" stroke-width="1.5" stroke-dasharray="5,3"/>
+<text x="350" y="30" text-anchor="middle" font-size="12" fill="#5a5044">t분포(초록, df작음: 꼬리 두꺼움) vs 표준정규(점선)</text>
+</svg>
+</div>
+<h3>4.2 손계산 예제 — 독립표본 t검정</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> A반(n1=10) 평균 78, 분산 16 / B반(n2=12) 평균 74, 분산 20. H0: μA=μB
+
+<span class="step-label">[Step1]</span> 합동분산 sp² = [(10-1)*16 + (12-1)*20] / (10+12-2) = (144+220)/20 = 18.2
+<span class="step-label">[Step2]</span> SE = √(18.2*(1/10+1/12)) = √(18.2*0.1833) = √3.337 = 1.827
+<span class="step-label">[Step3]</span> t = (78-74)/1.827 = <span class="result">2.19</span>, df=20
+<span class="step-label">[Step4]</span> t(0.025, df=20) ≈ 2.086 → |2.19| &gt; 2.086
+<span class="step-label">[결론]</span> H0 기각 → 두 반의 평균은 유의하게 다르다 (α=.05)
+</div>
+<div class="quiz" data-qid="q4-1">
+<div class="q">Q. 다이어트 프로그램 전후 체중 차이(대응표본)를 검정할 때 자유도(df)는 표본수 n=15일 때?</div>
+<label><input type="radio" name="q4-1" value="0">28</label>
+<label><input type="radio" name="q4-1" value="1">14</label>
+<label><input type="radio" name="q4-1" value="2">30</label>
+<label><input type="radio" name="q4-1" value="3">13</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q4-1"]={correct:1, explain:"대응표본은 차이값(d) 하나의 표본으로 취급하므로 df=n-1=14"};</script>
+</section>
+
+<!-- ================= CH5 F검정 ================= -->
+<section class="chapter" id="ch5">
+<h2><span class="chnum">5</span>F검정 — 분산의 비율을 이용하는 검정들</h2>
+<h3>5.1 원리</h3>
+<p>F검정은 "두 집단 분산 비교" 하나만을 가리키는 이름이 아니라, <b>두 분산(또는 두 변동)의 비율이 F분포를 따르는 모든 검정</b>을 통칭한다. 즉 "분산비 = 1인가?"라는 동일한 논리가 여러 국면에 반복해서 등장한다.</p>
+<div class="formula-box">
+\[ F = \frac{s_1^2}{s_2^2} \sim F_{(n_1-1,\ n_2-1)} \quad (\text{관례상 } s_1^2 \ge s_2^2 \text{ 로 두어 } F\ge1) \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;">
+<path d="M20,150 C120,150 100,20 220,20 C350,20 350,140 680,150" fill="none" stroke="#b5652f" stroke-width="2"/>
+<line x1="480" y1="150" x2="480" y2="60" stroke="#b5432f" stroke-dasharray="3,3"/>
+<path d="M480,150 L680,150 L680,140 Q560,120 480,60 Z" fill="#f4e2dc" opacity="0.8"/>
+<text x="480" y="190" text-anchor="middle" font-size="11" fill="#b5432f">F(0.05) 임계값</text>
+<text x="230" y="12" text-anchor="middle" font-size="12" fill="#5a5044">F분포: 오른쪽 꼬리, 항상 양수, 비대칭</text>
+</svg>
+</div>
+<h3>5.2 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 그룹1(n1=13) 분산 s1²=25, 그룹2(n2=10) 분산 s2²=9. 등분산인가?
+
+<span class="step-label">[Step1]</span> F = 25/9 = <span class="result">2.78</span>, df1=12, df2=9
+<span class="step-label">[Step2]</span> F(0.025, 12, 9) ≈ 3.87 (양측검정이므로 α/2 임계값 사용)
+<span class="step-label">[Step3]</span> 2.78 &lt; 3.87 이므로 기각역 밖
+<span class="step-label">[결론]</span> H0 기각 못함 → 등분산 가정 유지, 이후 t검정에서 합동분산 사용 가능
+</div>
+<div class="callout tip">실무 팁: 등분산 여부에 따라 t검정의 자유도 계산법이 달라진다(등분산이면 n1+n2-2, 이분산이면 Welch's t-test로 자유도를 근사 계산).</div>
+<div class="quiz" data-qid="q5-1">
+<div class="q">Q. F검정 통계량은 항상 어떤 값을 가지는가?</div>
+<label><input type="radio" name="q5-1" value="0">음수 포함 모든 실수</label>
+<label><input type="radio" name="q5-1" value="1">-1~1 사이</label>
+<label><input type="radio" name="q5-1" value="2">0 이상의 양수</label>
+<label><input type="radio" name="q5-1" value="3">항상 1</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q5-1"]={correct:2, explain:"F는 두 분산(항상 양수)의 비율이므로 0 이상의 값만 가진다."};</script>
+
+<h3>5.3 F검정의 다양한 활용 — 등분산 비교만이 아니다</h3>
+<div class="card">
+<p>F검정은 크게 <b>네 가지 국면</b>에서 쓰인다. 5.1~5.2는 그중 ①번(등분산 비교)이고, ②③은 각각 7장(ANOVA)·8장(회귀)에서 이미 다뤘다. 여기서는 아직 다루지 않은 <b>④ 중첩모형 비교(Partial F-test)</b>를 새로 추가한다.</p>
+</div>
+<table>
+<tr><th>유형</th><th>비교 대상</th><th>다루는 장</th></tr>
+<tr><td>① 등분산검정</td><td>두 집단의 분산 s1² vs s2²</td><td>5.1~5.2 (본 절)</td></tr>
+<tr><td>② ANOVA F검정</td><td>집단간 변동 MSB vs 집단내 변동 MSW</td><td>7장</td></tr>
+<tr><td>③ 회귀모형 전체 유의성</td><td>회귀로 설명된 변동 MSR vs 잔차 MSE</td><td>8장</td></tr>
+<tr><td>④ 중첩모형 비교 (Partial F-test)</td><td>변수를 추가하기 전/후 모형의 잔차제곱합(SSE) 감소량</td><td>본 절 5.4 (신규)</td></tr>
+</table>
+
+<h3>5.4 중첩모형 비교 F검정 (Partial F-test)</h3>
+<p>회귀모형에 변수를 <b>새로 추가했을 때, 그 변수(들)가 모형 설명력을 유의하게 개선하는지</b>를 검정한다. "축소모형(Reduced)"과 "완전모형(Full)"의 잔차제곱합(SSE) 차이를 이용하며, 변수선택(Stepwise)의 이론적 근거가 된다.</p>
+<div class="formula-box">
+\[ F = \frac{(SSE_R - SSE_F)/(k_F-k_R)}{SSE_F/(n-k_F-1)} \sim F_{(k_F-k_R,\ n-k_F-1)} \]
+<p style="font-size:0.85rem;color:#5a5044;margin:6px 0 0;">R: 축소모형(변수 적음), F: 완전모형(변수 많음), k: 각 모형의 독립변수 개수</p>
+</div>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> n=30. 축소모형(변수 2개) SSE_R=150. 완전모형(변수 4개, 2개 추가) SSE_F=110
+
+<span class="step-label">[Step1]</span> 분자 자유도 = k_F - k_R = 4-2 = 2, 분모 자유도 = n-k_F-1 = 30-4-1 = 25
+<span class="step-label">[Step2]</span> F = [(150-110)/2] / [110/25] = (40/2) / (4.4) = 20 / 4.4 = <span class="result">4.55</span>
+<span class="step-label">[Step3]</span> F(0.05, 2, 25) ≈ 3.39 → 4.55 &gt; 3.39
+<span class="step-label">[결론]</span> H0(추가 변수들의 계수=0) 기각 → 새로 추가한 2개 변수는 모형 설명력을 유의하게 개선함
+</div>
+<div class="callout tip">변수 1개만 추가하는 경우 Partial F-test는 그 변수의 <b>t검정과 동일한 결론</b>을 준다(F=t²). 여러 변수를 한꺼번에 추가/제거할 때는 t검정으로 한 번에 판단할 수 없으므로 Partial F-test가 필요하다.</div>
+
+<div class="quiz" data-qid="q5-2">
+<div class="q">Q. 완전모형에 변수를 5개→8개로 늘렸다(3개 추가), n=50, SSE_R=200, SSE_F=140. F통계량의 분자 자유도와 분모 자유도는?</div>
+<label><input type="radio" name="q5-2" value="0">분자 3, 분모 41</label>
+<label><input type="radio" name="q5-2" value="1">분자 8, 분모 50</label>
+<label><input type="radio" name="q5-2" value="2">분자 5, 분모 45</label>
+<label><input type="radio" name="q5-2" value="3">분자 3, 분모 42</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q5-2"]={correct:0, explain:"분자=k_F-k_R=8-5=3, 분모=n-k_F-1=50-8-1=41"};</script>
+</section>
+
+<!-- ================= CH6 카이제곱 ================= -->
+<section class="chapter" id="ch6">
+<h2><span class="chnum">6</span>카이제곱검정 — 범주형 자료의 검정</h2>
+<h3>6.1 세 가지 용도</h3>
+<table>
+<tr><th>종류</th><th>목적</th></tr>
+<tr><td>적합도검정 (Goodness of Fit)</td><td>한 범주형 변수가 특정 분포(비율)를 따르는지</td></tr>
+<tr><td>독립성검정 (Independence)</td><td>두 범주형 변수가 서로 독립인지 (교차표)</td></tr>
+<tr><td>동질성검정 (Homogeneity)</td><td>여러 모집단에서 범주 비율이 동일한지</td></tr>
+</table>
+<div class="formula-box">
+\[ \chi^2 = \sum \frac{(O_i - E_i)^2}{E_i} \sim \chi^2_{(df)} \]
+\[ \text{독립성검정 } df=(r-1)(c-1),\quad E_{ij}=\frac{\text{행합}\times\text{열합}}{\text{전체합}} \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;">
+<path d="M20,150 C60,150 60,140 100,60 C130,15 170,15 200,60 C260,140 400,150 680,150" fill="none" stroke="#8a7048" stroke-width="2"/>
+<line x1="380" y1="150" x2="380" y2="118" stroke="#b5432f" stroke-dasharray="3,3"/>
+<path d="M380,150 L680,150 L680,148 Q500,140 380,118 Z" fill="#f4e2dc" opacity="0.8"/>
+<text x="350" y="15" text-anchor="middle" font-size="12" fill="#5a5044">χ² 분포: 0 이상, df가 작을수록 왼쪽으로 치우침</text>
+</svg>
+</div>
+<h3>6.2 손계산 예제 — 독립성검정</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 성별×제품선호 교차표. 남 (선호40,비선호10=50) / 여 (선호30,비선호20=50), 전체100
+
+<span class="step-label">[Step1]</span> 기대빈도 E(남,선호)=50*70/100=35, E(남,비선호)=50*30/100=15
+                E(여,선호)=50*70/100=35, E(여,비선호)=50*30/100=15
+<span class="step-label">[Step2]</span> χ² = (40-35)²/35 + (10-15)²/15 + (30-35)²/35 + (20-15)²/15
+       = 25/35 + 25/15 + 25/35 + 25/15 = 0.714+1.667+0.714+1.667 = <span class="result">4.76</span>
+<span class="step-label">[Step3]</span> df=(2-1)(2-1)=1, χ²(0.05,1)=3.841
+<span class="step-label">[결론]</span> 4.76 &gt; 3.841 → H0 기각, 성별과 제품선호는 유의한 관련이 있음
+</div>
+<div class="quiz" data-qid="q6-1">
+<div class="q">Q. 3×4 교차표에서 카이제곱 독립성검정의 자유도는?</div>
+<label><input type="radio" name="q6-1" value="0">12</label>
+<label><input type="radio" name="q6-1" value="1">6</label>
+<label><input type="radio" name="q6-1" value="2">7</label>
+<label><input type="radio" name="q6-1" value="3">3</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q6-1"]={correct:1, explain:"df=(r-1)(c-1)=(3-1)(4-1)=2*3=6"};</script>
+
+<h3>6.3 범주형이 아닐 때 — 카이제곱을 연속형 데이터에 쓰는 경우</h3>
+<div class="card">
+<p>카이제곱검정은 "빈도(도수)"를 다루는 검정이라 범주형 자료의 전유물처럼 보이지만, <b>χ² 분포 자체는 연속형 확률변수</b>다. 정규분포를 따르는 연속형 데이터에서도 다음 두 상황에서 카이제곱검정을 사용한다.</p>
+</div>
+<table>
+<tr><th>용도</th><th>데이터 성격</th><th>H0</th></tr>
+<tr><td>① 모분산 검정 (단일표본)</td><td>연속형 (정규분포 가정)</td><td>σ² = σ0² (분산이 특정 값과 같다)</td></tr>
+<tr><td>② 적합도검정을 연속형에 적용 (구간화)</td><td>연속형 → 구간(계급)으로 나눠 도수화</td><td>특정 분포(정규분포 등)를 따른다</td></tr>
+</table>
+
+<h4>6.3.1 모분산 검정 — 연속형 데이터의 분산이 특정 값과 같은가</h4>
+<p>표본분산 s²이 모분산 σ0²과 같은지 검정할 때, 정규모집단이라면 다음 통계량이 자유도 n-1인 카이제곱분포를 따른다. 이때 데이터는 개별 <b>연속형 측정값</b>(예: 부품의 길이, 시험 점수)이지 빈도가 아니다.</p>
+<div class="formula-box">
+\[ \chi^2 = \frac{(n-1)s^2}{\sigma_0^2} \sim \chi^2_{(n-1)} \]
+</div>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 부품 길이(mm, 연속형) 표본 n=15, 표본분산 s²=6.4. "모분산이 4.0이다"(σ0²=4)라는 주장을 α=.05로 검정 (양측)
+
+<span class="step-label">[Step1]</span> χ² = (n-1)*s² / σ0² = 14*6.4 / 4 = 89.6/4 = <span class="result">22.4</span>
+<span class="step-label">[Step2]</span> df=14, 양측이므로 하한 χ²(0.975,14)=5.629, 상한 χ²(0.025,14)=26.119
+<span class="step-label">[Step3]</span> 5.629 &lt; 22.4 &lt; 26.119 → 기각역 밖
+<span class="step-label">[결론]</span> H0 기각 못함 → 모분산이 4.0이 아니라고 할 근거 없음
+</div>
+<div class="callout warn">모분산 검정의 χ² 분포는 <b>좌우 비대칭</b>이라서, 등분산 F검정(두 집단 비교)과 달리 <b>상한과 하한 임계값을 따로</b> 구해 양쪽에서 판정해야 한다(위 예시처럼 α/2씩 나눠 양쪽 검정).</div>
+
+<h4>6.3.2 적합도검정을 연속형 분포 확인에 쓰는 경우</h4>
+<p>연속형 데이터라도 <b>구간을 나눠 도수표로 변환</b>하면 "이 데이터가 정규분포(혹은 다른 이론분포)를 따르는가"를 카이제곱 적합도검정으로 확인할 수 있다. 다만 표본이 크지 않다면 정규성 확인은 Shapiro-Wilk나 K-S검정이 더 일반적으로 쓰인다(9장 참고).</p>
+<div class="formula-box">
+\[ \chi^2 = \sum_{i=1}^{k} \frac{(O_i-E_i)^2}{E_i},\quad E_i = n \times P(\text{구간 } i \text{에 속할 이론 확률}) \]
+</div>
+
+<div class="quiz" data-qid="q6-2">
+<div class="q">Q. 정규모집단에서 표본 n=21, 표본분산 s²=25. "모분산=16"인지 검정할 때 카이제곱 통계량은?</div>
+<label><input type="radio" name="q6-2" value="0">20</label>
+<label><input type="radio" name="q6-2" value="1">31.25</label>
+<label><input type="radio" name="q6-2" value="2">16.0</label>
+<label><input type="radio" name="q6-2" value="3">25.0</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q6-2"]={correct:1, explain:"χ² = (n-1)s²/σ0² = 20*25/16 = 500/16 = 31.25"};</script>
+</section>
+
+<!-- ================= CH7 ANOVA ================= -->
+<section class="chapter" id="ch7">
+<h2><span class="chnum">7</span>분산분석 ANOVA — 3개 이상 집단 평균 비교</h2>
+<h3>7.1 원리</h3>
+<p>t검정을 여러 번 반복하면 1종 오류가 누적되는 문제(다중비교 문제)가 생긴다. ANOVA는 <b>전체 변동을 집단간 변동(SSB)과 집단내 변동(SSW)으로 분해</b>하여 한 번에 검정한다. "평균의 차이"를 "분산의 비율(F)"로 검정하는 것이 핵심 아이디어다.</p>
+<div class="formula-box">
+\[ SST = SSB + SSW \qquad F = \frac{MSB}{MSW} = \frac{SSB/(k-1)}{SSW/(N-k)} \sim F_{(k-1,\,N-k)} \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 620 150" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:560px;">
+<rect x="20" y="20" width="180" height="46" rx="10" fill="#e8d3b8" stroke="#b5652f"/>
+<text x="110" y="48" text-anchor="middle" font-size="13" font-weight="700">전체 변동 SST</text>
+<line x1="200" y1="43" x2="240" y2="43" stroke="#8a7048" stroke-width="1.5" marker-end="url(#a1)"/>
+<rect x="250" y="0" width="180" height="40" rx="10" fill="#e5efe4" stroke="#3f7d5c"/>
+<text x="340" y="25" text-anchor="middle" font-size="12" font-weight="700">집단간 변동 SSB</text>
+<rect x="250" y="70" width="180" height="40" rx="10" fill="#f4e2dc" stroke="#b5432f"/>
+<text x="340" y="95" text-anchor="middle" font-size="12" font-weight="700">집단내 변동 SSW</text>
+<text x="460" y="18" font-size="11" fill="#5a5044">→ 처리효과(진짜 차이)</text>
+<text x="460" y="88" font-size="11" fill="#5a5044">→ 오차(우연변동)</text>
+</svg>
+</div>
+<h3>7.2 손계산 예제 — 일원배치 ANOVA</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 3개 비료(A,B,C) 각 3개 표본 수확량: A(4,5,6) B(7,8,9) C(10,11,12)
+
+<span class="step-label">[Step1]</span> 각 그룹평균: Ā=5, B̄=8, C̄=11, 전체평균 Ḡ=8
+<span class="step-label">[Step2]</span> SSB = 3*(5-8)²+3*(8-8)²+3*(11-8)² = 3*9+0+3*9 = <span class="result">54</span>
+<span class="step-label">[Step3]</span> SSW = 그룹내 편차제곱합 = (1+0+1)+(1+0+1)+(1+0+1) = 2+2+2 = <span class="result">6</span>
+<span class="step-label">[Step4]</span> df between=k-1=2, df within=N-k=9-3=6
+       MSB=54/2=27, MSW=6/6=1
+<span class="step-label">[Step5]</span> F = 27/1 = <span class="result">27</span>, F(0.05,2,6)=5.14
+<span class="step-label">[결론]</span> 27 &gt; 5.14 → H0 기각, 비료 종류에 따라 수확량 평균이 유의하게 다름
+</div>
+<div class="callout">ANOVA에서 H0 기각 후 <b>어느 그룹끼리 다른지</b> 알려면 Tukey HSD, Bonferroni 등의 <b>사후검정(post-hoc test)</b>이 추가로 필요하다.</div>
+<div class="quiz" data-qid="q7-1">
+<div class="q">Q. 4개 그룹(각 5개 표본, 전체 N=20)의 일원배치 ANOVA에서 집단내 자유도는?</div>
+<label><input type="radio" name="q7-1" value="0">3</label>
+<label><input type="radio" name="q7-1" value="1">16</label>
+<label><input type="radio" name="q7-1" value="2">19</label>
+<label><input type="radio" name="q7-1" value="3">20</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q7-1"]={correct:1, explain:"df within = N-k = 20-4 = 16"};</script>
+</section>
+
+<!-- ================= CH8 상관/회귀 ================= -->
+<section class="chapter" id="ch8">
+<h2><span class="chnum">8</span>상관계수·회귀계수 검정</h2>
+<h3>8.1 상관계수 검정</h3>
+<p>피어슨 상관계수 r이 모집단에서 0인지(선형관계 없음) 검정한다.</p>
+<div class="formula-box">
+\[ t = \frac{r\sqrt{n-2}}{\sqrt{1-r^2}} \sim t_{(n-2)} \]
+</div>
+<h3>8.2 회귀계수 검정</h3>
+<p>단순/다중회귀에서 각 회귀계수 β가 0인지 검정(=해당 변수가 종속변수에 유의한 영향을 주는지), 모형 전체의 유의성은 F검정으로 판단한다.</p>
+<div class="formula-box">
+\[ t = \frac{\hat\beta_1}{SE(\hat\beta_1)} \sim t_{(n-2)} \qquad F = \frac{MSR}{MSE} = \frac{SSR/k}{SSE/(n-k-1)} \]
+</div>
+<h3>8.3 손계산 예제 — 상관계수 검정</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> n=20, 표본상관계수 r=0.5. H0: ρ=0
+
+<span class="step-label">[Step1]</span> t = 0.5*√(20-2) / √(1-0.25) = 0.5*√18 / √0.75
+<span class="step-label">[Step2]</span> = 0.5*4.243 / 0.866 = 2.121 / 0.866 = <span class="result">2.45</span>
+<span class="step-label">[Step3]</span> t(0.025, df=18) = 2.101 → 2.45 &gt; 2.101
+<span class="step-label">[결론]</span> H0 기각 → 상관관계가 통계적으로 유의함
+</div>
+<div class="quiz" data-qid="q8-1">
+<div class="q">Q. 다중회귀에서 개별 회귀계수의 유의성을 판단할 때 사용하는 검정통계량은?</div>
+<label><input type="radio" name="q8-1" value="0">χ²</label>
+<label><input type="radio" name="q8-1" value="1">t</label>
+<label><input type="radio" name="q8-1" value="2">F (오직 F만)</label>
+<label><input type="radio" name="q8-1" value="3">Z 만 가능</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q8-1"]={correct:1, explain:"개별 계수는 t검정, 모형 전체 유의성은 F검정을 사용한다."};</script>
+</section>
+
+<!-- ================= CH9 정규성 ================= -->
+<section class="chapter" id="ch9">
+<h2><span class="chnum">9</span>정규성 검정 — 모수적 검정의 전제조건 확인</h2>
+<h3>9.1 왜 필요한가</h3>
+<p>t검정, ANOVA, 피어슨 상관 등 모수적 검정은 데이터가 정규분포를 따른다고 가정한다. 이 가정이 깨지면 비모수 검정으로 전환해야 한다.</p>
+<table>
+<tr><th>방법</th><th>특징</th></tr>
+<tr><td>Shapiro-Wilk 검정</td><td>표본크기 &lt; 2000에 적합, 소표본에서 검정력 우수, 가장 널리 사용</td></tr>
+<tr><td>Kolmogorov-Smirnov 검정</td><td>표본분포와 이론분포의 최대 누적확률 차이(D) 이용, 대표본에 적합</td></tr>
+<tr><td>Q-Q Plot</td><td>시각적 진단 도구, 점들이 45도 직선에서 벗어나면 비정규성 의심</td></tr>
+</table>
+<div class="formula-box">
+\[ H_0: \text{데이터는 정규분포를 따른다} \qquad H_1: \text{정규분포를 따르지 않는다} \]
+</div>
+<div class="callout warn">정규성 검정은 다른 검정과 반대로 <b>p ≥ α이면 "정규성을 만족한다(H0 기각 못함)"</b>는 결론을 내리는 구조라 해석에 주의해야 한다.</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 620 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:520px;">
+<line x1="40" y1="170" x2="580" y2="170" stroke="#8a7048"/>
+<line x1="40" y1="170" x2="40" y2="20" stroke="#8a7048"/>
+<line x1="40" y1="170" x2="560" y2="30" stroke="#3f7d5c" stroke-width="2"/>
+<circle cx="90" cy="150" r="3" fill="#b5652f"/><circle cx="150" cy="130" r="3" fill="#b5652f"/>
+<circle cx="210" cy="110" r="3" fill="#b5652f"/><circle cx="270" cy="100" r="3" fill="#b5652f"/>
+<circle cx="330" cy="80" r="3" fill="#b5652f"/><circle cx="390" cy="72" r="3" fill="#b5652f"/>
+<circle cx="450" cy="55" r="3" fill="#b5652f"/><circle cx="510" cy="45" r="3" fill="#b5652f"/>
+<text x="310" y="15" text-anchor="middle" font-size="12" fill="#5a5044">Q-Q Plot: 점이 직선에 가까울수록 정규성 만족</text>
+</svg>
+</div>
+<div class="quiz" data-qid="q9-1">
+<div class="q">Q. Shapiro-Wilk 검정 결과 p-value = 0.32 (α=.05)일 때 결론은?</div>
+<label><input type="radio" name="q9-1" value="0">정규분포를 따르지 않는다</label>
+<label><input type="radio" name="q9-1" value="1">정규성을 기각할 근거가 없다 (정규성 가정 가능)</label>
+<label><input type="radio" name="q9-1" value="2">표본크기가 부족하다</label>
+<label><input type="radio" name="q9-1" value="3">비모수검정을 반드시 써야 한다</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q9-1"]={correct:1, explain:"p(0.32) ≥ α(0.05)이므로 H0(정규분포를 따른다)을 기각하지 못한다."};</script>
+</section>
+
+<!-- ================= CH10 비모수 ================= -->
+<section class="chapter" id="ch10">
+<h2><span class="chnum">10</span>비모수검정 — 정규성이 깨졌을 때</h2>
+<table>
+<tr><th>모수적 검정</th><th>대응 비모수검정</th><th>기본 아이디어</th></tr>
+<tr><td>단일/대응표본 t검정</td><td>Wilcoxon 부호순위검정</td><td>차이값의 부호와 순위(크기)를 이용</td></tr>
+<tr><td>독립표본 t검정</td><td>Mann-Whitney U검정</td><td>두 그룹을 합쳐 순위를 매기고 순위합 비교</td></tr>
+<tr><td>일원배치 ANOVA</td><td>Kruskal-Wallis 검정</td><td>전체 순위 기반 H통계량(χ² 근사)</td></tr>
+<tr><td>피어슨 상관</td><td>스피어만 순위상관</td><td>원값 대신 순위의 상관계수</td></tr>
+</table>
+<div class="formula-box">
+\[ U = n_1 n_2 + \frac{n_1(n_1+1)}{2} - R_1 \qquad H = \frac{12}{N(N+1)}\sum_{i=1}^{k}\frac{R_i^2}{n_i} - 3(N+1) \]
+</div>
+<h3>10.1 손계산 예제 — Mann-Whitney U</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 그룹A(3,5,8) 그룹B(4,6,9), n1=n2=3. 전체 순위: 3(1) 4(2) 5(3) 6(4) 8(5) 9(6)
+
+<span class="step-label">[Step1]</span> A의 순위합 R1 = 1+3+5 = 9
+<span class="step-label">[Step2]</span> U = n1*n2 + n1(n1+1)/2 - R1 = 9 + 6 - 9 = <span class="result">6</span>
+<span class="step-label">[Step3]</span> 최대 U = n1*n2 = 9, U가 4.5(중앙)에 가까울수록 차이 없음을 의미
+<span class="step-label">[결론]</span> 소표본이므로 U분포표와 비교하여 판정 (U=6은 임계값 범위 내 → 유의한 차이 없음)
+</div>
+<div class="quiz" data-qid="q10-1">
+<div class="q">Q. 표본이 매우 작고(n=8) 정규성 검정 결과 정규분포를 따르지 않는 두 독립 그룹의 중앙값 차이를 검정하려 한다. 적절한 방법은?</div>
+<label><input type="radio" name="q10-1" value="0">독립표본 t검정</label>
+<label><input type="radio" name="q10-1" value="1">Mann-Whitney U검정</label>
+<label><input type="radio" name="q10-1" value="2">일원배치 ANOVA</label>
+<label><input type="radio" name="q10-1" value="3">카이제곱검정</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q10-1"]={correct:1, explain:"정규성이 깨진 두 독립표본 비교이므로 비모수검정인 Mann-Whitney U가 적절하다."};</script>
+</section>
+
+<!-- ================= CH11 ML 검정 ================= -->
+<section class="chapter" id="ch11">
+<h2><span class="chnum">11</span>머신러닝에서의 검정 활용</h2>
+<h3>11.1 모델 성능 비교: McNemar 검정</h3>
+<p>같은 테스트셋에 대해 두 분류모델의 <b>정오답 여부가 대응(paired)</b>되므로, 독립표본이 아닌 <b>McNemar 검정</b>을 사용한다. 두 모델이 서로 다르게 틀린 경우(불일치 셀)만 비교한다.</p>
+<div class="formula-box">
+\[ \chi^2 = \frac{(|b-c|-1)^2}{b+c} \sim \chi^2_{(1)} \]
+<p style="font-size:0.85rem;color:#5a5044;margin:6px 0 0;">b: 모델A만 맞고 B는 틀림 / c: 모델B만 맞고 A는 틀림 (연속성 수정 포함)</p>
+</div>
+<h3>11.2 교차검증 결과 비교: 대응표본 t검정</h3>
+<p>K-fold 교차검증에서 각 fold의 정확도를 모델A, 모델B 쌍으로 얻으면, fold별 차이값에 <b>대응표본 t검정</b>을 적용해 두 모델의 평균 성능 차이가 유의한지 검정한다.</p>
+<h3>11.3 피처 선택에서의 검정</h3>
+<table>
+<tr><th>피처 유형</th><th>타겟 유형</th><th>사용 검정</th></tr>
+<tr><td>범주형</td><td>범주형</td><td>카이제곱 독립성검정</td></tr>
+<tr><td>연속형</td><td>범주형(그룹 2개+)</td><td>t검정 / ANOVA F검정</td></tr>
+<tr><td>연속형</td><td>연속형</td><td>피어슨 상관계수 검정</td></tr>
+</table>
+<h3>11.4 손계산 예제 — McNemar</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 100개 테스트샘플. A만 맞음(b)=18, B만 맞음(c)=6, 둘다맞음/둘다틀림은 제외
+
+<span class="step-label">[Step1]</span> χ² = (|18-6|-1)² / (18+6) = (12-1)²/24 = 121/24 = <span class="result">5.04</span>
+<span class="step-label">[Step2]</span> χ²(0.05, df=1) = 3.841 → 5.04 &gt; 3.841
+<span class="step-label">[결론]</span> H0 기각 → 두 모델의 예측 성능은 통계적으로 유의하게 다름 (모델A가 더 우수)
+</div>
+<div class="quiz" data-qid="q11-1">
+<div class="q">Q. 동일한 5-fold 교차검증에서 모델A, B의 fold별 accuracy 5쌍의 평균 차이를 검정하려 한다. 가장 적절한 검정은?</div>
+<label><input type="radio" name="q11-1" value="0">독립표본 t검정</label>
+<label><input type="radio" name="q11-1" value="1">대응표본 t검정</label>
+<label><input type="radio" name="q11-1" value="2">카이제곱검정</label>
+<label><input type="radio" name="q11-1" value="3">단일표본 Z검정</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q11-1"]={correct:1, explain:"같은 fold에서 두 모델이 짝지어 측정되므로 대응표본(paired) t검정이 적합하다."};</script>
+</section>
+
+<!-- ================= CH12 선택가이드 ================= -->
+<section class="chapter" id="ch12">
+<h2><span class="chnum">12</span>검정 선택 가이드 & 종합 체크리스트</h2>
+<h3>12.1 의사결정 플로우</h3>
+<div class="diagram-wrap">
+<svg viewBox="0 0 950 330" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:950px;">
+<g font-family="Pretendard" font-size="12">
+<rect x="370" y="10" width="210" height="46" rx="10" fill="#2c2620"/>
+<text x="475" y="38" text-anchor="middle" fill="#e0a458" font-weight="700">데이터 형태는?</text>
+
+<line x1="420" y1="56" x2="200" y2="95" stroke="#8a7048" marker-end="url(#a1)"/>
+<line x1="530" y1="56" x2="750" y2="95" stroke="#8a7048" marker-end="url(#a1)"/>
+<rect x="80" y="95" width="240" height="40" rx="8" fill="#e8d3b8" stroke="#b5652f"/>
+<text x="200" y="120" text-anchor="middle" font-weight="700">범주형 변수</text>
+<rect x="630" y="95" width="240" height="40" rx="8" fill="#e5efe4" stroke="#3f7d5c"/>
+<text x="750" y="120" text-anchor="middle" font-weight="700">연속형 변수</text>
+
+<line x1="200" y1="135" x2="200" y2="170" stroke="#8a7048" marker-end="url(#a1)"/>
+<rect x="80" y="170" width="240" height="50" rx="8" fill="#fffaf0" stroke="#b5652f"/>
+<text x="200" y="192" text-anchor="middle" font-size="11.5">카이제곱 적합도/독립성검정</text>
+<text x="200" y="208" text-anchor="middle" font-size="10.5" fill="#5a5044">(교차표 기반)</text>
+
+<line x1="750" y1="135" x2="750" y2="170" stroke="#8a7048" marker-end="url(#a1)"/>
+<rect x="630" y="170" width="240" height="40" rx="8" fill="#fffaf0" stroke="#3f7d5c"/>
+<text x="750" y="195" text-anchor="middle" font-weight="700">정규성 검정 먼저</text>
+
+<line x1="700" y1="210" x2="620" y2="250" stroke="#8a7048" marker-end="url(#a1)"/>
+<line x1="800" y1="210" x2="880" y2="250" stroke="#8a7048" marker-end="url(#a1)"/>
+<rect x="480" y="250" width="220" height="60" rx="8" fill="#e5efe4" stroke="#3f7d5c"/>
+<text x="590" y="272" text-anchor="middle" font-size="11.5" font-weight="700">정규성 O → 모수적</text>
+<text x="590" y="290" text-anchor="middle" font-size="10.5" fill="#5a5044">Z/t/F/ANOVA/상관·회귀</text>
+<rect x="740" y="250" width="200" height="60" rx="8" fill="#e8d3b8" stroke="#b5652f"/>
+<text x="840" y="272" text-anchor="middle" font-size="11.5" font-weight="700">정규성 X → 비모수</text>
+<text x="840" y="290" text-anchor="middle" font-size="10.5" fill="#5a5044">Wilcoxon/Mann-Whitney/K-W</text>
+</g>
+</svg>
+</div>
+
+<h3>12.2 상황별 즉답 조견표</h3>
+<table>
+<tr><th>상황</th><th>정답 검정</th></tr>
+<tr><td>모집단 표준편차를 알고 표본이 큰 평균 검정</td><td>Z검정</td></tr>
+<tr><td>표본표준편차만 알고 표본이 작은 평균 검정</td><td>t검정</td></tr>
+<tr><td>두 그룹의 분산(퍼짐 정도)이 같은지</td><td>F검정</td></tr>
+<tr><td>범주형 변수 두 개가 서로 관련 있는지</td><td>카이제곱 독립성검정</td></tr>
+<tr><td>3개 이상 그룹의 평균 비교</td><td>ANOVA (사후검정 병행)</td></tr>
+<tr><td>두 연속형 변수의 선형관계 유의성</td><td>상관계수 t검정</td></tr>
+<tr><td>회귀모형에서 특정 변수의 영향력 유의성</td><td>회귀계수 t검정</td></tr>
+<tr><td>정규성이 깨진 소표본 그룹 비교</td><td>비모수검정(Mann-Whitney/K-W/Wilcoxon)</td></tr>
+<tr><td>두 분류모델의 예측 정오답 비교(같은 테스트셋)</td><td>McNemar검정</td></tr>
+<tr><td>교차검증 fold별 두 모델 성능 비교</td><td>대응표본 t검정</td></tr>
+</table>
+
+<h3>12.3 최종 체크리스트</h3>
+<div class="callout tip">
+✅ H0/H1을 명확히 정의했는가?<br>
+✅ 데이터 형태(범주형/연속형)와 표본 독립성(독립/대응)을 확인했는가?<br>
+✅ 정규성·등분산 등 검정의 전제조건을 확인했는가?<br>
+✅ 검정통계량과 자유도를 올바르게 계산했는가?<br>
+✅ 유의수준 α와 p-value를 비교하여 결론을 내렸는가?<br>
+✅ 통계적 유의성과 실질적(현업) 의미를 구분해서 해석했는가?
+</div>
+</section>
+
+</main>
+</div>
+<a href="#top" class="top-btn" onclick="document.getElementById('main').scrollTo(0,0); window.scrollTo(0,0); return false;">↑</a>
+<script>
+// ---- TOC 자동 생성 ----
+const chapters = document.querySelectorAll('section.chapter');
+const toc = document.getElementById('toc');
+chapters.forEach(ch=>{
+  const h2 = ch.querySelector('h2');
+  const a = document.createElement('a');
+  a.href = '#'+ch.id;
+  a.textContent = h2.textContent.replace(/^\d+/,'').trim();
+  a.dataset.target = ch.id;
+  toc.appendChild(a);
+});
+
+// ---- 스크롤스파이 ----
+function onScroll(){
+  let current = chapters[0].id;
+  chapters.forEach(ch=>{
+    const rect = ch.getBoundingClientRect();
+    if(rect.top < 140) current = ch.id;
+  });
+  document.querySelectorAll('#toc a').forEach(a=>{
+    a.classList.toggle('active', a.dataset.target===current);
+  });
+  const doc = document.documentElement;
+  const pct = (doc.scrollTop)/(doc.scrollHeight-doc.clientHeight)*100;
+  document.getElementById('progressBar').style.width = pct+'%';
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+
+// ---- 퀴즈 채점 ----
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const qid = quiz.dataset.qid;
+  const answer = window.QUIZ_ANSWERS[qid];
+  const labels = quiz.querySelectorAll('label');
+  const feedback = quiz.querySelector('.feedback');
+  quiz.querySelectorAll('input[type=radio]').forEach(input=>{
+    input.addEventListener('change', ()=>{
+      const val = parseInt(input.value);
+      labels.forEach((lb,i)=>{
+        lb.style.borderColor = 'var(--line)';
+        lb.style.background = '#fffdf7';
+      });
+      if(!answer) return;
+      if(val === answer.correct){
+        labels[val].style.borderColor='var(--good)';
+        labels[val].style.background='#e5efe4';
+        feedback.className='feedback correct';
+        feedback.innerHTML = '<span class="badge-correct">정답입니다.</span> '+answer.explain;
+      } else {
+        labels[val].style.borderColor='var(--bad)';
+        labels[val].style.background='#f4e2dc';
+        labels[answer.correct].style.borderColor='var(--good)';
+        labels[answer.correct].style.background='#e5efe4';
+        feedback.className='feedback wrong';
+        feedback.innerHTML = '<span class="badge-wrong">오답입니다.</span> '+answer.explain;
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

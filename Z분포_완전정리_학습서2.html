@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Z분포 완전정리 — 원리, 모양, 검정방법</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+<style>
+:root{
+  --paper:#faf6ef; --paper-2:#f3ecdf; --ink:#2b2620; --ink-soft:#5b5347; --line:#e2d6c0;
+  --accent:#b5673a; --accent-2:#8a6a3f; --accent-soft:#f0ddc8;
+  --good:#4d7358; --good-bg:#e7efe4; --bad:#a8453a; --bad-bg:#f6e4df;
+  --blue:#3d6fa5; --blue-bg:#e3ecf5;
+  --sans:'Pretendard','Apple SD Gothic Neo',sans-serif; --serif:'Spectral',Georgia,serif; --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); line-height:1.75; font-size:16px;}
+.layout{display:flex; max-width:1320px; margin:0 auto;}
+nav.sidebar{width:250px; flex-shrink:0; position:sticky; top:0; align-self:flex-start; height:100vh; overflow-y:auto; padding:32px 18px 32px 24px; border-right:1px solid var(--line);}
+nav.sidebar h3{font-family:var(--serif); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); margin:0 0 14px;}
+nav.sidebar a{display:block; padding:7px 10px; border-radius:8px; color:var(--ink-soft); text-decoration:none; font-size:13.5px; border-left:2px solid transparent; transition:.15s;}
+nav.sidebar a:hover{background:var(--paper-2); color:var(--ink);}
+nav.sidebar a.active{background:var(--accent-soft); color:var(--accent); border-left:2px solid var(--accent); font-weight:600;}
+main{flex:1; min-width:0; padding:48px 56px 120px;}
+.hero{border-bottom:1px solid var(--line); padding-bottom:28px; margin-bottom:40px;}
+.hero .kicker{font-family:var(--mono); font-size:12px; color:var(--accent); letter-spacing:.12em; text-transform:uppercase;}
+.hero h1{font-family:var(--serif); font-size:38px; margin:10px 0 12px; line-height:1.25;}
+.hero p.lead{color:var(--ink-soft); font-size:15.5px; max-width:760px;}
+section{margin-bottom:56px; scroll-margin-top:24px;}
+section h2{font-family:var(--serif); font-size:26px; border-left:4px solid var(--accent); padding-left:14px; margin-bottom:18px;}
+section h3{font-family:var(--serif); font-size:19px; color:var(--accent-2); margin:26px 0 10px;}
+p{color:var(--ink);}
+.card{background:#fff; border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin:16px 0; box-shadow:0 2px 10px rgba(90,70,40,.04);}
+.definition{background:var(--paper-2); border-left:3px solid var(--accent-2); border-radius:8px; padding:14px 18px; margin:14px 0; font-size:14.8px;}
+.definition b{color:var(--accent);}
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14.3px;}
+th,td{border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top;}
+th{background:var(--accent-soft); color:var(--accent-2); font-weight:700;}
+tr:nth-child(even) td{background:#fbf8f2;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.warn{background:var(--bad-bg); border-left:3px solid var(--bad); border-radius:8px; padding:12px 16px; font-size:14.3px; margin:14px 0;}
+.tip{background:var(--good-bg); border-left:3px solid var(--good); border-radius:8px; padding:12px 16px; font-size:14.3px; margin:14px 0;}
+.note{background:var(--blue-bg); border-left:3px solid var(--blue); border-radius:8px; padding:12px 16px; font-size:14.3px; margin:14px 0;}
+svg{width:100%; height:auto; display:block;}
+.diagram-box{background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px; margin:18px 0;}
+.diagram-caption{text-align:center; font-size:12.5px; color:var(--ink-soft); margin-top:8px; font-family:var(--mono);}
+code{font-family:var(--mono); background:var(--paper-2); padding:1px 6px; border-radius:5px; font-size:13.5px; color:var(--accent-2);}
+.legend{display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:10px; font-size:12.5px; font-family:var(--mono); color:var(--ink-soft);}
+.legend span.sw{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px; vertical-align:-2px;}
+.step-badge{display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; font-family:var(--mono); font-size:12px; font-weight:700; margin-right:8px;}
+.test-tag{display:inline-block; font-family:var(--mono); font-size:11.5px; padding:3px 10px; border-radius:999px; margin-bottom:10px;}
+.test-tag.mean{background:var(--blue-bg); color:var(--blue);}
+.test-tag.prop{background:var(--accent-soft); color:var(--accent-2);}
+.test-tag.twomean{background:var(--good-bg); color:var(--good);}
+.test-tag.twoprop{background:var(--bad-bg); color:var(--bad);}
+.quiz{background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px 24px; margin:16px 0;}
+.quiz .q{font-weight:700; margin-bottom:10px;}
+.quiz label{display:block; padding:8px 12px; margin:6px 0; border:1px solid var(--line); border-radius:8px; cursor:pointer; font-size:14.3px;}
+.quiz label:hover{background:var(--paper-2);}
+.quiz .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:8px; font-size:13.8px;}
+.quiz .fb.correct{background:var(--good-bg); color:var(--good); display:none;}
+.quiz .fb.wrong{background:var(--bad-bg); color:var(--bad); display:none;}
+.code-label{display:inline-block; font-family:var(--mono); font-size:11.5px; padding:3px 10px; border-radius:999px; margin-bottom:8px; background:var(--paper-2); color:var(--accent-2); border:1px solid var(--line);}
+.code-block{background:#2b2620; color:#f3ecdf; border-radius:12px; padding:18px 22px; margin:10px 0 18px; overflow-x:auto; font-family:var(--mono); font-size:12.6px; line-height:1.65; white-space:pre;}
+.code-block .cmt{color:#9c8f75;}
+.output-block{background:var(--paper-2); border:1px dashed var(--line); border-radius:10px; padding:14px 18px; margin:10px 0 18px; font-family:var(--mono); font-size:12.6px; line-height:1.7; color:var(--ink-soft); white-space:pre;}
+.output-block b{color:var(--accent);}
+@media(max-width:1000px){ nav.sidebar{display:none;} main{padding:28px 20px 100px;} }
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <h3>목차</h3>
+  <a href="#overview">01 · Z분포란</a>
+  <a href="#glossary">02 · 용어 미리보기</a>
+  <a href="#derivation">03 · 정의와 유도</a>
+  <a href="#shape">04 · 표준정규분포의 모양</a>
+  <a href="#properties">05 · 주요 성질</a>
+  <a href="#ztable">06 · Z표 읽는 법</a>
+  <a href="#when-to-use">07 · 언제 사용하는가: 4가지 상황</a>
+  <a href="#test-mean">08 · 검정① 모평균 검정</a>
+  <a href="#test-proportion">09 · 검정② 모비율 검정</a>
+  <a href="#test-two-means">10 · 검정③ 두 모평균 차이 검정</a>
+  <a href="#test-two-proportions">11 · 검정④ 두 모비율 차이 검정</a>
+  <a href="#z-vs-t">12 · Z검정 vs t검정</a>
+  <a href="#procedure">13 · 공통 검정 절차 6단계</a>
+  <a href="#summary">14 · 종합 비교표</a>
+  <a href="#python-code">15 · Python 실전코드 (챕터별)</a>
+</nav>
+<main>
+
+<div class="hero">
+  <div class="kicker">Statistical Analysis · Z분포 심화</div>
+  <h1>Z분포 완전정리<br>원리 · 모양 · 검정방법</h1>
+  <p class="lead">Z분포(표준정규분포)가 정규분포에서 어떻게 유도되는지, 왜 다른 분포들과 달리 파라미터 없이 단 하나의 모양만 가지는지, 그리고 실제로 어떤 상황에서 어떤 검정 방법으로 쓰이는지 — 원리부터 절차, 그림까지 한 번에 정리합니다.</p>
+</div>
+
+<section id="overview">
+<h2>01 · Z분포란</h2>
+<div class="definition">Z분포(표준정규분포, Standard Normal Distribution)는 <b>평균이 0, 분산(표준편차)이 1인 정규분포</b>입니다. 모든 정규분포 확률변수는 표준화(standardization)라는 변환을 거치면 이 하나의 Z분포로 귀결됩니다. 통계에서는 주로 <b>모평균·모비율에 대한 추론</b>과 <b>확률·임계값 계산의 공통 기준</b>으로 사용됩니다.</div>
+<div class="tip">한 문장 요약: "어떤 정규분포든 평균을 빼고 표준편차로 나누면 Z분포가 되고, 이 분포는 관측값이 평균에서 얼마나 떨어져 있는지를 표준 단위로 알려주며, 모집단 정보(σ)를 알 때 모평균·모비율에 대한 검정에 쓰인다."</div>
+</section>
+
+<section id="glossary">
+<h2>02 · 용어 미리보기</h2>
+<div class="grid2">
+  <div class="definition"><b>표준화(Standardization)</b> — 확률변수에서 평균을 빼고 표준편차로 나누어 Z분포로 변환하는 과정.</div>
+  <div class="definition"><b>Z값(Z-score)</b> — 표준화된 값. 관측값이 평균으로부터 표준편차 몇 배만큼 떨어져 있는지를 나타냄.</div>
+  <div class="definition"><b>중심극한정리(CLT)</b> — 모집단의 분포와 무관하게, 표본크기 n이 충분히 크면 표본평균의 분포가 근사적으로 정규분포를 따른다는 정리.</div>
+  <div class="definition"><b>기각역(Rejection Region)</b> — 검정통계량이 이 영역에 속하면 귀무가설을 기각하는 구간.</div>
+  <div class="definition"><b>임계값(Critical Value)</b> — 기각역의 경계가 되는 값. Z표에서 유의수준으로 찾음(예: α=0.05 양측 → ±1.96).</div>
+  <div class="definition"><b>Z표(Z-table)</b> — 표준정규분포의 누적확률 P(Z≤z)를 z값별로 정리한 표.</div>
+  <div class="definition"><b>σ 기지(known)</b> — 모표준편차 σ를 이미 알고 있다는 가정. Z검정을 쓰기 위한 전제조건.</div>
+  <div class="definition"><b>재생성(Reproductive Property)</b> — 독립인 정규분포들의 선형결합은 다시 정규분포가 되는 성질. 표준화의 근거가 됨.</div>
+</div>
+</section>
+
+<section id="derivation">
+<h2>03 · 정의와 유도</h2>
+<p>Z분포는 두 가지 대표적인 경로로 등장합니다.</p>
+
+<h3>① 개별 관측값의 표준화 (원론적 정의)</h3>
+<p>확률변수 $X$가 정규분포 $N(\mu, \sigma^2)$를 따를 때, 다음과 같이 변환된 $Z$는 항상 표준정규분포를 따릅니다.</p>
+$$Z = \frac{X - \mu}{\sigma} \sim N(0,1)$$
+<p>이는 정규분포의 <b>재생성(선형결합의 정규성)</b> 성질 때문입니다. $X$를 $1/\sigma$배 하고 $-\mu/\sigma$만큼 이동시키는 것은 선형변환이므로, 결과도 정규분포이며 그 평균과 분산을 직접 계산하면 각각 0과 1이 됩니다.</p>
+
+<div class="diagram-box">
+<svg viewBox="0 0 900 150" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#8a6a3f"/></marker></defs>
+<g font-family="Pretendard">
+<rect x="40" y="45" width="230" height="60" rx="10" fill="#e3ecf5" stroke="#3d6fa5"/>
+<text x="155" y="70" text-anchor="middle" font-size="14" font-weight="700" fill="#3d6fa5">X ~ N(μ, σ²)</text>
+<text x="155" y="90" text-anchor="middle" font-size="11" fill="#5b5347">개별 관측값 (일반 정규분포)</text>
+
+<path d="M275 75 L 615 75" stroke="#8a6a3f" stroke-width="1.6" fill="none" marker-end="url(#a1)"/>
+<text x="445" y="62" text-anchor="middle" font-size="13" font-weight="700" fill="#8a6a3f">Z = (X − μ) / σ</text>
+<text x="445" y="94" text-anchor="middle" font-size="10.5" fill="#5b5347">평균을 빼고 표준편차로 나눈다</text>
+
+<rect x="630" y="45" width="230" height="60" rx="10" fill="#f0ddc8" stroke="#b5673a"/>
+<text x="745" y="70" text-anchor="middle" font-size="14" font-weight="700" fill="#8a6a3f">Z ~ N(0, 1)</text>
+<text x="745" y="90" text-anchor="middle" font-size="11" fill="#5b5347">표준정규분포</text>
+</g>
+</svg>
+<div class="diagram-caption">개별 관측값 X를 표준화하면, μ와 σ가 무엇이든 상관없이 항상 동일한 Z ~ N(0,1)로 귀결된다</div>
+</div>
+
+<h3>② 표본평균의 표준화 (중심극한정리 경로)</h3>
+<p>모집단이 $N(\mu, \sigma^2)$를 따르거나, 표본크기 $n$이 충분히 크면(중심극한정리), 표본평균 $\bar{X}$는 다음 분포에 근사적으로 따릅니다.</p>
+$$\bar{X} \sim N\left(\mu, \frac{\sigma^2}{n}\right)$$
+<p>따라서 표본평균을 표준화하면 역시 Z분포가 됩니다.</p>
+$$Z = \frac{\bar{X} - \mu}{\sigma/\sqrt{n}} \sim N(0,1)$$
+
+<div class="diagram-box">
+<svg viewBox="0 0 900 150" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#8a6a3f"/></marker></defs>
+<g font-family="Pretendard">
+<rect x="30" y="45" width="250" height="60" rx="10" fill="#e7efe4" stroke="#4d7358"/>
+<text x="155" y="66" text-anchor="middle" font-size="13.5" font-weight="700" fill="#4d7358">X̄ ~ N(μ, σ²/n)</text>
+<text x="155" y="86" text-anchor="middle" font-size="10.5" fill="#5b5347">표본평균 (CLT 근거)</text>
+
+<path d="M285 75 L 615 75" stroke="#8a6a3f" stroke-width="1.6" fill="none" marker-end="url(#a2)"/>
+<text x="450" y="60" text-anchor="middle" font-size="12.5" font-weight="700" fill="#8a6a3f">Z = (X̄ − μ) / (σ/√n)</text>
+<text x="450" y="94" text-anchor="middle" font-size="10.5" fill="#5b5347">표준오차로 나눈다</text>
+
+<rect x="630" y="45" width="230" height="60" rx="10" fill="#f0ddc8" stroke="#b5673a"/>
+<text x="745" y="70" text-anchor="middle" font-size="14" font-weight="700" fill="#8a6a3f">Z ~ N(0, 1)</text>
+<text x="745" y="90" text-anchor="middle" font-size="11" fill="#5b5347">표준정규분포</text>
+</g>
+</svg>
+<div class="diagram-caption">여러 표본에서 얻은 X̄들은 서로 다른 값이지만, 표준오차 σ/√n으로 나누어 표준화하면 모두 동일한 Z ~ N(0,1)에 놓인다</div>
+</div>
+
+<div class="note">두 경로의 차이: ①은 <b>개별 관측값 하나</b>를 표준화하는 것이고(σ 그대로 사용), ②는 <b>표본평균</b>을 표준화하는 것입니다(표준오차 σ/√n 사용). 가설검정에서 "모평균 검정"이라고 하면 대부분 ②의 형태를 사용합니다.</div>
+</section>
+
+<section id="shape">
+<h2>04 · 표준정규분포의 모양</h2>
+<p>카이제곱분포나 t분포는 자유도(df)에 따라 모양이 달라지지만, <b>Z분포는 파라미터가 전혀 없는 단 하나의 고정된 모양</b>입니다. 평균 0을 중심으로 완벽하게 좌우 대칭인 종모양(bell shape)이며, 표준편차가 1이므로 −1, −2, −3 지점이 곧 1σ, 2σ, 3σ 지점이 됩니다.</p>
+
+<div class="diagram-box">
+<svg viewBox="0 0 620 290" xmlns="http://www.w3.org/2000/svg">
+<line x1="40" y1="230" x2="605" y2="230" stroke="#c9bda0" stroke-width="1"/>
+<line x1="320" y1="15" x2="320" y2="230" stroke="#c9bda0" stroke-width="1" stroke-dasharray="3,3"/>
+
+<polygon points="110.0,230 110.0,227.6 115.6,227.0 121.2,226.2 126.8,225.2 132.4,224.1 138.0,222.7 143.6,221.0 149.2,219.0 154.8,216.7 160.4,214.0 166.0,210.9 171.6,207.3 177.2,203.2 180.0,230" fill="#d18a3f" opacity="0.35"/>
+<polygon points="460.0,230 460.0,200.9 465.6,205.3 471.2,209.1 476.8,212.5 482.4,215.4 488.0,217.9 493.6,220.1 499.2,221.9 504.8,223.4 510.4,224.7 516.0,225.7 521.6,226.6 527.2,227.3 530.0,230" fill="#d18a3f" opacity="0.35"/>
+<polygon points="180.0,230 180.0,200.9 185.6,196.0 191.2,190.4 196.8,184.3 202.4,177.6 208.0,170.2 213.6,162.3 219.2,153.8 224.8,144.7 230.4,135.2 236.0,125.3 241.6,115.2 247.2,104.8 250.0,230" fill="#c9a227" opacity="0.4"/>
+<polygon points="390.0,230 390.0,99.6 395.6,110.0 401.2,120.3 406.8,130.3 412.4,140.0 418.0,149.3 423.6,158.1 429.2,166.3 434.8,174.0 440.4,181.0 446.0,187.5 451.6,193.3 457.2,198.5 460.0,230" fill="#c9a227" opacity="0.4"/>
+<polygon points="250.0,230 250.0,99.6 255.6,89.2 261.2,78.9 266.8,68.9 272.4,59.4 278.0,50.4 283.6,42.2 289.2,34.8 294.8,28.5 300.4,23.3 306.0,19.3 311.6,16.5 317.2,15.2 322.8,15.2 328.4,16.5 334.0,19.3 339.6,23.3 345.2,28.5 350.8,34.8 356.4,42.2 362.0,50.4 367.6,59.4 373.2,68.9 378.8,78.9 384.4,89.2 390.0,99.6 390.0,230" fill="#4d7358" opacity="0.4"/>
+
+<polyline points="40.0,229.9 45.6,229.9 51.2,229.9 56.8,229.8 62.4,229.8 68.0,229.7 73.6,229.6 79.2,229.4 84.8,229.2 90.4,229.0 96.0,228.7 101.6,228.3 107.2,227.9 112.8,227.3 118.4,226.6 124.0,225.7 129.6,224.7 135.2,223.4 140.8,221.9 146.4,220.1 152.0,217.9 157.6,215.4 163.2,212.5 168.8,209.1 174.4,205.3 180.0,200.9 185.6,196.0 191.2,190.4 196.8,184.3 202.4,177.6 208.0,170.2 213.6,162.3 219.2,153.8 224.8,144.7 230.4,135.2 236.0,125.3 241.6,115.2 247.2,104.8 252.8,94.4 258.4,84.0 264.0,73.9 269.6,64.1 275.2,54.8 280.8,46.2 286.4,38.4 292.0,31.5 297.6,25.7 303.2,21.1 308.8,17.7 314.4,15.7 320.0,15.0 325.6,15.7 331.2,17.7 336.8,21.1 342.4,25.7 348.0,31.5 353.6,38.4 359.2,46.2 364.8,54.8 370.4,64.1 376.0,73.9 381.6,84.0 387.2,94.4 392.8,104.8 398.4,115.2 404.0,125.3 409.6,135.2 415.2,144.7 420.8,153.8 426.4,162.3 432.0,170.2 437.6,177.6 443.2,184.3 448.8,190.4 454.4,196.0 460.0,200.9 465.6,205.3 471.2,209.1 476.8,212.5 482.4,215.4 488.0,217.9 493.6,220.1 499.2,221.9 504.8,223.4 510.4,224.7 516.0,225.7 521.6,226.6 527.2,227.3 532.8,227.9 538.4,228.3 544.0,228.7 549.6,229.0 555.2,229.2 560.8,229.4 566.4,229.6 572.0,229.7 577.6,229.8 583.2,229.8 588.8,229.9 594.4,229.9 600.0,229.9" fill="none" stroke="#2b2620" stroke-width="2.2"/>
+
+<text x="110" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#5b5347">−3σ</text>
+<text x="180" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#5b5347">−2σ</text>
+<text x="250" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#5b5347">−1σ</text>
+<text x="320" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#5b5347">0</text>
+<text x="390" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#5b5347">+1σ</text>
+<text x="460" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#5b5347">+2σ</text>
+<text x="530" y="248" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#5b5347">+3σ</text>
+</svg>
+<div class="legend">
+<span><span class="sw" style="background:#4d7358"></span>±1σ 이내 ≈ 68.3%</span>
+<span><span class="sw" style="background:#c9a227"></span>±2σ 이내 ≈ 95.4%</span>
+<span><span class="sw" style="background:#d18a3f"></span>±3σ 이내 ≈ 99.7%</span>
+</div>
+<div class="diagram-caption">실제 표준정규 밀도함수 φ(z)를 계산하여 그린 그래프. 평균 0을 축으로 완벽히 대칭이며, 이 모양은 σ나 μ와 무관하게 항상 동일하다</div>
+</div>
+
+<h3>68-95-99.7 규칙 (경험적 규칙)</h3>
+<table>
+<tr><th>구간</th><th>포함 확률</th><th>의미</th></tr>
+<tr><td>μ ± 1σ (Z: −1~1)</td><td>약 68.3%</td><td>관측값의 약 2/3가 평균 근처 1표준편차 이내에 위치</td></tr>
+<tr><td>μ ± 2σ (Z: −2~2)</td><td>약 95.4%</td><td>대부분의 관측값이 포함되는 구간, 95% 신뢰구간(≈1.96σ)과 근접</td></tr>
+<tr><td>μ ± 3σ (Z: −3~3)</td><td>약 99.7%</td><td>거의 모든 관측값이 포함, 이 밖은 이상치로 간주되는 경우가 많음</td></tr>
+</table>
+<div class="tip">Z분포가 "파라미터 없는 유일한 모양"이라는 점이 카이제곱분포·t분포와 근본적으로 다른 지점입니다. df가 커질수록 모양이 변하는 t분포·카이제곱분포와 달리, 어떤 정규모집단에서 나온 자료든 표준화만 하면 <b>항상 동일한 Z곡선 위에서</b> 비교할 수 있습니다.</div>
+</section>
+
+<section id="properties">
+<h2>05 · 주요 성질</h2>
+<table>
+<tr><th>성질</th><th>내용</th></tr>
+<tr><td>정의역</td><td>−∞ &lt; z &lt; ∞ (모든 실수)</td></tr>
+<tr><td>평균</td><td>E[Z] = 0</td></tr>
+<tr><td>분산</td><td>Var[Z] = 1, 표준편차 = 1</td></tr>
+<tr><td>모양</td><td>평균 0을 중심으로 완벽히 좌우대칭인 종모양. 파라미터가 없어 <b>모양이 항상 하나로 고정</b></td></tr>
+<tr><td>재생성</td><td>독립인 정규분포들의 선형결합은 다시 정규분포 — 표준화가 가능한 근거</td></tr>
+<tr><td>비대칭도(왜도)</td><td>0 (완전 대칭)</td></tr>
+<tr><td>첨도</td><td>3 (정규분포 기준 첨도, 초과첨도 0)</td></tr>
+<tr><td>정규분포와의 관계</td><td>모든 N(μ, σ²)의 확률은 Z = (X−μ)/σ 변환을 통해 Z분포표로 계산 가능</td></tr>
+</table>
+</section>
+
+<section id="ztable">
+<h2>06 · Z표 읽는 법</h2>
+<p>Z표는 표준정규분포의 <b>누적확률 P(Z ≤ z)</b>를 z값별로 미리 계산해 정리한 표입니다. z값의 소수 첫째 자리까지는 표의 행(row)에서, 둘째 자리는 열(column)에서 찾아 교차하는 값을 읽습니다.</p>
+
+<div class="diagram-box">
+<svg viewBox="0 0 620 260" xmlns="http://www.w3.org/2000/svg">
+<line x1="40" y1="230" x2="605" y2="230" stroke="#c9bda0" stroke-width="1"/>
+<polygon points="40.0,230 40.0,229.9 45.6,229.9 51.2,229.9 56.8,229.8 62.4,229.8 68.0,229.7 73.6,229.6 79.2,229.4 84.8,229.2 90.4,229.0 96.0,228.7 101.6,228.3 107.2,227.9 112.8,227.3 118.4,226.6 124.0,225.7 129.6,224.7 135.2,223.4 140.8,221.9 146.4,220.1 152.0,217.9 157.6,215.4 163.2,212.5 168.8,209.1 174.4,205.3 180.0,200.9 185.6,196.0 191.2,190.4 196.8,184.3 202.4,177.6 208.0,170.2 213.6,162.3 219.2,153.8 224.8,144.7 230.4,135.2 236.0,125.3 241.6,115.2 247.2,104.8 252.8,94.4 258.4,84.0 264.0,73.9 269.6,64.1 275.2,54.8 280.8,46.2 286.4,38.4 292.0,31.5 297.6,25.7 303.2,21.1 308.8,17.7 314.4,15.7 320.0,15.0 325.6,15.7 331.2,17.7 336.8,21.1 342.4,25.7 348.0,31.5 353.6,38.4 359.2,46.2 364.8,54.8 370.4,64.1 376.0,73.9 381.6,84.0 387.2,94.4 392.8,104.8 398.4,115.2 404.0,125.3 409.6,135.2 415.2,144.7 420.8,153.8 426.4,162.3 432.0,170.2 435.5,230" fill="#3d6fa5" opacity="0.3"/>
+<polyline points="40.0,229.9 45.6,229.9 51.2,229.9 56.8,229.8 62.4,229.8 68.0,229.7 73.6,229.6 79.2,229.4 84.8,229.2 90.4,229.0 96.0,228.7 101.6,228.3 107.2,227.9 112.8,227.3 118.4,226.6 124.0,225.7 129.6,224.7 135.2,223.4 140.8,221.9 146.4,220.1 152.0,217.9 157.6,215.4 163.2,212.5 168.8,209.1 174.4,205.3 180.0,200.9 185.6,196.0 191.2,190.4 196.8,184.3 202.4,177.6 208.0,170.2 213.6,162.3 219.2,153.8 224.8,144.7 230.4,135.2 236.0,125.3 241.6,115.2 247.2,104.8 252.8,94.4 258.4,84.0 264.0,73.9 269.6,64.1 275.2,54.8 280.8,46.2 286.4,38.4 292.0,31.5 297.6,25.7 303.2,21.1 308.8,17.7 314.4,15.7 320.0,15.0 325.6,15.7 331.2,17.7 336.8,21.1 342.4,25.7 348.0,31.5 353.6,38.4 359.2,46.2 364.8,54.8 370.4,64.1 376.0,73.9 381.6,84.0 387.2,94.4 392.8,104.8 398.4,115.2 404.0,125.3 409.6,135.2 415.2,144.7 420.8,153.8 426.4,162.3 432.0,170.2 437.6,177.6 443.2,184.3 448.8,190.4 454.4,196.0 460.0,200.9 465.6,205.3 471.2,209.1 476.8,212.5 482.4,215.4 488.0,217.9 493.6,220.1 499.2,221.9 504.8,223.4 510.4,224.7 516.0,225.7 521.6,226.6 527.2,227.3 532.8,227.9 538.4,228.3 544.0,228.7 549.6,229.0 555.2,229.2 560.8,229.4 566.4,229.6 572.0,229.7 577.6,229.8 583.2,229.8 588.8,229.9 594.4,229.9 600.0,229.9" fill="none" stroke="#2b2620" stroke-width="2.2"/>
+<line x1="435.5" y1="230" x2="435.5" y2="20" stroke="#a8453a" stroke-width="1.4" stroke-dasharray="4,3"/>
+<text x="435.5" y="14" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="#a8453a" font-weight="700">z = 1.65</text>
+<text x="230" y="150" text-anchor="middle" font-family="Pretendard" font-size="13" fill="#3d6fa5" font-weight="700">P(Z ≤ 1.65) = 0.9505</text>
+</svg>
+<div class="diagram-caption">Z표에서 읽는 값은 z 왼쪽(음의 무한대부터 z까지)의 누적 면적, 즉 P(Z≤z)이다</div>
+</div>
+
+<h3>표 조각 예시 — z = 1.6x 행</h3>
+<table>
+<tr><th>z</th><th>.00</th><th>.01</th><th>.02</th><th>.03</th><th>.04</th><th>.05</th></tr>
+<tr><td>1.6</td><td>0.9452</td><td>0.9463</td><td>0.9474</td><td>0.9484</td><td>0.9495</td><td><b>0.9505</b></td></tr>
+</table>
+<p>예를 들어 z = 1.65에 대한 확률을 찾으려면, 행에서 <code>1.6</code>을 찾고 열에서 <code>.05</code>를 찾아 교차점의 값 <code>0.9505</code>를 읽습니다. 즉 P(Z ≤ 1.65) = 0.9505입니다.</p>
+
+<h3>자주 쓰는 임계값 (역방향: 확률 → z값)</h3>
+<table>
+<tr><th>용도</th><th>누적확률</th><th>z값</th></tr>
+<tr><td>단측 α=0.05</td><td>P(Z≤z)=0.95</td><td>z = 1.645</td></tr>
+<tr><td>양측 α=0.05 (각 꼬리 0.025)</td><td>P(Z≤z)=0.975</td><td>z = 1.96</td></tr>
+<tr><td>단측 α=0.01</td><td>P(Z≤z)=0.99</td><td>z = 2.326</td></tr>
+<tr><td>양측 α=0.01 (각 꼬리 0.005)</td><td>P(Z≤z)=0.995</td><td>z = 2.576</td></tr>
+</table>
+<div class="tip">가설검정에서는 Z표를 두 방향으로 씁니다. (1) 임계값 찾기: 유의수준 α를 알 때 기각역의 경계 z값을 찾는 것. (2) p-value 계산: 계산된 검정통계량 z값의 누적확률(또는 1−누적확률)을 찾아 유의확률을 구하는 것.</div>
+</section>
+
+<section id="when-to-use">
+<h2>07 · 언제 사용하는가: 4가지 상황</h2>
+<p>Z분포는 <b>모표준편차 σ를 알고 있을 때</b>(또는 표본이 매우 커서 σ를 표본표준편차로 대체해도 무방할 때) 모평균·모비율에 대한 추론에 사용됩니다. 실무적으로는 다음 4가지 검정으로 나뉘어 사용됩니다.</p>
+
+<div class="diagram-box">
+<svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
+<g font-family="Pretendard">
+<rect x="350" y="10" width="200" height="46" rx="10" fill="#2b2620"/>
+<text x="450" y="38" text-anchor="middle" fill="#faf6ef" font-size="13" font-weight="700">Z분포의 활용</text>
+
+<path d="M420 56 L 190 100" stroke="#8a6a3f" stroke-width="1.5" fill="none"/>
+<path d="M480 56 L 710 100" stroke="#8a6a3f" stroke-width="1.5" fill="none"/>
+<text x="270" y="86" text-anchor="middle" font-size="11.5" fill="#5b5347">단일 모집단</text>
+<text x="630" y="86" text-anchor="middle" font-size="11.5" fill="#5b5347">두 모집단 비교</text>
+
+<rect x="60" y="100" width="260" height="56" rx="8" fill="#e3ecf5" stroke="#3d6fa5"/>
+<text x="190" y="122" text-anchor="middle" font-size="13" font-weight="700" fill="#3d6fa5">① 모평균 검정</text>
+<text x="190" y="140" text-anchor="middle" font-size="10.5" fill="#5b5347">연속형, 모평균이 특정 값인가?</text>
+
+<rect x="580" y="100" width="260" height="56" rx="8" fill="#e7efe4" stroke="#4d7358"/>
+<text x="710" y="122" text-anchor="middle" font-size="13" font-weight="700" fill="#4d7358">③ 두 모평균 차이 검정</text>
+<text x="710" y="140" text-anchor="middle" font-size="10.5" fill="#5b5347">연속형, 두 집단의 평균이 같은가?</text>
+
+<rect x="60" y="176" width="260" height="56" rx="8" fill="#f0ddc8" stroke="#b5673a"/>
+<text x="190" y="198" text-anchor="middle" font-size="13" font-weight="700" fill="#8a6a3f">② 모비율 검정</text>
+<text x="190" y="216" text-anchor="middle" font-size="10.5" fill="#5b5347">범주형(비율), 모비율이 특정 값인가?</text>
+
+<rect x="580" y="176" width="260" height="56" rx="8" fill="#f6e4df" stroke="#a8453a"/>
+<text x="710" y="198" text-anchor="middle" font-size="13" font-weight="700" fill="#a8453a">④ 두 모비율 차이 검정</text>
+<text x="710" y="216" text-anchor="middle" font-size="10.5" fill="#5b5347">범주형, 두 집단의 비율이 같은가?</text>
+</g>
+</svg>
+<div class="diagram-caption">Z분포는 단일 모집단 검정(①②)과 두 모집단 비교 검정(③④), 그리고 연속형(평균, ①③)과 범주형(비율, ②④)이라는 두 축으로 나뉘어 활용된다</div>
+</div>
+
+<table>
+<tr><th>검정</th><th>자료 형태</th><th>핵심 질문</th><th>전제조건</th></tr>
+<tr><td>① 모평균 검정</td><td>연속형, 단일 표본</td><td>모평균이 특정값 μ₀와 같은가?</td><td>σ 기지, 정규모집단 또는 n 충분히 큼</td></tr>
+<tr><td>② 모비율 검정</td><td>범주형, 단일 표본</td><td>모비율이 특정값 p₀와 같은가?</td><td>np₀≥5, n(1−p₀)≥5 (정규근사 조건)</td></tr>
+<tr><td>③ 두 모평균 차이 검정</td><td>연속형, 두 독립표본</td><td>두 모평균이 같은가(차이가 0인가)?</td><td>σ₁, σ₂ 모두 기지, 두 표본 독립</td></tr>
+<tr><td>④ 두 모비율 차이 검정</td><td>범주형, 두 독립표본</td><td>두 모비율이 같은가?</td><td>각 집단 정규근사 조건 충족</td></tr>
+</table>
+</section>
+
+<section id="test-mean">
+<h2>08 · 검정① 모평균 검정 (σ 기지)</h2>
+<span class="test-tag mean">단일 표본 · 평균검정</span>
+<div class="definition"><b>목적</b>: 모표준편차 σ를 알고 있는 상황에서, 표본평균을 근거로 모평균이 특정 가설값 μ₀와 같은지를 검정합니다.</div>
+
+<h3>가설</h3>
+<table>
+<tr><th>형태</th><th>H₀</th><th>H₁</th></tr>
+<tr><td>양측검정</td><td>μ = μ₀</td><td>μ ≠ μ₀</td></tr>
+<tr><td>우측단측</td><td>μ ≤ μ₀</td><td>μ &gt; μ₀</td></tr>
+<tr><td>좌측단측</td><td>μ ≥ μ₀</td><td>μ &lt; μ₀</td></tr>
+</table>
+
+<h3>검정통계량</h3>
+$$Z = \frac{\bar{X} - \mu_0}{\sigma/\sqrt{n}}$$
+
+<div class="card">
+<b>예제</b>: 어느 공장에서 생산하는 부품의 길이는 모표준편차 σ=2mm로 알려진 정규분포를 따른다. 신제품 공정에서 표본 n=36개를 뽑아 측정한 결과 평균이 20.7mm였다. 목표 길이는 20mm이다. 유의수준 5%에서 공정 평균이 목표와 다르다고 할 수 있는가?
+<p>$$Z = \frac{20.7 - 20}{2/\sqrt{36}} = \frac{0.7}{0.333} \approx 2.10$$</p>
+<p>양측검정 α=0.05의 임계값은 ±1.96. |2.10| &gt; 1.96 이므로 <b>H₀ 기각</b> — 공정 평균이 목표(20mm)와 유의하게 다르다.</p>
+</div>
+</section>
+
+<section id="test-proportion">
+<h2>09 · 검정② 모비율 검정</h2>
+<span class="test-tag prop">단일 표본 · 비율검정</span>
+<div class="definition"><b>목적</b>: 범주형 자료에서 표본비율을 근거로 모비율이 특정 가설값 p₀와 같은지를 검정합니다. 표본이 충분히 크면 표본비율의 분포가 정규분포로 근사되는 성질(np₀≥5, n(1−p₀)≥5)을 이용합니다.</div>
+
+<h3>가설</h3>
+<table>
+<tr><th>형태</th><th>H₀</th><th>H₁</th></tr>
+<tr><td>양측검정</td><td>p = p₀</td><td>p ≠ p₀</td></tr>
+<tr><td>우측단측</td><td>p ≤ p₀</td><td>p &gt; p₀</td></tr>
+</table>
+
+<h3>검정통계량</h3>
+$$Z = \frac{\hat{p} - p_0}{\sqrt{p_0(1-p_0)/n}}$$
+<p>여기서 $\hat{p} = x/n$ (표본에서 성공 횟수 x를 표본크기 n으로 나눈 표본비율)입니다.</p>
+
+<div class="card">
+<b>예제</b>: 어느 온라인 쇼핑몰은 기존 구매전환율이 p₀=10%라고 알려져 있다. 새 UI를 적용한 후 표본 n=400명 중 52명이 구매했다(p̂=0.13). 유의수준 5%에서 구매전환율이 개선되었다고 할 수 있는가? (우측단측검정)
+<p>$$Z = \frac{0.13 - 0.10}{\sqrt{0.10 \times 0.90 / 400}} = \frac{0.03}{0.015} = 2.00$$</p>
+<p>우측단측 α=0.05의 임계값은 1.645. 2.00 &gt; 1.645 이므로 <b>H₀ 기각</b> — 구매전환율이 유의하게 개선되었다.</p>
+</div>
+</section>
+
+<section id="test-two-means">
+<h2>10 · 검정③ 두 모평균 차이 검정</h2>
+<span class="test-tag twomean">독립 두 표본 · 평균 비교</span>
+<div class="definition"><b>목적</b>: 두 모표준편차 σ₁, σ₂를 모두 알고 있는 상황에서, 독립인 두 표본을 근거로 두 모평균이 같은지(차이가 있는지)를 검정합니다.</div>
+
+<h3>가설</h3>
+<table>
+<tr><th>형태</th><th>H₀</th><th>H₁</th></tr>
+<tr><td>양측검정</td><td>μ₁ = μ₂ (μ₁−μ₂=0)</td><td>μ₁ ≠ μ₂</td></tr>
+</table>
+
+<h3>검정통계량</h3>
+$$Z = \frac{(\bar{X}_1 - \bar{X}_2) - (\mu_1 - \mu_2)_0}{\sqrt{\dfrac{\sigma_1^2}{n_1} + \dfrac{\sigma_2^2}{n_2}}}$$
+<p>귀무가설이 보통 μ₁−μ₂=0이므로 분자는 $(\bar{X}_1-\bar{X}_2)$로 단순화되는 경우가 많습니다.</p>
+
+<div class="card">
+<b>예제</b>: A공장(σ₁=3, n₁=40, 표본평균 x̄₁=52)과 B공장(σ₂=4, n₂=50, 표본평균 x̄₂=49.5)에서 생산한 제품의 강도를 비교한다. 유의수준 5%에서 두 공장의 평균 강도가 다르다고 할 수 있는가?
+<p>$$Z = \frac{52 - 49.5}{\sqrt{3^2/40 + 4^2/50}} = \frac{2.5}{\sqrt{0.225+0.32}} = \frac{2.5}{0.738} \approx 3.39$$</p>
+<p>양측검정 α=0.05의 임계값은 ±1.96. 3.39 &gt; 1.96 이므로 <b>H₀ 기각</b> — 두 공장의 평균 강도는 유의하게 다르다.</p>
+</div>
+</section>
+
+<section id="test-two-proportions">
+<h2>11 · 검정④ 두 모비율 차이 검정</h2>
+<span class="test-tag twoprop">독립 두 표본 · 비율 비교</span>
+<div class="definition"><b>목적</b>: 독립인 두 표본을 근거로 두 모집단의 비율이 같은지를 검정합니다. 귀무가설 하에서는 두 모비율이 같다고 가정하므로, 두 표본을 합친 <b>합동비율(pooled proportion)</b>을 사용해 표준오차를 추정합니다.</div>
+
+<h3>가설</h3>
+<table>
+<tr><th>형태</th><th>H₀</th><th>H₁</th></tr>
+<tr><td>양측검정</td><td>p₁ = p₂</td><td>p₁ ≠ p₂</td></tr>
+</table>
+
+<h3>검정통계량</h3>
+$$\hat{p} = \frac{x_1 + x_2}{n_1 + n_2} \quad(\text{합동비율})$$
+$$Z = \frac{\hat{p}_1 - \hat{p}_2}{\sqrt{\hat{p}(1-\hat{p})\left(\dfrac{1}{n_1}+\dfrac{1}{n_2}\right)}}$$
+
+<div class="card">
+<b>예제</b>: 신약 임상시험에서 치료군(n₁=200명 중 60명 호전, p̂₁=0.30)과 대조군(n₂=180명 중 36명 호전, p̂₂=0.20)의 호전율을 비교한다. 유의수준 5%에서 두 군의 호전율이 다르다고 할 수 있는가?
+<p>$$\hat{p} = \frac{60+36}{200+180} = \frac{96}{380} \approx 0.253$$</p>
+<p>$$Z = \frac{0.30 - 0.20}{\sqrt{0.253 \times 0.747 \times (1/200 + 1/180)}} = \frac{0.10}{\sqrt{0.189 \times 0.01056}} \approx \frac{0.10}{0.0447} \approx 2.24$$</p>
+<p>양측검정 α=0.05의 임계값은 ±1.96. 2.24 &gt; 1.96 이므로 <b>H₀ 기각</b> — 두 군의 호전율은 유의하게 다르다.</p>
+</div>
+</section>
+
+<section id="z-vs-t">
+<h2>12 · Z검정 vs t검정</h2>
+<p>가장 흔한 실수는 "모평균 검정 = 무조건 Z검정"으로 착각하는 것입니다. 실제로는 <b>σ를 아는지 여부</b>와 <b>표본크기</b>에 따라 Z검정과 t검정이 갈립니다.</p>
+
+<div class="diagram-box">
+<svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+<g font-family="Pretendard">
+<rect x="350" y="10" width="200" height="46" rx="10" fill="#2b2620"/>
+<text x="450" y="38" text-anchor="middle" fill="#faf6ef" font-size="13" font-weight="700">모표준편차 σ를 아는가?</text>
+
+<path d="M420 56 L 190 100" stroke="#8a6a3f" stroke-width="1.5" fill="none"/>
+<path d="M480 56 L 710 100" stroke="#8a6a3f" stroke-width="1.5" fill="none"/>
+<text x="270" y="86" text-anchor="middle" font-size="11.5" fill="#5b5347">σ 기지 (안다)</text>
+<text x="630" y="86" text-anchor="middle" font-size="11.5" fill="#5b5347">σ 미지 (모른다, s로 추정)</text>
+
+<rect x="60" y="100" width="260" height="70" rx="8" fill="#e3ecf5" stroke="#3d6fa5"/>
+<text x="190" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#3d6fa5">Z검정 사용</text>
+<text x="190" y="146" text-anchor="middle" font-size="10.5" fill="#5b5347">Z = (X̄−μ₀)/(σ/√n)</text>
+<text x="190" y="162" text-anchor="middle" font-size="10.5" fill="#5b5347">또는 n이 매우 클 때(n≥30)</text>
+
+<rect x="580" y="100" width="260" height="70" rx="8" fill="#f0ddc8" stroke="#b5673a"/>
+<text x="710" y="126" text-anchor="middle" font-size="13" font-weight="700" fill="#8a6a3f">t검정 사용</text>
+<text x="710" y="146" text-anchor="middle" font-size="10.5" fill="#5b5347">t = (X̄−μ₀)/(s/√n)</text>
+<text x="710" y="162" text-anchor="middle" font-size="10.5" fill="#5b5347">자유도 n−1, 표본표준편차 s로 대체</text>
+</g>
+</svg>
+<div class="diagram-caption">실무에서는 σ를 정확히 아는 경우가 드물어, 표본표준편차 s로 추정하는 t검정이 더 자주 쓰인다. 다만 n이 충분히 크면(대략 30 이상) t분포가 Z분포에 근사하므로 Z검정으로 대체해도 무방하다</div>
+</div>
+
+<table>
+<tr><th>구분</th><th>Z검정</th><th>t검정</th></tr>
+<tr><td>모표준편차 σ</td><td>알고 있음(기지)</td><td>모름 → 표본표준편차 s로 추정</td></tr>
+<tr><td>분포</td><td>표준정규분포 N(0,1), 파라미터 없음</td><td>t분포, 자유도(df=n−1)에 따라 모양 변화</td></tr>
+<tr><td>꼬리 두께</td><td>상대적으로 얇음</td><td>df가 작을수록 꼬리가 두꺼움(불확실성 반영)</td></tr>
+<tr><td>표본크기</td><td>제한 없음(소표본도 정규모집단이면 가능)</td><td>제한 없음, df→∞이면 Z분포에 수렴</td></tr>
+<tr><td>실무 활용 빈도</td><td>비율 검정, 대표본 평균 검정에서 흔함</td><td>소표본 평균 검정에서 표준적으로 사용</td></tr>
+</table>
+<div class="tip">비율(proportion) 검정은 표본크기가 충분히 크다는 정규근사 조건(np≥5, n(1−p)≥5) 자체가 전제이므로, 관행적으로 t검정이 아닌 <b>Z검정</b>을 사용합니다. 반면 평균 검정은 σ를 모르는 경우가 대부분이라 실무에서는 t검정이 기본값입니다.</div>
+</section>
+
+<section id="procedure">
+<h2>13 · 공통 검정 절차 6단계</h2>
+<p>위의 네 가지 검정 모두 다음과 같은 공통된 절차를 따릅니다.</p>
+<div class="card">
+<p><span class="step-badge">1</span><b>가설 설정</b> — 귀무가설(H₀)과 대립가설(H₁)을 명확히 세운다.</p>
+<p><span class="step-badge">2</span><b>유의수준 결정</b> — α(보통 0.05 또는 0.01)를 설정하고, 양측/단측 여부를 정한다.</p>
+<p><span class="step-badge">3</span><b>검정통계량 계산</b> — 자료로부터 Z 검정통계량을 계산한다.</p>
+<p><span class="step-badge">4</span><b>기각역/임계값 결정</b> — 유의수준과 검정방향(양측·단측)을 기준으로 Z표에서 임계값을 찾는다.</p>
+<p><span class="step-badge">5</span><b>통계량과 임계값 비교</b> — 검정통계량이 기각역에 속하는지 확인한다(또는 p-value와 α를 비교).</p>
+<p><span class="step-badge">6</span><b>결론 도출</b> — 귀무가설을 기각할지, 기각하지 못할지 결정하고 실질적 의미를 해석한다.</p>
+</div>
+<div class="warn">Z분포는 좌우 대칭이므로, 네 가지 검정 모두 <b>양측검정과 단측검정이 모두 가능</b>합니다(카이제곱검정의 적합도·독립성·동질성 검정이 항상 단측인 것과 대비됩니다). 연구 질문이 "다른가?"이면 양측, "더 큰가/더 작은가?"이면 단측을 사용합니다.</div>
+</section>
+
+<section id="summary">
+<h2>14 · 종합 비교표</h2>
+<div class="card">
+<table>
+<tr><th>검정</th><th>목적</th><th>검정통계량</th><th>전제조건</th><th>기각역 방향</th></tr>
+<tr><td>① 모평균 검정</td><td>단일 모평균이 특정값과 같은가</td><td>(X̄−μ₀)/(σ/√n)</td><td>σ 기지</td><td>양측 또는 단측</td></tr>
+<tr><td>② 모비율 검정</td><td>단일 모비율이 특정값과 같은가</td><td>(p̂−p₀)/√(p₀(1−p₀)/n)</td><td>np₀≥5, n(1−p₀)≥5</td><td>양측 또는 단측</td></tr>
+<tr><td>③ 두 모평균 차이 검정</td><td>두 모평균이 같은가</td><td>(X̄₁−X̄₂)/√(σ₁²/n₁+σ₂²/n₂)</td><td>σ₁,σ₂ 기지, 독립표본</td><td>양측 또는 단측</td></tr>
+<tr><td>④ 두 모비율 차이 검정</td><td>두 모비율이 같은가</td><td>(p̂₁−p̂₂)/√(p̂(1−p̂)(1/n₁+1/n₂))</td><td>정규근사 조건, 독립표본</td><td>양측 또는 단측</td></tr>
+</table>
+</div>
+<div class="tip">암기 포인트: 네 검정통계량의 형태는 결국 모두 <b>"(추정값 − 가설값) ÷ 표준오차"</b>라는 동일한 구조입니다. 분자는 관측된 것과 가정된 것의 차이, 분모는 그 차이가 우연히 생길 수 있는 정도(표준오차)를 나타내며, 이 비율이 클수록 우연이라 보기 어렵다는 뜻입니다.</div>
+</section>
+
+<section id="python-code">
+<h2>15 · Python 실전코드 (챕터별)</h2>
+<p>지금까지 손으로 계산한 04~14장의 예제들을 <code>scipy.stats</code>와 <code>statsmodels</code>로 그대로 재현합니다. 모든 결과값은 앞선 챕터의 손계산 결과와 정확히 일치하도록 검증했습니다.</p>
+
+<div class="note">공통으로 필요한 임포트입니다. 아래 모든 코드 조각은 이 임포트가 이미 실행되었다고 가정합니다.</div>
+<div class="code-block">import numpy as np
+from scipy import stats
+from statsmodels.stats.weightstats import ztest
+from statsmodels.stats.proportion import proportions_ztest</div>
+
+<h3>15.1 · scipy.stats.norm 기본 사용법 <span style="font-weight:400; color:var(--ink-soft); font-size:14px;">(04장 모양 · 05장 성질 · 06장 Z표 읽는 법 대응)</span></h3>
+<span class="code-label">04 · 05 · 06장</span>
+<div class="code-block">print("=" * 60)
+print("0. scipy.stats.norm 기본 사용법")
+print("=" * 60)
+
+# 표준정규분포 객체 (평균 0, 표준편차 1)
+Z = stats.norm(loc=0, scale=1)
+
+# (1) 누적확률 P(Z &lt;= z)  ─ Z표를 찾는 것과 동일
+print(f"P(Z &lt;= 1.65)          = {Z.cdf(1.65):.4f}")   # 학습서 06장 예제: 0.9505
+print(f"P(Z &lt;= 1.96)          = {Z.cdf(1.96):.4f}")
+print(f"P(-1.96 &lt;= Z &lt;= 1.96) = {Z.cdf(1.96) - Z.cdf(-1.96):.4f}")  # 95% 구간
+
+# (2) 역함수 ppf(percent point function) ─ 확률 -&gt; z값 (Z표의 역방향 조회)
+print(f"P(Z&lt;=z)=0.95 인 z      = {Z.ppf(0.95):.4f}")   # 단측 5% 임계값 -&gt; 1.645
+print(f"P(Z&lt;=z)=0.975 인 z     = {Z.ppf(0.975):.4f}")  # 양측 5% 임계값 -&gt; 1.96
+
+# (3) 68-95-99.7 규칙 검증
+for k in [1, 2, 3]:
+    p = Z.cdf(k) - Z.cdf(-k)
+    print(f"±{k}σ 이내 확률        = {p*100:.2f}%")
+
+# (4) 개별 관측값 표준화: Z = (X - μ) / σ
+x, mu, sigma = 23.5, 20.0, 2.0
+z_score = (x - mu) / sigma
+print(f"\nX={x}, μ={mu}, σ={sigma} 일 때 Z값 = {z_score:.3f}")
+print(f"이 값보다 클 확률 P(Z &gt; z)   = {1 - Z.cdf(z_score):.4f}")</div>
+<div class="output-block">P(Z &lt;= 1.65)          = <b>0.9505</b>
+P(Z &lt;= 1.96)          = 0.9750
+P(-1.96 &lt;= Z &lt;= 1.96) = 0.9500
+P(Z&lt;=z)=0.95 인 z      = <b>1.6449</b>
+P(Z&lt;=z)=0.975 인 z     = 1.9600
+±1σ 이내 확률        = 68.27%
+±2σ 이내 확률        = 95.45%
+±3σ 이내 확률        = 99.73%
+
+X=23.5, μ=20.0, σ=2.0 일 때 Z값 = 1.750
+이 값보다 클 확률 P(Z &gt; z)   = 0.0401</div>
+<div class="definition"><b>포인트</b> — <code>stats.norm(loc=0, scale=1)</code>이 곧 03장에서 유도한 <b>Z ~ N(0,1)</b> 그 자체입니다. <code>cdf()</code>는 06장에서 손으로 Z표를 찾던 과정을 함수로 대체한 것("z값 → 누적확률" 방향)이고, <code>ppf()</code>는 그 반대("확률 → z값")로 07~11장의 검정에서 임계값을 구할 때 씁니다. 68/95/99.7% 검증부는 04장 음영 그래프를 수치로 재확인한 것입니다.</div>
+
+<h3>15.2 · 모평균 검정 <span style="font-weight:400; color:var(--ink-soft); font-size:14px;">(08장 대응)</span></h3>
+<span class="code-label">08장 · 모평균 검정</span>
+<div class="code-block">print("\n" + "=" * 60)
+print("1. 모평균 검정 (One-sample Z-test)")
+print("=" * 60)
+# 예제: 목표 길이 20mm, σ=2mm(기지), n=36, 표본평균=20.7mm
+
+n = 36
+x_bar = 20.7
+mu0 = 20.0
+sigma = 2.0
+
+# 수식 그대로 계산
+z_stat = (x_bar - mu0) / (sigma / np.sqrt(n))
+p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))  # 양측검정
+
+print(f"검정통계량 Z = {z_stat:.3f}")
+print(f"p-value (양측) = {p_value:.4f}")
+print(f"결론: {'H0 기각 (평균이 다르다)' if p_value &lt; 0.05 else 'H0 기각 못함'}")
+
+# statsmodels로 실제 표본 데이터가 있을 때 (요약통계 대신 원자료 사용 예시)
+np.random.seed(0)
+sample = np.random.normal(loc=20.7, scale=sigma, size=n)  # 가상의 원자료
+z_stat2, p_value2 = ztest(sample, value=mu0)
+print(f"\n[statsmodels ztest, 임의생성 원자료 기준] Z = {z_stat2:.3f}, p = {p_value2:.4f}")</div>
+<div class="output-block">검정통계량 Z = <b>2.100</b>
+p-value (양측) = 0.0357
+결론: H0 기각 (평균이 다르다)
+
+[statsmodels ztest, 임의생성 원자료 기준] Z = 3.520, p = 0.0004</div>
+<div class="definition"><b>포인트</b> — 08장 공식 $Z=\dfrac{\bar X-\mu_0}{\sigma/\sqrt n}$을 한 줄로 옮긴 것입니다. 08장은 임계값(±1.96)과 비교했지만 코드는 <b>p-value 방식</b>(꼬리확률을 α와 비교)을 썼습니다 — 둘은 동치입니다. <code>ztest()</code>는 원자료 배열을 받아 같은 공식을 자동 계산해주는 함수로, 실무에서는 요약통계보다 원자료가 있는 경우가 많아 더 일반적입니다.</div>
+
+<h3>15.3 · 모비율 검정 <span style="font-weight:400; color:var(--ink-soft); font-size:14px;">(09장 대응)</span></h3>
+<span class="code-label">09장 · 모비율 검정</span>
+<div class="code-block">print("\n" + "=" * 60)
+print("2. 모비율 검정 (One-proportion Z-test)")
+print("=" * 60)
+# 예제: 기존 전환율 p0=10%, n=400명 중 52명 구매 (p̂=0.13), 우측단측검정
+
+count = 52
+nobs = 400
+p0 = 0.10
+
+# 수식 그대로 계산
+p_hat = count / nobs
+z_stat = (p_hat - p0) / np.sqrt(p0 * (1 - p0) / nobs)
+p_value = 1 - stats.norm.cdf(z_stat)  # 우측단측검정
+
+print(f"표본비율 p̂ = {p_hat:.3f}")
+print(f"검정통계량 Z = {z_stat:.3f}")
+print(f"p-value (우측단측) = {p_value:.4f}")
+
+# statsmodels 함수 사용 (alternative='larger' = 우측단측)
+# 주의: prop_var 기본값(False)은 분산 계산에 표본비율 p̂을 쓴다.
+#       교과서·학습서 공식(H0의 p0로 분산 계산)과 맞추려면 prop_var=p0를 명시해야 한다.
+z_stat2, p_value2 = proportions_ztest(count=count, nobs=nobs, value=p0,
+                                       alternative='larger', prop_var=p0)
+print(f"\n[statsmodels proportions_ztest, prop_var=p0] Z = {z_stat2:.3f}, p = {p_value2:.4f}")
+print(f"결론: {'H0 기각 (전환율 개선)' if p_value2 &lt; 0.05 else 'H0 기각 못함'}")</div>
+<div class="output-block">표본비율 p̂ = 0.130
+검정통계량 Z = <b>2.000</b>
+p-value (우측단측) = 0.0228
+
+[statsmodels proportions_ztest, prop_var=p0] Z = 2.000, p = 0.0228
+결론: H0 기각 (전환율 개선)</div>
+<div class="warn"><b>주의(라이브러리 함정)</b> — <code>proportions_ztest</code>는 기본값(<code>prop_var=False</code>)에서 분산 계산에 <b>표본비율(p̂)</b>을 씁니다. 09장 교과서 공식은 <b>귀무가설의 p₀</b>로 분산을 계산하므로, 기본 옵션 그대로 쓰면 Z=1.784로 학습서 손계산(Z=2.000)과 달라집니다. <code>prop_var=p0</code>를 명시해야 정확히 일치합니다 — 라이브러리 기본값을 맹신하면 안 된다는 실전 사례입니다.</div>
+
+<h3>15.4 · 두 모평균 차이 검정 <span style="font-weight:400; color:var(--ink-soft); font-size:14px;">(10장 대응)</span></h3>
+<span class="code-label">10장 · 두 모평균 차이 검정</span>
+<div class="code-block">print("\n" + "=" * 60)
+print("3. 두 모평균 차이 검정 (Two-sample Z-test)")
+print("=" * 60)
+# 예제: A공장(σ1=3, n1=40, x̄1=52) vs B공장(σ2=4, n2=50, x̄2=49.5)
+
+n1, x1_bar, sigma1 = 40, 52.0, 3.0
+n2, x2_bar, sigma2 = 50, 49.5, 4.0
+
+se = np.sqrt(sigma1**2 / n1 + sigma2**2 / n2)
+z_stat = (x1_bar - x2_bar) / se
+p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))
+
+print(f"표준오차 SE = {se:.4f}")
+print(f"검정통계량 Z = {z_stat:.3f}")
+print(f"p-value (양측) = {p_value:.4f}")
+print(f"결론: {'H0 기각 (두 공장 평균이 다르다)' if p_value &lt; 0.05 else 'H0 기각 못함'}")
+
+# statsmodels ztest 는 두 원자료 배열을 받아 계산 가능 (아래는 원자료 예시)
+np.random.seed(1)
+group1 = np.random.normal(x1_bar, sigma1, n1)
+group2 = np.random.normal(x2_bar, sigma2, n2)
+z_stat2, p_value2 = ztest(group1, group2, value=0)
+print(f"\n[statsmodels ztest, 임의생성 원자료 기준] Z = {z_stat2:.3f}, p = {p_value2:.4f}")</div>
+<div class="output-block">표준오차 SE = 0.7382
+검정통계량 Z = <b>3.386</b>
+p-value (양측) = 0.0007
+결론: H0 기각 (두 공장 평균이 다르다)
+
+[statsmodels ztest, 임의생성 원자료 기준] Z = 2.208, p = 0.0273</div>
+<div class="definition"><b>포인트</b> — 10장 공식의 분모(표준오차) $\sqrt{\sigma_1^2/n_1+\sigma_2^2/n_2}$를 그대로 옮겼습니다. 귀무가설이 μ₁−μ₂=0이라 분자가 단순히 두 표본평균 차이로 줄어드는 것도 10장 설명과 동일합니다. <code>ztest(group1, group2, value=0)</code>는 두 표본을 배열로 넘기면 위 공식을 자동 적용합니다.</div>
+
+<h3>15.5 · 두 모비율 차이 검정 <span style="font-weight:400; color:var(--ink-soft); font-size:14px;">(11장 대응)</span></h3>
+<span class="code-label">11장 · 두 모비율 차이 검정</span>
+<div class="code-block">print("\n" + "=" * 60)
+print("4. 두 모비율 차이 검정 (Two-proportion Z-test)")
+print("=" * 60)
+# 예제: 치료군(n1=200, x1=60) vs 대조군(n2=180, x2=36)
+
+counts = np.array([60, 36])
+nobs_arr = np.array([200, 180])
+
+p_pool = counts.sum() / nobs_arr.sum()
+p1_hat, p2_hat = counts[0] / nobs_arr[0], counts[1] / nobs_arr[1]
+se = np.sqrt(p_pool * (1 - p_pool) * (1/nobs_arr[0] + 1/nobs_arr[1]))
+z_stat = (p1_hat - p2_hat) / se
+p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))
+
+print(f"합동비율 p̂ = {p_pool:.4f}")
+print(f"검정통계량 Z = {z_stat:.3f}")
+print(f"p-value (양측) = {p_value:.4f}")
+
+# statsmodels 함수 사용 (배열을 넘기면 두 비율 비교로 자동 처리)
+z_stat2, p_value2 = proportions_ztest(count=counts, nobs=nobs_arr, alternative='two-sided')
+print(f"\n[statsmodels proportions_ztest] Z = {z_stat2:.3f}, p = {p_value2:.4f}")
+print(f"결론: {'H0 기각 (두 군의 호전율이 다르다)' if p_value2 &lt; 0.05 else 'H0 기각 못함'}")</div>
+<div class="output-block">합동비율 p̂ = 0.2526
+검정통계량 Z = <b>2.240</b>
+p-value (양측) = 0.0251
+
+[statsmodels proportions_ztest] Z = 2.240, p = 0.0251
+결론: H0 기각 (두 군의 호전율이 다르다)</div>
+<div class="definition"><b>포인트</b> — 11장에서 강조한 <b>합동비율(pooled proportion)</b> 계산이 핵심입니다. 귀무가설(p₁=p₂)이 참이라고 가정하고 두 표본을 합쳐 공통 분산을 추정한다는 점이 09장(단일비율 검정, p₀ 사용)과 다릅니다. <code>proportions_ztest</code>에 <code>count</code>·<code>nobs</code>를 <b>배열로</b> 넘기면 자동으로 pooled 방식이 적용되어, 15.3과 달리 기본 옵션 그대로도 학습서 수치(Z=2.240)와 일치합니다.</div>
+
+<h3>15.6 · 신뢰구간 계산 <span style="font-weight:400; color:var(--ink-soft); font-size:14px;">(보충 — 08장 예제 재활용)</span></h3>
+<span class="code-label">보충 · 신뢰구간</span>
+<div class="code-block">print("\n" + "=" * 60)
+print("5. Z분포 기반 신뢰구간")
+print("=" * 60)
+n, x_bar, sigma = 36, 20.7, 2.0
+alpha = 0.05
+z_crit = stats.norm.ppf(1 - alpha / 2)  # 1.96
+margin = z_crit * sigma / np.sqrt(n)
+
+print(f"95% 신뢰구간 = ({x_bar - margin:.3f}, {x_bar + margin:.3f})")
+print(f"(임계값 z = {z_crit:.3f}, 오차한계 = {margin:.3f})")</div>
+<div class="output-block">95% 신뢰구간 = <b>(20.047, 21.353)</b>
+(임계값 z = 1.960, 오차한계 = 0.653)</div>
+<div class="tip"><b>포인트</b> — 08장은 가설검정에 집중했지만, 같은 Z분포·같은 표준오차 공식으로 <b>신뢰구간</b>도 바로 구할 수 있습니다. 08장 예제의 x̄=20.7을 그대로 써서 95% 신뢰구간 (20.047, 21.353) 안에 μ₀=20이 들어가지 <b>않는다</b>는 것을 확인할 수 있는데, 이는 08장에서 H0(μ=20)를 기각한 결론과 정확히 일관됩니다 — "신뢰구간이 μ₀를 포함하지 않으면 H0 기각"이라는 검정-구간의 동치 관계를 보여줍니다.</div>
+</section>
+
+</main>
+</div>
+
+<script>
+const sections = document.querySelectorAll('main section');
+const navLinks = document.querySelectorAll('nav.sidebar a');
+function onScroll(){
+  let current = '';
+  sections.forEach(sec=>{
+    const rect = sec.getBoundingClientRect();
+    if(rect.top <= 120) current = sec.id;
+  });
+  navLinks.forEach(a=>{
+    a.classList.toggle('active', a.getAttribute('href') === '#'+current);
+  });
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+</script>
+</body>
+</html>

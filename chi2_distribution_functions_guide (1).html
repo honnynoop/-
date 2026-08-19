@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카이제곱분포 함수 완전정복 — scipy.stats.chi2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css"></script>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+:root{
+  --paper:#f7f1e6; --paper-2:#efe6d3; --ink:#2c2620; --ink-soft:#5a5044;
+  --line:#dcd0b8; --accent:#b5652f; --accent-2:#8a7048; --accent-soft:#e8d3b8;
+  --good:#3f7d5c; --bad:#b5432f; --card:#fffaf0; --shadow:0 2px 10px rgba(60,45,20,0.08); --radius:14px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:'Pretendard',-apple-system,sans-serif; line-height:1.75; font-size:16px;}
+h1,h2,h3,h4{font-family:'Spectral',serif; font-weight:700; color:var(--ink); line-height:1.3;}
+.layout{display:flex; max-width:1400px; margin:0 auto;}
+.sidebar{width:270px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto; padding:28px 18px; border-right:1px solid var(--line); background:var(--paper-2);}
+.sidebar h2{font-size:1.05rem; margin:0 0 4px; color:var(--accent);}
+.sidebar .sub{font-size:0.78rem; color:var(--ink-soft); margin-bottom:20px;}
+.sidebar nav a{display:block; padding:7px 10px; margin:2px 0; border-radius:8px; color:var(--ink-soft); text-decoration:none; font-size:0.86rem; border-left:3px solid transparent;}
+.sidebar nav a:hover{background:var(--accent-soft); color:var(--ink);}
+.sidebar nav a.active{background:var(--accent-soft); color:var(--accent); font-weight:600; border-left:3px solid var(--accent);}
+main{flex:1; min-width:0; padding:40px 56px 120px;}
+.hero{padding:36px 40px; background:linear-gradient(135deg,var(--card),var(--accent-soft)); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:44px; border:1px solid var(--line);}
+.hero h1{font-size:2.0rem; margin:0 0 10px;}
+.hero p{color:var(--ink-soft); font-size:1rem; margin:6px 0;}
+section.chapter{margin-bottom:70px; scroll-margin-top:20px;}
+section.chapter > h2{font-size:1.55rem; padding-bottom:10px; border-bottom:3px solid var(--accent); display:flex; align-items:center; gap:10px;}
+.chnum{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:var(--accent); color:#fff; font-family:'JetBrains Mono',monospace; font-size:0.85rem; flex-shrink:0;}
+h3{font-size:1.2rem; margin-top:32px; color:var(--accent-2); border-left:4px solid var(--accent-soft); padding-left:10px;}
+h4{font-size:1.02rem; color:var(--ink);}
+p{margin:10px 0;}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px 26px; margin:18px 0; box-shadow:var(--shadow);}
+.callout{border-left:4px solid var(--accent); background:var(--accent-soft); padding:14px 18px; border-radius:0 10px 10px 0; margin:16px 0; font-size:0.94rem;}
+.callout.tip{border-left-color:var(--good); background:#e5efe4;}
+.callout.warn{border-left-color:var(--bad); background:#f4e2dc;}
+.formula-box{background:#fffdf7; border:1px dashed var(--accent-2); border-radius:10px; padding:16px 20px; margin:16px 0; overflow-x:auto;}
+.calc-steps{background:#2c2620; color:#f7f1e6; border-radius:10px; padding:18px 22px; font-family:'JetBrains Mono',monospace; font-size:0.85rem; margin:16px 0; overflow-x:auto; line-height:1.9; white-space:pre-wrap;}
+.calc-steps .step-label{color:#e0a458; font-weight:700;}
+.calc-steps .result{color:#8fd19e;}
+.code-box{background:#1f2b23; color:#d8f0dc; border-radius:10px; padding:18px 22px; font-family:'JetBrains Mono',monospace; font-size:0.83rem; margin:16px 0; overflow-x:auto; line-height:1.7;}
+.code-box .cm{color:#7fae87;}
+.code-box .kw{color:#e0a458;}
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;}
+th,td{border:1px solid var(--line); padding:9px 12px; text-align:center;}
+th{background:var(--accent-soft); color:var(--ink);}
+tr:nth-child(even) td{background:#faf5e8;}
+.tag{display:inline-block; font-size:0.72rem; padding:2px 9px; border-radius:20px; background:var(--accent-2); color:#fff; margin-right:6px; font-family:'JetBrains Mono',monospace;}
+.diagram-wrap{background:#fffdf7; border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin:18px 0; overflow-x:auto; text-align:center;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media (max-width:900px){.grid2{grid-template-columns:1fr;}}
+.quiz{background:var(--card); border:2px solid var(--accent-soft); border-radius:var(--radius); padding:20px 24px; margin:16px 0;}
+.quiz .q{font-weight:600; margin-bottom:10px;}
+.quiz label{display:block; padding:8px 12px; margin:5px 0; border-radius:8px; cursor:pointer; border:1px solid var(--line); background:#fffdf7; font-size:0.92rem;}
+.quiz label:hover{background:var(--accent-soft);}
+.quiz .feedback{margin-top:10px; padding:10px 14px; border-radius:8px; font-size:0.9rem; display:none;}
+.quiz .feedback.correct{display:block; background:#e5efe4; color:var(--good); border:1px solid var(--good);}
+.quiz .feedback.wrong{display:block; background:#f4e2dc; color:var(--bad); border:1px solid var(--bad);}
+.badge-correct{color:var(--good); font-weight:700;}
+.badge-wrong{color:var(--bad); font-weight:700;}
+code{background:#efe6d3; padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:0.86rem;}
+.top-btn{position:fixed; bottom:26px; right:26px; width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow); font-size:1.2rem; text-decoration:none; opacity:0.85;}
+.progress-bar{position:fixed; top:0; left:0; height:3px; background:var(--accent); z-index:99; transition:width .1s;}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="layout">
+<aside class="sidebar">
+  <h2>카이제곱분포 완전정복</h2>
+  <div class="sub">scipy.stats.chi2 — pdf·cdf·sf·ppf·isf·interval·stats</div>
+  <nav id="toc"></nav>
+</aside>
+<main id="main">
+
+<div class="hero">
+  <h1>scipy.stats.chi2 함수 완전정복</h1>
+  <p>카이제곱분포 곡선 위에서 pdf, cdf, sf, ppf, isf, interval, stats가 각각 무엇을 구하는가</p>
+  <p>같은 곡선, 다른 질문 — 그림으로 구별하고 손계산·코드로 확인한다</p>
+</div>
+
+<script>window.QUIZ_ANSWERS = {};</script>
+
+<!-- ============ CH0 카이제곱분포 리마인드 ============ -->
+<section class="chapter" id="ch0">
+<h2><span class="chnum">0</span>카이제곱분포 이론 — 정의부터 원리까지</h2>
+
+<h3>0.1 정의 — 표준정규 제곱합</h3>
+<div class="card">
+<p>표준정규분포 \(N(0,1)\)를 따르는 <b>서로 독립인</b> 확률변수 \(Z_1, Z_2, \dots, Z_k\)가 있을 때, 이들의 <b>제곱합</b>은 자유도 k인 카이제곱분포를 따른다고 <b>정의</b>한다.</p>
+</div>
+<div class="formula-box">
+\[ \chi^2_{(k)} = Z_1^2+Z_2^2+\cdots+Z_k^2 = \sum_{i=1}^{k} Z_i^2,\qquad Z_i \overset{iid}{\sim} N(0,1) \]
+</div>
+<p>즉 카이제곱분포는 그 자체로 새로 발명된 분포가 아니라, <b>표준정규분포에서 자연스럽게 파생되는 분포</b>다. 편차를 표준화한 뒤 제곱해서 더하는 연산은 통계학 전반(분산 추정, 적합도 판정, 독립성 판정)에서 반복적으로 나타나기 때문에, 이 파생 분포에 별도의 이름과 표(table)를 붙여 놓은 것이라고 이해하면 된다.</p>
+
+<h3>0.2 왜 항상 0 이상이고 오른쪽으로 긴 꼬리를 갖는가</h3>
+<div class="grid2">
+<div class="card">
+<h4>항상 0 이상인 이유</h4>
+<p>정의식 자체가 <b>제곱들의 합</b>이다. 각 \(Z_i^2 \ge 0\)이므로 아무리 값이 흩어져도 합은 결코 음수가 될 수 없다. 이 때문에 카이제곱분포는 좌측이 0에서 잘려나간(clipped) 형태를 가지며, 정규분포처럼 좌우로 무한히 뻗어나가지 않는다.</p>
+</div>
+<div class="card">
+<h4>오른쪽 꼬리가 긴 이유</h4>
+<p>대부분의 \(Z_i\)는 0 근처에 몰려 있으므로(표준정규의 특성), 제곱합도 대개 작은 값 근처에 몰린다. 하지만 드물게 \(Z_i\)가 큰 값(예: ±3 이상)을 취하면 <b>제곱되면서 그 영향이 급격히 커져</b> 합계를 크게 밀어올린다. 이 비대칭적인 증폭 효과 때문에 오른쪽으로 긴 꼬리가 만들어진다.</p>
+</div>
+</div>
+
+<h3>0.3 감마분포와의 관계</h3>
+<p>카이제곱분포는 사실 <b>감마분포(Gamma distribution)의 특수한 경우</b>다. 형상모수(shape) \(=k/2\), 척도모수(scale) \(=2\)인 감마분포가 바로 자유도 k인 카이제곱분포와 정확히 같다.</p>
+<div class="formula-box">
+\[ \chi^2_{(k)} \sim \text{Gamma}\!\left(\text{shape}=\tfrac{k}{2},\ \text{scale}=2\right) \]
+\[ f(x;k)=\frac{1}{2^{k/2}\Gamma(k/2)}\,x^{k/2-1}e^{-x/2},\qquad x\ge0 \]
+</div>
+<p>이 관계 덕분에 카이제곱분포의 여러 성질(감마함수 기반 pdf, 재생성, 극한 거동)이 감마분포 이론에서 그대로 상속된다. 참고로 <b>df=2인 카이제곱분포는 지수분포(평균 2)와 완전히 동일</b>하다 — 감마분포에서 shape=1인 경우가 지수분포이기 때문이다.</p>
+
+<h3>0.4 재생성(가법성) — 왜 자유도를 그냥 더할 수 있는가</h3>
+<div class="card">
+<p>서로 독립인 두 카이제곱분포 \(X_1\sim\chi^2_{(k_1)}\), \(X_2\sim\chi^2_{(k_2)}\)가 있으면, 그 합은 다시 카이제곱분포를 따르며 <b>자유도는 단순히 더해진다</b>.</p>
+</div>
+<div class="formula-box">
+\[ X_1+X_2 \sim \chi^2_{(k_1+k_2)} \]
+</div>
+<p>정의식(제곱합)을 생각하면 당연한 결과다 — 서로 다른 두 무리의 표준정규 제곱합을 합치면, 결국 더 많은 표준정규 확률변수들의 제곱합이 될 뿐이기 때문이다. 이 성질(가법성) 덕분에 <b>독립성검정에서 여러 셀의 (O-E)²/E를 단순히 더해도 되는 이유</b>, <b>ANOVA에서 SST=SSB+SSW로 분해된 두 변동이 각각 카이제곱을 따르고 그 합도 카이제곱을 따르는 이유</b>가 모두 설명된다.</p>
+
+<h3>0.5 자유도의 의미 — 표본분산과의 연결</h3>
+<p>정규모집단에서 뽑은 표본의 <b>표본분산</b>은 다음과 같이 카이제곱분포와 직접 연결된다(카이제곱 학습서 5장 모분산검정의 근거).</p>
+<div class="formula-box">
+\[ \frac{(n-1)s^2}{\sigma^2} \sim \chi^2_{(n-1)} \]
+</div>
+<p>왜 자유도가 <b>n이 아니라 n-1</b>인가? 표본분산을 계산할 때 모평균 μ 대신 <b>표본평균 x̄</b>를 사용하는데, n개의 편차 \((x_i-\bar x)\)는 합이 항상 0이 되도록 <b>서로 묶여(제약되어)</b> 있다. 즉 n개 중 n-1개가 정해지면 마지막 하나는 자동으로 결정된다 — "자유롭게 흩어질 수 있는" 정보의 개수가 n-1개라는 뜻이며, 이것이 자유도(degrees of freedom)라는 이름의 유래다.</p>
+
+<h3>0.6 평균·분산과 정규분포로의 수렴</h3>
+<div class="formula-box">
+\[ E(\chi^2_{(k)}) = k \qquad Var(\chi^2_{(k)}) = 2k \]
+</div>
+<p>평균이 정확히 자유도 k와 같다는 점이 핵심이다 — 각 \(Z_i^2\)의 기댓값이 \(Var(Z_i)=1\)이므로, k개를 더하면 평균도 그대로 k가 된다. 또한 <b>중심극한정리</b>에 의해, k가 충분히 크면(대략 30 이상) 카이제곱분포는 평균 k, 분산 2k인 정규분포로 근사할 수 있다 — 이는 카이제곱분포 자체가 "많은 것을 더한 합"의 형태를 갖기 때문에 나타나는 자연스러운 결과다.</p>
+
+<h3>0.7 자유도별 형태 변화</h3>
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;">
+<line x1="30" y1="170" x2="670" y2="170" stroke="#8a7048"/>
+<path d="M30,170 L90,60 L120,20 L150,15 L180,25 L230,50 L300,80 L390,110 L490,135 L600,155 L670,163" fill="none" stroke="#3f7d5c" stroke-width="2"/>
+<text x="140" y="8" font-size="12" fill="#3f7d5c">df 작음(예:2~4): 뾰족+긴 오른쪽 꼬리</text>
+<path d="M30,170 L120,150 L220,100 L320,65 L420,58 L520,72 L620,105 L670,125" fill="none" stroke="#8a7048" stroke-width="2" stroke-dasharray="5,3"/>
+<text x="470" y="45" font-size="12" fill="#8a7048">df 큼(예:30↑): 좌우대칭(정규분포)에 근접</text>
+<text x="350" y="188" text-anchor="middle" font-size="12" fill="#5a5044">이 곡선 하나 위에서 아래 7개 함수가 서로 다른 질문을 던진다</text>
+</svg>
+</div>
+
+<h3>0.8 왜 카이제곱검정이 이 분포를 쓰는가 — 이론과 실전의 연결</h3>
+<div class="callout tip">
+카이제곱검정의 공통 공식 \(\sum(O-E)^2/E\)는 사실 <b>"표준화된 편차의 제곱합"</b>이라는 카이제곱분포의 정의와 정확히 같은 구조다. 각 범주(셀)의 (관측-기대)를 기대값의 제곱근으로 표준화하면 근사적으로 표준정규분포를 따르고, 그것을 제곱해서 모든 범주에 대해 더한 것이 바로 카이제곱 검정통계량이다. 즉 카이제곱검정은 <b>0.1의 정의를 데이터에 그대로 적용한 것</b>이며, 자유도는 0.5에서 본 "제약 조건으로 인해 자유롭게 흩어질 수 없는 개수"의 논리를 그대로 따른다 — 예를 들어 적합도검정의 df=k-1은 "전체 합이 n으로 고정된다"는 제약 하나가 자유도를 하나 깎아먹기 때문이다.
+</div>
+
+<div class="quiz" data-qid="q0-0a">
+<div class="q">Q. 카이제곱분포가 감마분포의 특수한 경우라고 할 때, df=2인 카이제곱분포는 어떤 분포와 동일한가?</div>
+<label><input type="radio" name="q0-0a" value="0">표준정규분포</label>
+<label><input type="radio" name="q0-0a" value="1">평균 2인 지수분포</label>
+<label><input type="radio" name="q0-0a" value="2">균등분포</label>
+<label><input type="radio" name="q0-0a" value="3">이항분포</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q0-0a"]={correct:1, explain:"감마분포에서 shape=1인 경우가 지수분포이며, df=2인 카이제곱분포는 shape=k/2=1이므로 평균 2(scale)인 지수분포와 동일하다."};</script>
+
+<div class="quiz" data-qid="q0-0b">
+<div class="q">Q. 표본분산 계산에서 자유도가 n이 아니라 n-1인 근본적인 이유는?</div>
+<label><input type="radio" name="q0-0b" value="0">계산 편의를 위한 임의의 관행</label>
+<label><input type="radio" name="q0-0b" value="1">표본평균을 사용함으로써 편차들의 합이 0이 되도록 제약되기 때문</label>
+<label><input type="radio" name="q0-0b" value="2">표본크기가 항상 짝수이기 때문</label>
+<label><input type="radio" name="q0-0b" value="3">모집단이 항상 유한하기 때문</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q0-0b"]={correct:1, explain:"n개의 편차(xi-x̄)는 합이 항상 0이 되는 제약을 가지므로, 자유롭게 흩어질 수 있는 정보는 n-1개뿐이다."};</script>
+</section>
+
+<!-- ============ CH1 7개 함수 전체 지도 ============ -->
+<section class="chapter" id="ch1">
+<h2><span class="chnum">1</span>7개 함수 전체 지도</h2>
+<div class="card">
+<p>모든 함수는 <b>χ²값 → 확률</b>로 가는 함수(pdf, cdf, sf)와 <b>확률 → χ²값</b>으로 거꾸로 가는 함수(ppf, isf)로 나뉜다.</p>
+</div>
+<table>
+<tr><th>함수</th><th>입력</th><th>출력</th><th>방향</th><th>한 줄 의미</th></tr>
+<tr><td><code>pdf(x, df)</code></td><td>χ²값</td><td>밀도(높이)</td><td>x → 높이</td><td>그 지점의 곡선 높이(확률 아님)</td></tr>
+<tr><td><code>cdf(x, df)</code></td><td>χ²값</td><td>누적확률</td><td>x → 확률</td><td>P(X ≤ x), 왼쪽부터 누적 면적</td></tr>
+<tr><td><code>sf(x, df)</code></td><td>χ²값</td><td>꼬리확률</td><td>x → 확률</td><td>P(X &gt; x) = 1-cdf(x), 검정의 p-value로 직결</td></tr>
+<tr><td><code>ppf(q, df)</code></td><td>누적확률 q</td><td>χ²값</td><td>확률 → x</td><td>cdf의 역함수, "누적확률 q가 되는 χ²는?"</td></tr>
+<tr><td><code>isf(q, df)</code></td><td>꼬리확률 q</td><td>χ²값</td><td>확률 → x</td><td>sf의 역함수, "오른쪽 꼬리확률 q가 되는 χ²는?"</td></tr>
+<tr><td><code>interval(a, df)</code></td><td>중심확률 a</td><td>(하한,상한)</td><td>확률 → 구간</td><td>중심 a를 포함하는 구간 — 비대칭!</td></tr>
+<tr><td><code>stats(df,'mv')</code></td><td>자유도</td><td>(평균,분산)</td><td>분포 → 요약값</td><td>분포 전체의 평균·분산</td></tr>
+</table>
+<div class="callout tip">카이제곱검정은 <b>거의 항상 오른쪽 꼬리(단측) 검정</b>이다. 관측값과 기대값의 차이가 클수록 χ²값이 커지므로, "크게 벗어났다"는 것은 항상 오른쪽 꼬리 방향이다. 그래서 <code>sf()</code>가 곧 p-value가 되는 경우가 대부분이다.</div>
+</section>
+
+<!-- ============ CH2 pdf ============ -->
+<section class="chapter" id="ch2">
+<h2><span class="chnum">2</span>pdf(x, df) — 확률밀도함수</h2>
+<h3>2.1 원리</h3>
+<p>x=특정값 지점에서 <b>곡선의 높이</b>를 반환한다. 카이제곱분포는 비대칭이므로 <b>최빈값(mode)이 평균(=df)보다 왼쪽</b>에 있다.</p>
+<div class="formula-box">
+\[ f(x;k)=\frac{1}{2^{k/2}\Gamma(k/2)}x^{k/2-1}e^{-x/2} \qquad \text{mode}=\max(k-2,\,0) \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M10,85 L25,55 L40,25 L50,14 L60,13 L75,17 L90,25 L105,34 L120,42 L140,52 L160,60 L180,67 L200,73 L215,78 L230,82" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="60" y1="85" x2="60" y2="13" stroke-dasharray="3 3" stroke="#0F6E56" stroke-width="1.4"/>
+<circle cx="60" cy="13" r="3.5" fill="#0F6E56"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="60" y="97" text-anchor="middle" font-size="10" fill="#5a5044">최빈값 = df-2</text>
+</svg>
+</div>
+<h3>2.2 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> df=6일 때 pdf의 최빈값(mode) 위치는?
+
+<span class="step-label">[Step1]</span> mode = max(k-2, 0) = max(6-2, 0) = <span class="result">4</span>
+<span class="step-label">[결론]</span> df=6인 카이제곱분포는 χ²=4 지점에서 곡선이 가장 높다 (평균인 6보다 왼쪽)
+</div>
+<div class="quiz" data-qid="q2-1">
+<div class="q">Q. df=2인 카이제곱분포의 최빈값(mode)은?</div>
+<label><input type="radio" name="q2-1" value="0">2</label>
+<label><input type="radio" name="q2-1" value="1">0</label>
+<label><input type="radio" name="q2-1" value="2">1</label>
+<label><input type="radio" name="q2-1" value="3">음수</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q2-1"]={correct:1, explain:"mode=max(k-2,0)=max(2-2,0)=0. df=2일 때는 곡선이 x=0에서 가장 높은 지수분포와 같은 형태가 된다."};</script>
+</section>
+
+<!-- ============ CH3 cdf ============ -->
+<section class="chapter" id="ch3">
+<h2><span class="chnum">3</span>cdf(x, df) — 누적분포함수</h2>
+<p>0부터 x까지 곡선 아래 면적, 즉 <b>P(X ≤ x)</b>를 반환한다.</p>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M10,85 L10,85 L25,55 L40,25 L50,14 L60,13 L75,17 L90,25 L105,34 L120,42 L140,52 L145,55 L145,85 Z" fill="#9fe1cb" stroke="#0F6E56" stroke-width="0.5" stroke-linejoin="round"/>
+<path d="M10,85 L25,55 L40,25 L50,14 L60,13 L75,17 L90,25 L105,34 L120,42 L140,52 L160,60 L180,67 L200,73 L215,78 L230,82" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="145" y1="85" x2="145" y2="55" stroke-dasharray="3 3" stroke="#085041" stroke-width="1.4"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="145" y="97" text-anchor="middle" font-size="10" fill="#5a5044">χ² = 8 (df=6)</text>
+<text x="60" y="70" font-size="10" fill="#085041">P(X≤8)</text>
+</svg>
+</div>
+<h3>3.1 손계산 예제 (근사)</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> df=6에서 카이제곱분포표로 cdf(12.59,6)을 근사하시오
+
+<span class="step-label">[Step1]</span> 카이제곱표에서 χ²(0.05,6)=12.59를 찾음(상위 5% 지점)
+<span class="step-label">[Step2]</span> 즉 P(X&gt;12.59)=0.05
+<span class="step-label">[결론]</span> cdf(12.59,6) = 1-0.05 = <span class="result">0.95</span>
+</div>
+</section>
+
+<!-- ============ CH4 sf ============ -->
+<section class="chapter" id="ch4">
+<h2><span class="chnum">4</span>sf(x, df) — 생존함수(p-value 직결)</h2>
+<p>x부터 오른쪽 끝까지의 면적, 즉 <b>P(X &gt; x)</b>. 카이제곱검정(적합도·독립성·동질성)은 항상 이 방향의 단측검정이므로, <code>sf()</code>가 그대로 <b>p-value</b>가 된다.</p>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M145,85 L145,55 L160,60 L180,67 L200,73 L215,78 L230,82 L230,85 Z" fill="#f5c4b3" stroke="#712B13" stroke-width="0.5" stroke-linejoin="round"/>
+<path d="M10,85 L25,55 L40,25 L50,14 L60,13 L75,17 L90,25 L105,34 L120,42 L140,52 L160,60 L180,67 L200,73 L215,78 L230,82" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="145" y1="85" x2="145" y2="55" stroke-dasharray="3 3" stroke="#712B13" stroke-width="1.4"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="145" y="97" text-anchor="middle" font-size="10" fill="#5a5044">χ² = 8 (df=6)</text>
+<text x="180" y="63" font-size="10" fill="#712B13">P(X&gt;8)</text>
+</svg>
+</div>
+<h3>4.1 손계산 예제 — 독립성검정의 p-value</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 카이제곱 학습서 3장 독립성검정 예제: χ²=12.5, df=1. p-value는?
+
+<span class="step-label">[Step1]</span> p-value = P(X &gt; 12.5) = sf(12.5, 1)
+<span class="step-label">[Step2]</span> scipy 계산 결과 sf(12.5,1) ≈ <span class="result">0.000407</span>
+<span class="step-label">[결론]</span> p ≈ 0.0004 &lt; .05 → H0 기각 (매우 강한 증거)
+</div>
+<div class="quiz" data-qid="q4-1">
+<div class="q">Q. 적합도검정에서 χ²=8.2, df=3일 때 p-value를 구하는 올바른 코드는?</div>
+<label><input type="radio" name="q4-1" value="0">chi2.cdf(8.2, 3)</label>
+<label><input type="radio" name="q4-1" value="1">chi2.sf(8.2, 3)</label>
+<label><input type="radio" name="q4-1" value="2">chi2.pdf(8.2, 3)</label>
+<label><input type="radio" name="q4-1" value="3">2 * chi2.cdf(8.2, 3)</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q4-1"]={correct:1, explain:"카이제곱검정은 오른쪽 꼬리 단측검정이므로 p-value = P(X>χ²) = sf(x, df)로 계산한다."};</script>
+</section>
+
+<!-- ============ CH5 ppf / isf ============ -->
+<section class="chapter" id="ch5">
+<h2><span class="chnum">5</span>ppf(q, df) / isf(q, df) — 임계값 찾기</h2>
+<p>확률을 알 때 χ²값을 역산한다. 검정의 <b>기각역 경계(임계값)</b>를 구하는 표준 방법이다.</p>
+<div class="formula-box">
+\[ \text{ppf}(1-\alpha,\,k) = \text{isf}(\alpha,\,k) = \chi^2_{(\alpha,\,k)} \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M10,85 L25,55 L40,25 L50,14 L60,13 L75,17 L90,25 L105,34 L120,42 L140,52 L160,60 L180,67 L200,73 L215,78 L230,82" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M185,85 L185,71 L200,73 L215,78 L230,82 L230,85 Z" fill="#fac775" stroke="#854F0B" stroke-width="0.5" stroke-linejoin="round"/>
+<line x1="185" y1="85" x2="185" y2="71" stroke-dasharray="3 3" stroke="#854F0B" stroke-width="1.4"/>
+<circle cx="185" cy="71" r="3.5" fill="#854F0B"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="185" y="97" text-anchor="middle" font-size="10" fill="#5a5044">ppf(0.95)=isf(0.05)</text>
+</svg>
+</div>
+<h3>5.1 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> df=1, α=.05 단측검정의 임계값을 구하시오
+
+<span class="step-label">[Step1]</span> ppf(0.95, 1) 또는 isf(0.05, 1) — 둘 다 같은 값
+<span class="step-label">[Step2]</span> 카이제곱표에서 χ²(0.05,1) 확인
+<span class="step-label">[결론]</span> 임계값 = <span class="result">3.841</span> (독립성검정 2×2표의 표준 임계값)
+</div>
+<div class="quiz" data-qid="q5-1">
+<div class="q">Q. isf(0.025, 5)와 같은 값을 반환하는 것은?</div>
+<label><input type="radio" name="q5-1" value="0">ppf(0.025, 5)</label>
+<label><input type="radio" name="q5-1" value="1">ppf(0.975, 5)</label>
+<label><input type="radio" name="q5-1" value="2">cdf(0.025, 5)</label>
+<label><input type="radio" name="q5-1" value="3">pdf(0.975, 5)</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q5-1"]={correct:1, explain:"isf(q)=ppf(1-q)이므로 isf(0.025,5)=ppf(0.975,5)와 동일한 값을 반환한다."};</script>
+</section>
+
+<!-- ============ CH6 interval ============ -->
+<section class="chapter" id="ch6">
+<h2><span class="chnum">6</span>interval(alpha, df) — 비대칭 신뢰구간</h2>
+<p>중심 확률 α를 포함하는 구간의 (하한, 상한)을 반환한다. <b>카이제곱분포는 비대칭</b>이므로 t분포와 달리 하한·상한이 중심에서 대칭이 아니다.</p>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M10,85 L25,55 L40,25 L50,14 L60,13 L75,17 L90,25 L105,34 L120,42 L140,52 L160,60 L180,67 L200,73 L215,78 L230,82" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M22,85 L22,42 L25,55 L40,25 L50,14 L60,13 L75,17 L90,25 L105,34 L120,42 L140,52 L145,55 L160,60 L180,67 L185,71 L185,85 Z" fill="#cecbf6" stroke="#3C3489" stroke-width="0.5" stroke-linejoin="round"/>
+<line x1="22" y1="85" x2="22" y2="42" stroke-dasharray="3 3" stroke="#3C3489" stroke-width="1.4"/>
+<line x1="185" y1="85" x2="185" y2="71" stroke-dasharray="3 3" stroke="#3C3489" stroke-width="1.4"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="22" y="97" text-anchor="middle" font-size="10" fill="#5a5044">하한</text>
+<text x="185" y="97" text-anchor="middle" font-size="10" fill="#5a5044">상한</text>
+</svg>
+</div>
+<div class="callout tip">하한까지의 거리는 짧고 상한까지의 거리는 길다 — 카이제곱분포가 비대칭임을 보여주는 시각적 증거다. <b>모분산검정의 양측검정 임계값</b>(카이제곱 학습서 5장)이 바로 이 비대칭 interval의 하한·상한을 사용한다.</div>
+<div class="quiz" data-qid="q6-1">
+<div class="q">Q. 모분산검정(연속형)에서 양측 α=.05 검정을 할 때 하한·상한 임계값을 구하는 방법은?</div>
+<label><input type="radio" name="q6-1" value="0">±ppf(0.975, df) 형태로 대칭 계산</label>
+<label><input type="radio" name="q6-1" value="1">하한=ppf(0.025,df), 상한=ppf(0.975,df)를 각각 따로 구함(또는 interval(0.95,df))</label>
+<label><input type="radio" name="q6-1" value="2">항상 0과 무한대</label>
+<label><input type="radio" name="q6-1" value="3">pdf 값으로 직접 계산</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q6-1"]={correct:1, explain:"카이제곱분포는 비대칭이므로 하한과 상한을 각각 따로(또는 interval 함수로) 구해야 한다. ±로 대칭 계산할 수 없다."};</script>
+</section>
+
+<!-- ============ CH7 stats ============ -->
+<section class="chapter" id="ch7">
+<h2><span class="chnum">7</span>stats(df, moments='mv') — 분포 요약통계</h2>
+<div class="formula-box">
+\[ E(\chi^2_{(k)}) = k \qquad Var(\chi^2_{(k)}) = 2k \]
+</div>
+<h3>7.1 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> df=10일 때 카이제곱분포의 평균과 분산은?
+
+<span class="step-label">[평균]</span> E(X) = k = <span class="result">10</span>
+<span class="step-label">[분산]</span> Var(X) = 2k = 2*10 = <span class="result">20</span>
+<span class="step-label">[결론]</span> df가 커질수록 평균과 분산이 함께 커진다(t·F분포와 달리 df가 커져도 값이 특정 상수로 수렴하지 않음)
+</div>
+<div class="callout warn">t분포나 F분포는 df가 커지면 분산이 특정 값(1 등)에 수렴하지만, 카이제곱분포는 <b>df 자체가 분포의 위치와 퍼짐을 동시에 결정</b>하므로 df가 커질수록 평균도 분산도 함께 커진다는 점이 다르다.</div>
+<div class="quiz" data-qid="q7-1">
+<div class="q">Q. df=15인 카이제곱분포의 분산은?</div>
+<label><input type="radio" name="q7-1" value="0">15</label>
+<label><input type="radio" name="q7-1" value="1">30</label>
+<label><input type="radio" name="q7-1" value="2">7.5</label>
+<label><input type="radio" name="q7-1" value="3">225</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q7-1"]={correct:1, explain:"Var=2k=2*15=30"};</script>
+</section>
+
+<!-- ============ CH8 Python 실전 종합 ============ -->
+<section class="chapter" id="ch8">
+<h2><span class="chnum">8</span>Python(scipy)으로 실전 계산하기</h2>
+<div class="code-box">
+<span class="cm"># 7개 함수 한 번에 확인</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> chi2
+
+df = 6
+<span class="kw">print</span>(<span class="cm">"pdf(4,6)       :"</span>, chi2.pdf(4, df))         <span class="cm"># 최빈값 근처 밀도</span>
+<span class="kw">print</span>(<span class="cm">"cdf(8,6)       :"</span>, chi2.cdf(8, df))         <span class="cm"># P(X<=8)</span>
+<span class="kw">print</span>(<span class="cm">"sf(8,6)        :"</span>, chi2.sf(8, df))          <span class="cm"># P(X>8) = p-value</span>
+<span class="kw">print</span>(<span class="cm">"ppf(0.95,6)    :"</span>, chi2.ppf(0.95, df))      <span class="cm"># 단측 alpha=.05 임계값</span>
+<span class="kw">print</span>(<span class="cm">"isf(0.05,6)    :"</span>, chi2.isf(0.05, df))       <span class="cm"># 위와 동일한 값</span>
+<span class="kw">print</span>(<span class="cm">"interval(.95,6):"</span>, chi2.interval(0.95, df))  <span class="cm"># 95% 구간(비대칭)</span>
+<span class="kw">print</span>(<span class="cm">"stats(mv)      :"</span>, chi2.stats(df, moments=<span class="cm">'mv'</span>))
+</div>
+<div class="code-box">
+<span class="cm"># 실전: 독립성검정 p-value를 sf로 직접 계산</span>
+observed_chi2, dof = 12.5, 1
+p_value = chi2.sf(observed_chi2, dof)
+<span class="kw">print</span>(f<span class="cm">"p-value = {p_value:.5f}"</span>)
+</div>
+<div class="code-box">
+<span class="cm"># 실전: 모분산검정의 비대칭 양측 임계값 (카이제곱 학습서 5장과 연결)</span>
+n, alpha = 20, 0.05
+lower, upper = chi2.interval(1-alpha, df=n-1)
+<span class="kw">print</span>(f<span class="cm">"기각역 경계: 하한={lower:.3f}, 상한={upper:.3f}"</span>)
+</div>
+<div class="callout tip"><code>chi2_contingency</code>, <code>chisquare</code> 같은 고수준 함수는 내부적으로 <code>sf()</code>를 사용해 p-value를 계산한다. 저수준 함수를 이해하면 결과를 직접 검증하거나 커스텀 검정을 구현할 때 큰 도움이 된다.</div>
+</section>
+
+<!-- ============ CH9 종합정리 ============ -->
+<section class="chapter" id="ch9">
+<h2><span class="chnum">9</span>종합 정리 & 체크리스트</h2>
+<table>
+<tr><th>궁금한 것</th><th>사용할 함수</th></tr>
+<tr><td>특정 χ²값에서 곡선이 얼마나 높은가</td><td>pdf(x, df)</td></tr>
+<tr><td>χ²값 이하일 확률은?</td><td>cdf(x, df)</td></tr>
+<tr><td>χ²값 초과일 확률(검정의 p-value)은?</td><td>sf(x, df)</td></tr>
+<tr><td>누적확률 q가 되는 χ²값(임계값)은?</td><td>ppf(q, df)</td></tr>
+<tr><td>오른쪽 꼬리확률 q가 되는 χ²값은?</td><td>isf(q, df)</td></tr>
+<tr><td>중심 신뢰구간의 상하한은? (비대칭 주의)</td><td>interval(alpha, df)</td></tr>
+<tr><td>분포 자체의 평균·분산은?</td><td>stats(df, moments='mv')</td></tr>
+</table>
+<div class="callout tip">
+✅ 카이제곱검정은 대부분 오른쪽 꼬리 단측검정임을 인지하고 sf를 올바르게 사용했는가?<br>
+✅ ppf(0.95)와 isf(0.05)가 같은 값을 반환한다는 것을 확인했는가?<br>
+✅ interval()이 t분포와 달리 비대칭이라는 것을 이해했는가? (모분산검정 양측 임계값에 직결)<br>
+✅ df가 커질수록 평균(=df)과 분산(=2df)이 함께 커진다는 점을 t·F분포와 구분해 기억했는가?<br>
+✅ 최빈값(mode=df-2)이 평균(df)보다 왼쪽에 있다는 비대칭성을 확인했는가?
+</div>
+</section>
+
+</main>
+</div>
+<a href="#top" class="top-btn" onclick="document.getElementById('main').scrollTo(0,0); window.scrollTo(0,0); return false;">↑</a>
+<script>
+const chapters = document.querySelectorAll('section.chapter');
+const toc = document.getElementById('toc');
+chapters.forEach(ch=>{
+  const h2 = ch.querySelector('h2');
+  const a = document.createElement('a');
+  a.href = '#'+ch.id;
+  a.textContent = h2.textContent.replace(/^\d+/,'').trim();
+  a.dataset.target = ch.id;
+  toc.appendChild(a);
+});
+function onScroll(){
+  let current = chapters[0].id;
+  chapters.forEach(ch=>{ const rect = ch.getBoundingClientRect(); if(rect.top < 140) current = ch.id; });
+  document.querySelectorAll('#toc a').forEach(a=>{ a.classList.toggle('active', a.dataset.target===current); });
+  const doc = document.documentElement;
+  const pct = (doc.scrollTop)/(doc.scrollHeight-doc.clientHeight)*100;
+  document.getElementById('progressBar').style.width = pct+'%';
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const qid = quiz.dataset.qid;
+  const answer = window.QUIZ_ANSWERS[qid];
+  const labels = quiz.querySelectorAll('label');
+  const feedback = quiz.querySelector('.feedback');
+  quiz.querySelectorAll('input[type=radio]').forEach(input=>{
+    input.addEventListener('change', ()=>{
+      const val = parseInt(input.value);
+      labels.forEach(lb=>{ lb.style.borderColor='var(--line)'; lb.style.background='#fffdf7'; });
+      if(!answer) return;
+      if(val === answer.correct){
+        labels[val].style.borderColor='var(--good)'; labels[val].style.background='#e5efe4';
+        feedback.className='feedback correct';
+        feedback.innerHTML = '<span class="badge-correct">정답입니다.</span> '+answer.explain;
+      } else {
+        labels[val].style.borderColor='var(--bad)'; labels[val].style.background='#f4e2dc';
+        labels[answer.correct].style.borderColor='var(--good)'; labels[answer.correct].style.background='#e5efe4';
+        feedback.className='feedback wrong';
+        feedback.innerHTML = '<span class="badge-wrong">오답입니다.</span> '+answer.explain;
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

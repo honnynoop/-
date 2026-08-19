@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>t검정 완전정복</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css"></script>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+:root{
+  --paper:#f7f1e6; --paper-2:#efe6d3; --ink:#2c2620; --ink-soft:#5a5044;
+  --line:#dcd0b8; --accent:#b5652f; --accent-2:#8a7048; --accent-soft:#e8d3b8;
+  --good:#3f7d5c; --bad:#b5432f; --card:#fffaf0; --shadow:0 2px 10px rgba(60,45,20,0.08); --radius:14px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:'Pretendard',-apple-system,sans-serif; line-height:1.75; font-size:16px;}
+h1,h2,h3,h4{font-family:'Spectral',serif; font-weight:700; color:var(--ink); line-height:1.3;}
+.layout{display:flex; max-width:1400px; margin:0 auto;}
+.sidebar{width:270px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto; padding:28px 18px; border-right:1px solid var(--line); background:var(--paper-2);}
+.sidebar h2{font-size:1.05rem; margin:0 0 4px; color:var(--accent);}
+.sidebar .sub{font-size:0.78rem; color:var(--ink-soft); margin-bottom:20px;}
+.sidebar nav a{display:block; padding:7px 10px; margin:2px 0; border-radius:8px; color:var(--ink-soft); text-decoration:none; font-size:0.86rem; border-left:3px solid transparent;}
+.sidebar nav a:hover{background:var(--accent-soft); color:var(--ink);}
+.sidebar nav a.active{background:var(--accent-soft); color:var(--accent); font-weight:600; border-left:3px solid var(--accent);}
+main{flex:1; min-width:0; padding:40px 56px 120px;}
+.hero{padding:36px 40px; background:linear-gradient(135deg,var(--card),var(--accent-soft)); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:44px; border:1px solid var(--line);}
+.hero h1{font-size:2.1rem; margin:0 0 10px;}
+.hero p{color:var(--ink-soft); font-size:1rem; margin:6px 0;}
+section.chapter{margin-bottom:70px; scroll-margin-top:20px;}
+section.chapter > h2{font-size:1.55rem; padding-bottom:10px; border-bottom:3px solid var(--accent); display:flex; align-items:center; gap:10px;}
+.chnum{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:var(--accent); color:#fff; font-family:'JetBrains Mono',monospace; font-size:0.85rem; flex-shrink:0;}
+h3{font-size:1.2rem; margin-top:32px; color:var(--accent-2); border-left:4px solid var(--accent-soft); padding-left:10px;}
+h4{font-size:1.02rem; color:var(--ink);}
+p{margin:10px 0;}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px 26px; margin:18px 0; box-shadow:var(--shadow);}
+.callout{border-left:4px solid var(--accent); background:var(--accent-soft); padding:14px 18px; border-radius:0 10px 10px 0; margin:16px 0; font-size:0.94rem;}
+.callout.tip{border-left-color:var(--good); background:#e5efe4;}
+.callout.warn{border-left-color:var(--bad); background:#f4e2dc;}
+.formula-box{background:#fffdf7; border:1px dashed var(--accent-2); border-radius:10px; padding:16px 20px; margin:16px 0; overflow-x:auto;}
+.calc-steps{background:#2c2620; color:#f7f1e6; border-radius:10px; padding:18px 22px; font-family:'JetBrains Mono',monospace; font-size:0.85rem; margin:16px 0; overflow-x:auto; line-height:1.9; white-space:pre-wrap;}
+.calc-steps .step-label{color:#e0a458; font-weight:700;}
+.calc-steps .result{color:#8fd19e;}
+.code-box{background:#1f2b23; color:#d8f0dc; border-radius:10px; padding:18px 22px; font-family:'JetBrains Mono',monospace; font-size:0.83rem; margin:16px 0; overflow-x:auto; line-height:1.7;}
+.code-box .cm{color:#7fae87;}
+.code-box .kw{color:#e0a458;}
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;}
+th,td{border:1px solid var(--line); padding:9px 12px; text-align:center;}
+th{background:var(--accent-soft); color:var(--ink);}
+tr:nth-child(even) td{background:#faf5e8;}
+.tag{display:inline-block; font-size:0.72rem; padding:2px 9px; border-radius:20px; background:var(--accent-2); color:#fff; margin-right:6px; font-family:'JetBrains Mono',monospace;}
+.diagram-wrap{background:#fffdf7; border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin:18px 0; overflow-x:auto; text-align:center;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media (max-width:900px){.grid2{grid-template-columns:1fr;}}
+.quiz{background:var(--card); border:2px solid var(--accent-soft); border-radius:var(--radius); padding:20px 24px; margin:16px 0;}
+.quiz .q{font-weight:600; margin-bottom:10px;}
+.quiz label{display:block; padding:8px 12px; margin:5px 0; border-radius:8px; cursor:pointer; border:1px solid var(--line); background:#fffdf7; font-size:0.92rem;}
+.quiz label:hover{background:var(--accent-soft);}
+.quiz .feedback{margin-top:10px; padding:10px 14px; border-radius:8px; font-size:0.9rem; display:none;}
+.quiz .feedback.correct{display:block; background:#e5efe4; color:var(--good); border:1px solid var(--good);}
+.quiz .feedback.wrong{display:block; background:#f4e2dc; color:var(--bad); border:1px solid var(--bad);}
+.badge-correct{color:var(--good); font-weight:700;}
+.badge-wrong{color:var(--bad); font-weight:700;}
+.flow-note{font-size:0.82rem; color:var(--ink-soft); text-align:center; margin-top:6px;}
+code{background:#efe6d3; padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:0.86rem;}
+.top-btn{position:fixed; bottom:26px; right:26px; width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow); font-size:1.2rem; text-decoration:none; opacity:0.85;}
+.progress-bar{position:fixed; top:0; left:0; height:3px; background:var(--accent); z-index:99; transition:width .1s;}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="layout">
+<aside class="sidebar">
+  <h2>t검정 완전정복</h2>
+  <div class="sub">t검정의 원리·이론·계산·실전</div>
+  <nav id="toc"></nav>
+</aside>
+<main id="main">
+
+<div class="hero">
+  <h1>t검정(Student's t-test) 완전정복</h1>
+  <p>t분포는 왜 정규분포보다 꼬리가 두꺼운가부터 3가지 t검정의 원리·손계산·실전 문제까지</p>
+</div>
+
+<script>window.QUIZ_ANSWERS = {};</script>
+
+<!-- ============ CH0 t분포의 정의와 유도 ============ -->
+<section class="chapter" id="ch0">
+<h2><span class="chnum">0</span>t분포는 어디서 오는가</h2>
+
+<h3>0.1 문제의 출발점 — 모분산을 모른다</h3>
+<div class="card">
+<p>표본평균을 표준화할 때 원래는 <b>모표준편차 σ</b>가 필요하다.</p>
+<div class="formula-box">
+\[ Z = \frac{\bar x - \mu}{\sigma/\sqrt n} \sim N(0,1) \]
+</div>
+<p>하지만 현실에서는 σ를 모르는 경우가 대부분이다. 그래서 <b>표본표준편차 s</b>로 σ를 대체하는데, s 자체도 표본마다 흔들리는 확률변수이므로, 이 흔들림까지 반영하면 더 이상 정규분포가 아니라 <b>꼬리가 더 두꺼운 분포</b>가 된다. 이것이 t분포다.</p>
+</div>
+<div class="formula-box">
+\[ t = \frac{\bar x - \mu}{s/\sqrt n} \sim t_{(n-1)} \]
+</div>
+
+<h3>0.2 수학적 정의</h3>
+<p>표준정규분포 Z와, Z와 독립인 자유도 k인 카이제곱분포 \(\chi^2_{(k)}\)가 있을 때, 다음과 같이 정의되는 확률변수가 자유도 k인 t분포를 따른다.</p>
+<div class="formula-box">
+\[ t = \frac{Z}{\sqrt{\chi^2_{(k)}/k}} \sim t_{(k)} \]
+</div>
+<p>표본평균의 표준화식 \(t=(\bar x-\mu)/(s/\sqrt n)\)에서 분자는 표준정규(Z), 분모의 s는 표본분산에서 나오는데 \((n-1)s^2/\sigma^2\)이 카이제곱분포를 따른다는 사실(카이제곱검정 학습서 5장 참고)을 이용하면 정확히 위 정의와 일치한다. <b>즉 t분포는 "표준정규를 카이제곱의 제곱근으로 나눈 것"</b>이며, 분모의 불확실성(표본마다 s가 흔들림) 때문에 극단값이 더 자주 나타난다.</p>
+
+<h3>0.3 자유도에 따른 형태 변화</h3>
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:620px;">
+<line x1="30" y1="185" x2="670" y2="185" stroke="#8a7048"/>
+<path d="M30,180 Q160,178 220,150 Q280,80 350,60 Q420,80 480,150 Q540,178 670,180" fill="none" stroke="#b5432f" stroke-width="2" stroke-dasharray="2,3"/>
+<text x="560" y="165" font-size="11" fill="#b5432f">df=2 (꼬리 두꺼움)</text>
+<path d="M30,182 Q160,180 230,140 Q290,55 350,35 Q410,55 470,140 Q540,180 670,182" fill="none" stroke="#8a7048" stroke-width="2"/>
+<text x="500" y="120" font-size="11" fill="#8a7048">df=10</text>
+<path d="M30,183 Q170,182 240,120 Q300,25 350,20 Q400,25 460,120 Q530,182 670,183" fill="none" stroke="#3f7d5c" stroke-width="2"/>
+<text x="440" y="60" font-size="11" fill="#3f7d5c">df=30 (≈정규분포)</text>
+<text x="350" y="15" text-anchor="middle" font-size="12" fill="#5a5044"></text>
+<text x="350" y="205" text-anchor="middle" font-size="12" fill="#5a5044">df가 커질수록(≈30 이상) t분포는 표준정규분포에 수렴</text>
+</svg>
+</div>
+<div class="callout tip">경험칙: 자유도가 <b>30 이상</b>이면 t분포와 표준정규분포의 차이가 실무적으로 무시할 만큼 작아진다. 그래서 대표본(n≥30)에서는 Z검정을 근사로 사용하기도 한다.</div>
+
+<div class="quiz" data-qid="q0-1">
+<div class="q">Q. t분포가 표준정규분포보다 꼬리가 두꺼운 근본적인 이유는?</div>
+<label><input type="radio" name="q0-1" value="0">표본크기가 항상 작기 때문</label>
+<label><input type="radio" name="q0-1" value="1">모표준편차 대신 표본표준편차(s)를 사용해 추가적인 불확실성이 반영되기 때문</label>
+<label><input type="radio" name="q0-1" value="2">평균이 다르기 때문</label>
+<label><input type="radio" name="q0-1" value="3">t분포는 이산분포이기 때문</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q0-1"]={correct:1, explain:"s는 표본마다 값이 흔들리는 확률변수이므로, σ 대신 s를 쓰면 그 불확실성이 더해져 극단값이 더 자주 나타난다(꼬리가 두꺼워짐)."};</script>
+
+<div class="quiz" data-qid="q0-2">
+<div class="q">Q. 자유도가 커질수록(예: 100 이상) t분포는 어떤 분포에 가까워지는가?</div>
+<label><input type="radio" name="q0-2" value="0">카이제곱분포</label>
+<label><input type="radio" name="q0-2" value="1">F분포</label>
+<label><input type="radio" name="q0-2" value="2">표준정규분포</label>
+<label><input type="radio" name="q0-2" value="3">균등분포</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q0-2"]={correct:2, explain:"자유도가 커지면 표본표준편차 s가 모표준편차 σ에 더 가까워져 t분포가 표준정규분포 N(0,1)에 수렴한다."};</script>
+</section>
+
+<!-- ============ CH1 3가지 t검정 개관 ============ -->
+<section class="chapter" id="ch1">
+<h2><span class="chnum">1</span>t검정의 3가지 얼굴</h2>
+<div class="diagram-wrap">
+<svg viewBox="0 0 950 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:950px;">
+<defs><marker id="a0" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8a7048"/></marker></defs>
+<rect x="370" y="10" width="210" height="50" rx="12" fill="#2c2620"/>
+<text x="475" y="40" text-anchor="middle" fill="#e0a458" font-weight="700" font-size="14">t검정</text>
+<line x1="420" y1="60" x2="180" y2="110" stroke="#8a7048" marker-end="url(#a0)"/>
+<line x1="475" y1="60" x2="475" y2="110" stroke="#8a7048" marker-end="url(#a0)"/>
+<line x1="530" y1="60" x2="770" y2="110" stroke="#8a7048" marker-end="url(#a0)"/>
+
+<rect x="30" y="110" width="300" height="80" rx="10" fill="#e8d3b8" stroke="#b5652f"/>
+<text x="180" y="138" text-anchor="middle" font-weight="700" font-size="13">① 단일표본 t검정</text>
+<text x="180" y="158" text-anchor="middle" font-size="11" fill="#5a5044">표본평균 vs 특정 기준값</text>
+<text x="180" y="174" text-anchor="middle" font-size="11" fill="#5a5044">df = n-1 (2장)</text>
+
+<rect x="345" y="110" width="260" height="80" rx="10" fill="#e5efe4" stroke="#3f7d5c"/>
+<text x="475" y="138" text-anchor="middle" font-weight="700" font-size="13">② 독립표본 t검정</text>
+<text x="475" y="158" text-anchor="middle" font-size="11" fill="#5a5044">서로 다른 두 그룹 비교</text>
+<text x="475" y="174" text-anchor="middle" font-size="11" fill="#5a5044">df ≈ n1+n2-2 (3장)</text>
+
+<rect x="620" y="110" width="300" height="80" rx="10" fill="#f4e2dc" stroke="#b5432f"/>
+<text x="770" y="138" text-anchor="middle" font-weight="700" font-size="13">③ 대응표본 t검정</text>
+<text x="770" y="158" text-anchor="middle" font-size="11" fill="#5a5044">같은 대상의 사전-사후 비교</text>
+<text x="770" y="174" text-anchor="middle" font-size="11" fill="#5a5044">df = n-1 (4장)</text>
+</svg>
+</div>
+<table>
+<tr><th>구분</th><th>①단일표본</th><th>②독립표본</th><th>③대응표본</th></tr>
+<tr><td>비교 대상</td><td>표본평균 vs 상수</td><td>그룹A평균 vs 그룹B평균</td><td>사전평균 vs 사후평균(차이)</td></tr>
+<tr><td>표본 관계</td><td>표본 1개</td><td>서로 독립인 두 표본</td><td>짝지어진(paired) 표본</td></tr>
+<tr><td>예시</td><td>신제품 배터리 수명이 10시간인가</td><td>남녀 평균 시험점수 차이</td><td>다이어트 프로그램 전후 체중</td></tr>
+</table>
+</section>
+
+<!-- ============ CH2 단일표본 t검정 ============ -->
+<section class="chapter" id="ch2">
+<h2><span class="chnum">2</span>단일표본 t검정 (One-sample t-test)</h2>
+<h3>2.1 원리</h3>
+<p>표본평균 x̄가 특정 기준값(모평균 후보) μ0과 유의하게 다른지 검정한다.</p>
+<div class="formula-box">
+\[ H_0: \mu = \mu_0 \qquad H_1: \mu \neq \mu_0\ (\text{또는}\ \gt,\ \lt) \]
+\[ t = \frac{\bar x - \mu_0}{s/\sqrt n},\quad df = n-1 \]
+</div>
+<h3>2.2 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 배터리 수명이 평균 10시간이라 광고. 표본 n=16, x̄=9.4, s=1.6. 광고가 맞는지 α=.05 양측검정
+
+<span class="step-label">[Step1]</span> SE = s/√n = 1.6/√16 = 1.6/4 = 0.4
+<span class="step-label">[Step2]</span> t = (9.4-10)/0.4 = -0.6/0.4 = <span class="result">-1.5</span>
+<span class="step-label">[Step3]</span> df=15, t(0.025,15)=±2.131
+<span class="step-label">[Step4]</span> |-1.5| &lt; 2.131 → 기각역 밖
+<span class="step-label">[결론]</span> H0 기각 못함 → 배터리 수명이 10시간이 아니라고 할 근거 없음
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;">
+<path d="M20,170 Q350,10 680,170" fill="none" stroke="#8a7048" stroke-width="2"/>
+<line x1="145" y1="170" x2="145" y2="80" stroke="#b5432f" stroke-dasharray="3,3"/>
+<line x1="555" y1="170" x2="555" y2="80" stroke="#b5432f" stroke-dasharray="3,3"/>
+<path d="M20,170 L20,168 Q80,145 145,80 L145,170 Z" fill="#f4e2dc" opacity="0.8"/>
+<path d="M555,170 L555,80 Q620,145 680,168 L680,170 Z" fill="#f4e2dc" opacity="0.8"/>
+<line x1="290" y1="170" x2="290" y2="120" stroke="#3f7d5c" stroke-width="2"/>
+<text x="290" y="188" text-anchor="middle" font-size="11" fill="#3f7d5c">t=-1.5 (관측값)</text>
+<text x="90" y="188" text-anchor="middle" font-size="10.5" fill="#b5432f">-2.131</text>
+<text x="610" y="188" text-anchor="middle" font-size="10.5" fill="#b5432f">+2.131</text>
+</svg>
+</div>
+<div class="quiz" data-qid="q2-1">
+<div class="q">Q. n=25 표본에서 단일표본 t검정을 수행할 때 자유도는?</div>
+<label><input type="radio" name="q2-1" value="0">25</label>
+<label><input type="radio" name="q2-1" value="1">24</label>
+<label><input type="radio" name="q2-1" value="2">23</label>
+<label><input type="radio" name="q2-1" value="3">26</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q2-1"]={correct:1, explain:"단일표본 t검정의 df=n-1=25-1=24"};</script>
+</section>
+
+<!-- ============ CH3 독립표본 t검정 ============ -->
+<section class="chapter" id="ch3">
+<h2><span class="chnum">3</span>독립표본 t검정 (Independent two-sample t-test)</h2>
+<h3>3.1 원리 — 등분산 vs 이분산</h3>
+<p>서로 독립인 두 그룹의 평균 차이를 검정한다. 두 그룹의 <b>모분산이 같다고 가정할 수 있는지(등분산성, F검정으로 사전 확인 가능)</b>에 따라 공식이 달라진다.</p>
+<div class="formula-box">
+\[ H_0: \mu_1=\mu_2 \qquad H_1: \mu_1\neq\mu_2 \]
+\[ \text{등분산 가정(Student's t): } t=\frac{\bar x_1-\bar x_2}{\sqrt{s_p^2\left(\frac1{n_1}+\frac1{n_2}\right)}},\ \ s_p^2=\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2},\ \ df=n_1+n_2-2 \]
+\[ \text{이분산 가정(Welch's t): } t=\frac{\bar x_1-\bar x_2}{\sqrt{\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}}},\ \ df\approx\frac{\left(\frac{s_1^2}{n_1}+\frac{s_2^2}{n_2}\right)^2}{\frac{(s_1^2/n_1)^2}{n_1-1}+\frac{(s_2^2/n_2)^2}{n_2-1}} \]
+</div>
+<h3>3.2 손계산 예제 — 등분산 가정 (Student's t)</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> A반(n1=10) 평균 78, 분산 16 / B반(n2=12) 평균 74, 분산 20. 사전 F검정으로 등분산 확인됨
+
+<span class="step-label">[Step1]</span> 합동분산 sp² = [(10-1)*16 + (12-1)*20] / (10+12-2) = (144+220)/20 = 18.2
+<span class="step-label">[Step2]</span> SE = √(18.2*(1/10+1/12)) = √(18.2*0.1833) = √3.337 = 1.827
+<span class="step-label">[Step3]</span> t = (78-74)/1.827 = <span class="result">2.19</span>, df=20
+<span class="step-label">[Step4]</span> t(0.025,20)=2.086 → |2.19| &gt; 2.086
+<span class="step-label">[결론]</span> H0 기각 → 두 반의 평균은 유의하게 다르다
+</div>
+<h3>3.3 손계산 예제 — 이분산 가정 (Welch's t)</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 그룹1(n1=8, x̄=50, s1²=36) / 그룹2(n2=15, x̄=44, s2²=9). 분산이 크게 다름(이분산)
+
+<span class="step-label">[Step1]</span> SE = √(36/8 + 9/15) = √(4.5+0.6) = √5.1 = 2.258
+<span class="step-label">[Step2]</span> t = (50-44)/2.258 = <span class="result">2.657</span>
+<span class="step-label">[Step3]</span> Welch-Satterthwaite df ≈ [(4.5+0.6)²] / [(4.5²/7)+(0.6²/14)]
+       = 26.01 / [2.893+0.0257] = 26.01/2.918 = <span class="result">8.9 ≈ 9</span>
+<span class="step-label">[Step4]</span> t(0.025, df≈9) = 2.262 → 2.657 &gt; 2.262
+<span class="step-label">[결론]</span> H0 기각 → 두 그룹 평균은 유의하게 다르다
+</div>
+<div class="callout warn">두 그룹의 <b>표본크기와 분산이 모두 비슷하지 않다면</b> 등분산을 가정하는 Student's t보다 <b>Welch's t를 기본으로 사용</b>하는 것이 안전하다는 것이 최근 통계 실무의 권고사항이다(등분산일 때도 Welch's t의 검정력 손실이 거의 없음).</div>
+<div class="quiz" data-qid="q3-1">
+<div class="q">Q. 두 그룹의 표본크기가 매우 다르고(n1=5, n2=40) 분산도 다를 때 가장 안전한 선택은?</div>
+<label><input type="radio" name="q3-1" value="0">Student's t (등분산 가정)</label>
+<label><input type="radio" name="q3-1" value="1">Welch's t (이분산 가정)</label>
+<label><input type="radio" name="q3-1" value="2">단일표본 t검정</label>
+<label><input type="radio" name="q3-1" value="3">Z검정</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q3-1"]={correct:1, explain:"표본크기와 분산이 불균형할 때는 등분산을 가정하지 않는 Welch's t가 더 안전하다."};</script>
+</section>
+
+<!-- ============ CH4 대응표본 t검정 ============ -->
+<section class="chapter" id="ch4">
+<h2><span class="chnum">4</span>대응표본 t검정 (Paired t-test)</h2>
+<h3>4.1 원리</h3>
+<p>같은 대상을 <b>두 번 측정</b>(사전-사후, 좌우, 처치 전후 등)하여 짝지어진 데이터일 때 사용한다. 두 측정값의 <b>차이(d) 하나의 표본</b>으로 변환하여 단일표본 t검정과 동일한 논리로 계산한다.</p>
+<div class="formula-box">
+\[ H_0: \mu_d = 0 \qquad H_1: \mu_d \neq 0 \]
+\[ d_i = x_{i,\text{후}} - x_{i,\text{전}} \qquad t = \frac{\bar d}{s_d/\sqrt n},\quad df=n-1 \]
+</div>
+<h3>4.2 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 다이어트 프로그램 전후 체중(kg), n=6
+  전: 80, 75, 90, 85, 78, 88
+  후: 76, 74, 85, 84, 75, 82
+
+<span class="step-label">[Step1]</span> 차이 d = 후-전 = -4, -1, -5, -1, -3, -6
+<span class="step-label">[Step2]</span> d̄ = (-4-1-5-1-3-6)/6 = -20/6 = <span class="result">-3.333</span>
+<span class="step-label">[Step3]</span> 편차제곱: (−4+3.33)²=0.444, (−1+3.33)²=5.444, (−5+3.33)²=2.778,
+       (−1+3.33)²=5.444, (−3+3.33)²=0.111, (−6+3.33)²=7.111
+       합=21.33, s_d² = 21.33/5 = 4.267, s_d=2.066
+<span class="step-label">[Step4]</span> t = -3.333 / (2.066/√6) = -3.333 / 0.8435 = <span class="result">-3.95</span>
+<span class="step-label">[Step5]</span> df=5, t(0.025,5)=2.571 → |-3.95| &gt; 2.571
+<span class="step-label">[결론]</span> H0 기각 → 다이어트 프로그램 전후 체중 차이는 통계적으로 유의함
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:440px;">
+<g font-family="Pretendard" font-size="12">
+<line x1="60" y1="20" x2="60" y2="170" stroke="#dcd0b8"/>
+<line x1="230" y1="20" x2="230" y2="170" stroke="#dcd0b8"/>
+<text x="60" y="14" text-anchor="middle" fill="#5a5044">전</text>
+<text x="230" y="14" text-anchor="middle" fill="#5a5044">후</text>
+<line x1="60" y1="40" x2="230" y2="60" stroke="#b5652f"/>
+<line x1="60" y1="55" x2="230" y2="65" stroke="#b5652f"/>
+<line x1="60" y1="25" x2="230" y2="30" stroke="#b5652f"/>
+<line x1="60" y1="35" x2="230" y2="35" stroke="#b5652f"/>
+<line x1="60" y1="50" x2="230" y2="58" stroke="#b5652f"/>
+<line x1="60" y1="28" x2="230" y2="45" stroke="#b5652f"/>
+<text x="350" y="90" font-size="12" fill="#5a5044">각 개체별 연결선 = 짝(pair)</text>
+<text x="350" y="108" font-size="12" fill="#5a5044">→ 개체 내 차이(d)만 검정</text>
+</g>
+</svg>
+</div>
+<div class="callout tip">대응표본 t검정은 <b>개체 간 편차(예: 원래 체중이 무거운 사람 vs 가벼운 사람의 차이)를 제거</b>하고 순수하게 "처치 효과"만 검정하기 때문에, 같은 표본크기라면 독립표본 t검정보다 검정력이 높다.</div>
+<div class="quiz" data-qid="q4-1">
+<div class="q">Q. 왼쪽 눈과 오른쪽 눈의 시력을 같은 사람에게서 측정해 차이를 검정하려 한다. 적절한 검정은?</div>
+<label><input type="radio" name="q4-1" value="0">독립표본 t검정</label>
+<label><input type="radio" name="q4-1" value="1">대응표본 t검정</label>
+<label><input type="radio" name="q4-1" value="2">단일표본 t검정</label>
+<label><input type="radio" name="q4-1" value="3">Z검정</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q4-1"]={correct:1, explain:"같은 사람에게서 두 번(좌/우) 측정한 짝지어진 데이터이므로 대응표본 t검정이 적합하다."};</script>
+</section>
+
+<!-- ============ CH5 전제조건과 대안 ============ -->
+<section class="chapter" id="ch5">
+<h2><span class="chnum">5</span>전제조건, 검정력, 비모수 대안</h2>
+<h3>5.1 t검정의 전제조건</h3>
+<table>
+<tr><th>조건</th><th>설명</th><th>확인 방법</th></tr>
+<tr><td>정규성</td><td>모집단(또는 차이값)이 정규분포를 따름</td><td>Shapiro-Wilk, Q-Q plot</td></tr>
+<tr><td>독립성</td><td>관측치들이 서로 독립(대응표본은 쌍 내에서는 예외)</td><td>연구 설계로 확보</td></tr>
+<tr><td>등분산성(독립표본만)</td><td>두 그룹의 모분산이 동일</td><td>F검정, Levene 검정</td></tr>
+<tr><td>척도</td><td>연속형(등간·비율) 척도</td><td>자료수집 설계</td></tr>
+</table>
+<div class="callout warn">표본크기가 충분히 크면(n≥30 정도) <b>중심극한정리</b>에 의해 정규성 가정이 다소 깨져도 t검정이 비교적 안정적으로 작동한다(강건성, robustness). 하지만 표본이 작고 정규성이 심하게 깨졌다면 비모수 검정으로 전환해야 한다.</div>
+
+<h3>5.1a F검정을 독립표본 t검정의 사전단계로 사용하기</h3>
+<div class="card">
+<p>독립표본 t검정은 등분산 가정 여부에 따라 <b>Student's t</b>(합동분산 사용, df=n1+n2-2)와 <b>Welch's t</b>(각 분산을 그대로 사용, df는 근사식)로 공식이 달라진다. 등분산 여부를 객관적으로 판단하는 표준적 방법이 바로 <b>F검정</b>이며, 아래처럼 "F검정 → 등분산 판정 → t검정 공식 선택 → t검정 수행"의 4단계로 이어진다.</p>
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 950 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;">
+<defs><marker id="a5" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8a7048"/></marker></defs>
+<g font-family="Pretendard" font-size="12">
+<rect x="10" y="35" width="200" height="60" rx="10" fill="#e8d3b8" stroke="#b5652f"/>
+<text x="110" y="60" text-anchor="middle" font-weight="700">① F검정</text>
+<text x="110" y="78" text-anchor="middle" font-size="11" fill="#5a5044">s1²/s2² 계산</text>
+<line x1="210" y1="65" x2="245" y2="65" stroke="#8a7048" stroke-width="1.6" marker-end="url(#a5)"/>
+
+<rect x="255" y="20" width="220" height="90" rx="10" fill="#fffaf0" stroke="#8a7048" stroke-width="1.5"/>
+<text x="365" y="45" text-anchor="middle" font-weight="700">② 등분산 판정</text>
+<text x="365" y="65" text-anchor="middle" font-size="11" fill="#5a5044">F(0.025) 임계값과 비교</text>
+<text x="365" y="82" text-anchor="middle" font-size="11" fill="#5a5044">H0: σ1²=σ2²</text>
+<text x="365" y="98" text-anchor="middle" font-size="11" fill="#5a5044">기각/기각못함</text>
+<line x1="475" y1="45" x2="510" y2="35" stroke="#3f7d5c" stroke-width="1.6" marker-end="url(#a5)"/>
+<line x1="475" y1="90" x2="510" y2="95" stroke="#b5432f" stroke-width="1.6" marker-end="url(#a5)"/>
+
+<rect x="520" y="10" width="200" height="50" rx="10" fill="#e5efe4" stroke="#3f7d5c"/>
+<text x="620" y="30" text-anchor="middle" font-weight="700" font-size="12">기각 못함 → 등분산</text>
+<text x="620" y="48" text-anchor="middle" font-size="11" fill="#5a5044">Student's t 사용</text>
+
+<rect x="520" y="75" width="200" height="50" rx="10" fill="#f4e2dc" stroke="#b5432f"/>
+<text x="620" y="95" text-anchor="middle" font-weight="700" font-size="12">기각 → 이분산</text>
+<text x="620" y="113" text-anchor="middle" font-size="11" fill="#5a5044">Welch's t 사용</text>
+
+<line x1="720" y1="35" x2="755" y2="55" stroke="#8a7048" stroke-width="1.6" marker-end="url(#a5)"/>
+<line x1="720" y1="100" x2="755" y2="75" stroke="#8a7048" stroke-width="1.6" marker-end="url(#a5)"/>
+<rect x="765" y="35" width="175" height="60" rx="10" fill="#2c2620"/>
+<text x="852" y="60" text-anchor="middle" fill="#e0a458" font-weight="700" font-size="12">④ 독립표본</text>
+<text x="852" y="78" text-anchor="middle" fill="#f7f1e6" font-size="11">t검정 최종 수행</text>
+</g>
+</svg>
+</div>
+
+<h4>5.1b 손계산 예제 — F검정 → 등분산 판정 → t검정까지 한번에</h4>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> A그룹(n1=10) 표본분산 s1²=25 / B그룹(n2=8) 표본분산 s2²=6. 두 그룹의 모분산이 같은지 확인 후 독립표본 t검정을 수행한다. A그룹 평균 x̄1=52, B그룹 평균 x̄2=46, α=.05(양측)
+
+<span class="step-label">━━━ Step A. 등분산성 F검정 ━━━</span>
+<span class="step-label">[A-1]</span> 관례상 큰 분산을 분자에 둔다: F = s1²(큰쪽)/s2²(작은쪽) = 25/6 = <span class="result">4.17</span>
+<span class="step-label">[A-2]</span> 자유도: df1=n1-1=9 (분자쪽), df2=n2-1=7 (분모쪽)
+<span class="step-label">[A-3]</span> 양측검정이므로 상위 임계값 F(0.025, 9, 7) ≈ 4.82 를 사용
+<span class="step-label">[A-4]</span> 4.17 &lt; 4.82 → 기각역 밖 → <span class="result">H0(등분산) 기각 못함</span>
+<span class="step-label">[A-결론]</span> 두 그룹은 등분산으로 볼 수 있다 → Student's t(합동분산) 공식 사용 결정
+
+<span class="step-label">━━━ Step B. Student's t 공식으로 t검정 수행 ━━━</span>
+<span class="step-label">[B-1]</span> 합동분산 sp² = [(n1-1)s1² + (n2-1)s2²] / (n1+n2-2)
+       = [9*25 + 7*6] / (10+8-2) = [225+42]/16 = 267/16 = <span class="result">16.6875</span>
+<span class="step-label">[B-2]</span> SE = √(sp² * (1/n1 + 1/n2)) = √(16.6875 * (0.1+0.125))
+       = √(16.6875 * 0.225) = √3.755 = <span class="result">1.938</span>
+<span class="step-label">[B-3]</span> t = (x̄1-x̄2) / SE = (52-46) / 1.938 = 6/1.938 = <span class="result">3.10</span>
+<span class="step-label">[B-4]</span> df = n1+n2-2 = 16, t(0.025, 16) = 2.120
+<span class="step-label">[B-결론]</span> |3.10| &gt; 2.120 → H0(μ1=μ2) 기각 → 두 그룹 평균은 통계적으로 유의하게 다르다
+</div>
+<div class="callout tip">만약 Step A에서 F값이 임계값을 넘어 <b>등분산 가정이 기각</b>되었다면, Step B는 합동분산 sp² 대신 각 그룹의 분산(s1², s2²)을 그대로 쓰는 <b>Welch's t 공식(3.1 참고)</b>과 Welch-Satterthwaite 근사자유도로 넘어가야 한다.</div>
+
+<div class="quiz" data-qid="q5-2">
+<div class="q">Q. F검정으로 등분산성을 사전 확인한 결과 F값이 임계값보다 커서 H0(등분산)가 기각되었다. 이어서 수행할 독립표본 t검정 공식은?</div>
+<label><input type="radio" name="q5-2" value="0">합동분산을 이용한 Student's t</label>
+<label><input type="radio" name="q5-2" value="1">각 그룹 분산을 그대로 쓰는 Welch's t</label>
+<label><input type="radio" name="q5-2" value="2">대응표본 t검정</label>
+<label><input type="radio" name="q5-2" value="3">단일표본 t검정</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q5-2"]={correct:1, explain:"등분산 가정이 기각되었으므로(이분산) 합동분산을 쓰지 않는 Welch's t 공식과 근사자유도를 사용해야 한다."};</script>
+
+<h3>5.2 정규성이 깨졌을 때의 비모수 대안</h3>
+<table>
+<tr><th>t검정 유형</th><th>비모수 대안</th></tr>
+<tr><td>단일표본 t검정</td><td>Wilcoxon 부호검정(sign test), Wilcoxon 부호순위검정</td></tr>
+<tr><td>독립표본 t검정</td><td>Mann-Whitney U검정</td></tr>
+<tr><td>대응표본 t검정</td><td>Wilcoxon 부호순위검정</td></tr>
+</table>
+
+<h3>5.3 검정력에 영향을 주는 요인</h3>
+<div class="formula-box">
+\[ \text{검정력에 영향: 표본크기}\ n\ \uparrow,\ \text{효과크기(평균차)}\ \uparrow,\ \text{유의수준}\ \alpha\ \uparrow,\ \text{분산}\ \sigma^2\ \downarrow \ \Rightarrow\ \text{검정력}\ (1-\beta)\ \uparrow \]
+</div>
+<p>t검정을 설계하기 전에 <b>사전 검정력 분석(power analysis)</b>으로 필요한 최소 표본크기를 계산하는 것이 좋은 실무 습관이다. Cohen's d(효과크기)를 기준으로 계산한다.</p>
+<div class="formula-box">
+\[ \text{Cohen's d} = \frac{\bar x_1-\bar x_2}{s_p} \quad (0.2\text{=작음},\ 0.5\text{=중간},\ 0.8\text{=큼}) \]
+</div>
+<div class="quiz" data-qid="q5-1">
+<div class="q">Q. 독립표본 t검정을 하려는데 표본이 작고(n1=6, n2=7) Shapiro-Wilk 검정 결과 정규성이 기각되었다. 적절한 대안은?</div>
+<label><input type="radio" name="q5-1" value="0">그래도 독립표본 t검정 사용</label>
+<label><input type="radio" name="q5-1" value="1">Mann-Whitney U검정</label>
+<label><input type="radio" name="q5-1" value="2">대응표본 t검정</label>
+<label><input type="radio" name="q5-1" value="3">카이제곱검정</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q5-1"]={correct:1, explain:"소표본이고 정규성이 깨졌으므로 독립표본 t검정의 비모수 대안인 Mann-Whitney U검정이 적합하다."};</script>
+</section>
+
+<!-- ============ CH6 Python 실전 사용법 ============ -->
+<section class="chapter" id="ch6">
+<h2><span class="chnum">6</span>Python(scipy)으로 실전 계산하기</h2>
+<h3>6.1 단일표본 t검정</h3>
+<div class="code-box">
+<span class="cm"># 배터리 수명 예제 (2장)</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> ttest_1samp
+
+data = [9.5, 9.1, 8.8, 10.2, 9.4, 9.0, 9.9, 8.6,
+        9.7, 9.3, 8.9, 10.0, 9.6, 9.2, 9.8, 8.7]  <span class="cm"># 예시 데이터(n=16)</span>
+stat, p = ttest_1samp(data, popmean=10)
+<span class="kw">print</span>(f<span class="cm">"t={stat:.3f}, p={p:.4f}"</span>)
+</div>
+<h3>6.2 독립표본 t검정 (등분산/이분산)</h3>
+<div class="code-box">
+<span class="cm"># A반, B반 예제 (3장)</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> ttest_ind, levene
+
+groupA = [82, 79, 75, 80, 77, 81, 78, 76, 83, 80]
+groupB = [70, 74, 76, 72, 75, 73, 71, 77, 74, 72, 76, 73]
+
+<span class="cm"># 사전 등분산검정 (Levene)</span>
+lstat, lp = levene(groupA, groupB)
+<span class="kw">print</span>(f<span class="cm">"Levene p={lp:.4f}"</span>)  <span class="cm"># p<.05면 등분산 가정 기각</span>
+
+<span class="cm"># 등분산 가정 (Student's t)</span>
+t1, p1 = ttest_ind(groupA, groupB, equal_var=<span class="kw">True</span>)
+<span class="cm"># 이분산 가정 (Welch's t) — 기본값 권장</span>
+t2, p2 = ttest_ind(groupA, groupB, equal_var=<span class="kw">False</span>)
+<span class="kw">print</span>(f<span class="cm">"Student t={t1:.3f}, p={p1:.4f} / Welch t={t2:.3f}, p={p2:.4f}"</span>)
+</div>
+<h3>6.3 대응표본 t검정</h3>
+<div class="code-box">
+<span class="cm"># 다이어트 전후 체중 예제 (4장)</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> ttest_rel
+
+before = [80, 75, 90, 85, 78, 88]
+after  = [76, 74, 85, 84, 75, 82]
+stat, p = ttest_rel(after, before)
+<span class="kw">print</span>(f<span class="cm">"t={stat:.3f}, p={p:.4f}"</span>)
+<span class="cm"># t=-3.950, p≈0.0108 → 앞선 손계산과 일치</span>
+</div>
+<div class="callout tip"><code>ttest_ind</code>는 기본값이 <code>equal_var=True</code>지만, 실무에서는 먼저 <code>levene()</code>으로 등분산을 확인하거나, 아예 <code>equal_var=False</code>(Welch's t)를 기본으로 쓰는 것을 권장한다.</div>
+</section>
+
+<!-- ============ CH7 종합정리 ============ -->
+<section class="chapter" id="ch7">
+<h2><span class="chnum">7</span>종합 정리 & 체크리스트</h2>
+<table>
+<tr><th>검정</th><th>핵심 공식</th><th>자유도</th></tr>
+<tr><td>단일표본 t검정</td><td>(x̄-μ0)/(s/√n)</td><td>n-1</td></tr>
+<tr><td>독립표본(등분산)</td><td>(x̄1-x̄2)/√(sp²(1/n1+1/n2))</td><td>n1+n2-2</td></tr>
+<tr><td>독립표본(이분산, Welch)</td><td>(x̄1-x̄2)/√(s1²/n1+s2²/n2)</td><td>Welch-Satterthwaite 근사</td></tr>
+<tr><td>대응표본</td><td>d̄/(s_d/√n)</td><td>n-1</td></tr>
+</table>
+<div class="callout tip">
+✅ 표본이 독립인가(다른 대상), 대응인가(같은 대상 반복측정)를 먼저 구분했는가?<br>
+✅ 정규성(Shapiro-Wilk)을 확인했는가? 깨졌다면 비모수 검정을 고려했는가?<br>
+✅ 독립표본이라면 등분산성(Levene/F검정)을 확인해 Student's t와 Welch's t 중 선택했는가?<br>
+✅ 자유도를 검정 유형에 맞게 올바르게 산출했는가?<br>
+✅ 통계적 유의성뿐 아니라 Cohen's d 등 효과크기도 함께 보고했는가?
+</div>
+</section>
+
+</main>
+</div>
+<a href="#top" class="top-btn" onclick="document.getElementById('main').scrollTo(0,0); window.scrollTo(0,0); return false;">↑</a>
+<script>
+const chapters = document.querySelectorAll('section.chapter');
+const toc = document.getElementById('toc');
+chapters.forEach(ch=>{
+  const h2 = ch.querySelector('h2');
+  const a = document.createElement('a');
+  a.href = '#'+ch.id;
+  a.textContent = h2.textContent.replace(/^\d+/,'').trim();
+  a.dataset.target = ch.id;
+  toc.appendChild(a);
+});
+function onScroll(){
+  let current = chapters[0].id;
+  chapters.forEach(ch=>{ const rect = ch.getBoundingClientRect(); if(rect.top < 140) current = ch.id; });
+  document.querySelectorAll('#toc a').forEach(a=>{ a.classList.toggle('active', a.dataset.target===current); });
+  const doc = document.documentElement;
+  const pct = (doc.scrollTop)/(doc.scrollHeight-doc.clientHeight)*100;
+  document.getElementById('progressBar').style.width = pct+'%';
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const qid = quiz.dataset.qid;
+  const answer = window.QUIZ_ANSWERS[qid];
+  const labels = quiz.querySelectorAll('label');
+  const feedback = quiz.querySelector('.feedback');
+  quiz.querySelectorAll('input[type=radio]').forEach(input=>{
+    input.addEventListener('change', ()=>{
+      const val = parseInt(input.value);
+      labels.forEach(lb=>{ lb.style.borderColor='var(--line)'; lb.style.background='#fffdf7'; });
+      if(!answer) return;
+      if(val === answer.correct){
+        labels[val].style.borderColor='var(--good)'; labels[val].style.background='#e5efe4';
+        feedback.className='feedback correct';
+        feedback.innerHTML = '<span class="badge-correct">정답입니다.</span> '+answer.explain;
+      } else {
+        labels[val].style.borderColor='var(--bad)'; labels[val].style.background='#f4e2dc';
+        labels[answer.correct].style.borderColor='var(--good)'; labels[answer.correct].style.background='#e5efe4';
+        feedback.className='feedback wrong';
+        feedback.innerHTML = '<span class="badge-wrong">오답입니다.</span> '+answer.explain;
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

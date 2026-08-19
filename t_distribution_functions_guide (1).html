@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>scipy.stats.t 함수 완전정복 — t분포 그래프 학습서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css"></script>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+:root{
+  --paper:#f7f1e6; --paper-2:#efe6d3; --ink:#2c2620; --ink-soft:#5a5044;
+  --line:#dcd0b8; --accent:#b5652f; --accent-2:#8a7048; --accent-soft:#e8d3b8;
+  --good:#3f7d5c; --bad:#b5432f; --card:#fffaf0; --shadow:0 2px 10px rgba(60,45,20,0.08); --radius:14px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:'Pretendard',-apple-system,sans-serif; line-height:1.75; font-size:16px;}
+h1,h2,h3,h4{font-family:'Spectral',serif; font-weight:700; color:var(--ink); line-height:1.3;}
+.layout{display:flex; max-width:1400px; margin:0 auto;}
+.sidebar{width:270px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto; padding:28px 18px; border-right:1px solid var(--line); background:var(--paper-2);}
+.sidebar h2{font-size:1.05rem; margin:0 0 4px; color:var(--accent);}
+.sidebar .sub{font-size:0.78rem; color:var(--ink-soft); margin-bottom:20px;}
+.sidebar nav a{display:block; padding:7px 10px; margin:2px 0; border-radius:8px; color:var(--ink-soft); text-decoration:none; font-size:0.86rem; border-left:3px solid transparent;}
+.sidebar nav a:hover{background:var(--accent-soft); color:var(--ink);}
+.sidebar nav a.active{background:var(--accent-soft); color:var(--accent); font-weight:600; border-left:3px solid var(--accent);}
+main{flex:1; min-width:0; padding:40px 56px 120px;}
+.hero{padding:36px 40px; background:linear-gradient(135deg,var(--card),var(--accent-soft)); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:44px; border:1px solid var(--line);}
+.hero h1{font-size:2.0rem; margin:0 0 10px;}
+.hero p{color:var(--ink-soft); font-size:1rem; margin:6px 0;}
+section.chapter{margin-bottom:70px; scroll-margin-top:20px;}
+section.chapter > h2{font-size:1.55rem; padding-bottom:10px; border-bottom:3px solid var(--accent); display:flex; align-items:center; gap:10px;}
+.chnum{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:var(--accent); color:#fff; font-family:'JetBrains Mono',monospace; font-size:0.85rem; flex-shrink:0;}
+h3{font-size:1.2rem; margin-top:32px; color:var(--accent-2); border-left:4px solid var(--accent-soft); padding-left:10px;}
+h4{font-size:1.02rem; color:var(--ink);}
+p{margin:10px 0;}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px 26px; margin:18px 0; box-shadow:var(--shadow);}
+.callout{border-left:4px solid var(--accent); background:var(--accent-soft); padding:14px 18px; border-radius:0 10px 10px 0; margin:16px 0; font-size:0.94rem;}
+.callout.tip{border-left-color:var(--good); background:#e5efe4;}
+.callout.warn{border-left-color:var(--bad); background:#f4e2dc;}
+.formula-box{background:#fffdf7; border:1px dashed var(--accent-2); border-radius:10px; padding:16px 20px; margin:16px 0; overflow-x:auto;}
+.calc-steps{background:#2c2620; color:#f7f1e6; border-radius:10px; padding:18px 22px; font-family:'JetBrains Mono',monospace; font-size:0.85rem; margin:16px 0; overflow-x:auto; line-height:1.9; white-space:pre-wrap;}
+.calc-steps .step-label{color:#e0a458; font-weight:700;}
+.calc-steps .result{color:#8fd19e;}
+.code-box{background:#1f2b23; color:#d8f0dc; border-radius:10px; padding:18px 22px; font-family:'JetBrains Mono',monospace; font-size:0.83rem; margin:16px 0; overflow-x:auto; line-height:1.7;}
+.code-box .cm{color:#7fae87;}
+.code-box .kw{color:#e0a458;}
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;}
+th,td{border:1px solid var(--line); padding:9px 12px; text-align:center;}
+th{background:var(--accent-soft); color:var(--ink);}
+tr:nth-child(even) td{background:#faf5e8;}
+.tag{display:inline-block; font-size:0.72rem; padding:2px 9px; border-radius:20px; background:var(--accent-2); color:#fff; margin-right:6px; font-family:'JetBrains Mono',monospace;}
+.diagram-wrap{background:#fffdf7; border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin:18px 0; overflow-x:auto; text-align:center;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+.grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;}
+@media (max-width:900px){.grid2,.grid3{grid-template-columns:1fr;}}
+.quiz{background:var(--card); border:2px solid var(--accent-soft); border-radius:var(--radius); padding:20px 24px; margin:16px 0;}
+.quiz .q{font-weight:600; margin-bottom:10px;}
+.quiz label{display:block; padding:8px 12px; margin:5px 0; border-radius:8px; cursor:pointer; border:1px solid var(--line); background:#fffdf7; font-size:0.92rem;}
+.quiz label:hover{background:var(--accent-soft);}
+.quiz .feedback{margin-top:10px; padding:10px 14px; border-radius:8px; font-size:0.9rem; display:none;}
+.quiz .feedback.correct{display:block; background:#e5efe4; color:var(--good); border:1px solid var(--good);}
+.quiz .feedback.wrong{display:block; background:#f4e2dc; color:var(--bad); border:1px solid var(--bad);}
+.badge-correct{color:var(--good); font-weight:700;}
+.badge-wrong{color:var(--bad); font-weight:700;}
+.flow-note{font-size:0.82rem; color:var(--ink-soft); text-align:center; margin-top:6px;}
+code{background:#efe6d3; padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:0.86rem;}
+.top-btn{position:fixed; bottom:26px; right:26px; width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow); font-size:1.2rem; text-decoration:none; opacity:0.85;}
+.progress-bar{position:fixed; top:0; left:0; height:3px; background:var(--accent); z-index:99; transition:width .1s;}
+.mini-card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px;}
+.mini-card .fn{font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--accent); font-weight:700; margin-bottom:4px;}
+.mini-card .desc{font-size:0.82rem; color:var(--ink-soft);}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="layout">
+<aside class="sidebar">
+  <h2>t분포 함수 완전정복</h2>
+  <div class="sub">scipy.stats.t — pdf·cdf·sf·ppf·isf·interval·stats</div>
+  <nav id="toc"></nav>
+</aside>
+<main id="main">
+
+<div class="hero">
+  <h1>scipy.stats.t 함수 완전정복</h1>
+  <p>t분포 곡선 위에서 pdf, cdf, sf, ppf, isf, interval, stats가 각각 무엇을 구하는가</p>
+  <p>같은 곡선, 다른 질문 — 그림으로 구별하고 손계산·코드로 확인한다</p>
+</div>
+
+<script>window.QUIZ_ANSWERS = {};</script>
+
+<!-- ============ CH0 t분포 리마인드 ============ -->
+<section class="chapter" id="ch0">
+<h2><span class="chnum">0</span>t분포 리마인드</h2>
+<div class="card">
+<p>t분포는 표준정규분포 Z를 자유도 k인 카이제곱분포의 제곱근으로 나눈 값이 따르는 분포다: \(t=Z/\sqrt{\chi^2_{(k)}/k}\). 모표준편차 대신 표본표준편차 s를 쓸 때 생기는 추가적 불확실성 때문에 <b>정규분포보다 꼬리가 두껍고</b>, 자유도(df)가 커질수록 표준정규분포에 가까워진다.</p>
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;">
+<line x1="30" y1="150" x2="670" y2="150" stroke="#8a7048"/>
+<path d="M30,145 C90,145 100,20 350,20 C600,20 610,145 670,145" fill="none" stroke="#8a7048" stroke-width="2"/>
+<text x="350" y="10" text-anchor="middle" font-size="12" fill="#5a5044">이 곡선 하나 위에서 아래 7개 함수가 서로 다른 "질문"을 던진다</text>
+<text x="350" y="165" text-anchor="middle" font-size="11" fill="#5a5044">가로축: t값 (표준화된 값)</text>
+</svg>
+</div>
+</section>
+
+<!-- ============ CH1 7개 함수 전체 지도 ============ -->
+<section class="chapter" id="ch1">
+<h2><span class="chnum">1</span>7개 함수 전체 지도</h2>
+<div class="card">
+<p>모든 함수는 <b>"가로축(t값)"</b>과 <b>"세로축 또는 면적(확률)"</b> 사이를 오가는 변환이다. 방향이 핵심이다: <b>t값 → 확률</b>로 가는 함수(pdf, cdf, sf)와, <b>확률 → t값</b>으로 거꾸로 가는 함수(ppf, isf)로 나뉜다.</p>
+</div>
+<table>
+<tr><th>함수</th><th>입력</th><th>출력</th><th>방향</th><th>한 줄 의미</th></tr>
+<tr><td><code>pdf(x, df)</code></td><td>t값</td><td>밀도(높이)</td><td>t → 높이</td><td>그 지점의 곡선 높이(확률이 아님)</td></tr>
+<tr><td><code>cdf(x, df)</code></td><td>t값</td><td>누적확률</td><td>t → 확률</td><td>P(T ≤ x), 왼쪽부터 누적 면적</td></tr>
+<tr><td><code>sf(x, df)</code></td><td>t값</td><td>꼬리확률</td><td>t → 확률</td><td>P(T &gt; x) = 1-cdf(x), 오른쪽 꼬리 면적</td></tr>
+<tr><td><code>ppf(q, df)</code></td><td>누적확률 q</td><td>t값</td><td>확률 → t</td><td>cdf의 역함수, "누적확률 q가 되는 t는?"</td></tr>
+<tr><td><code>isf(q, df)</code></td><td>꼬리확률 q</td><td>t값</td><td>확률 → t</td><td>sf의 역함수, "오른쪽 꼬리확률 q가 되는 t는?"</td></tr>
+<tr><td><code>interval(a, df)</code></td><td>중심확률 a</td><td>(하한,상한)</td><td>확률 → t 구간</td><td>중심 a를 포함하는 대칭 구간, ppf를 좌우로 묶음</td></tr>
+<tr><td><code>stats(df,'mv')</code></td><td>자유도</td><td>(평균,분산)</td><td>분포 → 요약값</td><td>곡선 하나가 아닌 분포 전체의 요약 통계</td></tr>
+</table>
+<div class="callout tip"><b>ppf(0.975, df)</b>와 <b>isf(0.025, df)</b>는 항상 <b>같은 t값</b>을 돌려준다. "누적확률이 97.5%인 지점"과 "오른쪽 꼬리확률이 2.5%인 지점"은 정확히 같은 점이기 때문이다. 이 값이 바로 α=0.05 양측검정의 임계값(t 0.025)이다.</div>
+</section>
+
+<!-- ============ CH2 pdf ============ -->
+<section class="chapter" id="ch2">
+<h2><span class="chnum">2</span>pdf(x, df) — 확률밀도함수</h2>
+<h3>2.1 원리</h3>
+<p>t=x 지점에서 <b>곡선의 높이</b>(밀도)를 반환한다. 이산변수의 "확률"과 달리 연속변수의 pdf 값 자체는 확률이 아니며, <b>구간에 대해 적분해야 확률</b>이 된다는 점이 핵심이다. 실무에서는 특정 지점의 상대적 가능성을 비교하거나 곡선 자체를 그릴 때 사용한다.</p>
+<div class="formula-box">
+\[ f(t;k) = \frac{\Gamma\left(\frac{k+1}{2}\right)}{\sqrt{k\pi}\,\Gamma\left(\frac{k}{2}\right)}\left(1+\frac{t^2}{k}\right)^{-\frac{k+1}{2}} \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M10,83.4 L20,81.93 L30,79.43 L40,75.53 L50,69.87 L60,62.27 L70,52.94 L80,42.54 L90,32.16 L100,23.23 L110,17.15 L120,15 L130,17.15 L140,23.23 L150,32.16 L160,42.54 L170,52.94 L180,62.27 L190,69.87 L200,75.53 L210,79.43 L220,81.93 L230,83.4" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="120" y1="85" x2="120" y2="15" stroke-dasharray="3 3" stroke="#0F6E56" stroke-width="1.4"/>
+<circle cx="120" cy="15" r="3.5" fill="#0F6E56"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="120" y="97" text-anchor="middle" font-size="10" fill="#5a5044">t = 0</text>
+<text x="120" y="8" text-anchor="middle" font-size="10" fill="#0F6E56">pdf(0,df) = 곡선의 높이</text>
+</svg>
+</div>
+<h3>2.2 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> df=10일 때 t=0에서의 pdf 값은?
+
+<span class="step-label">[Step1]</span> t=0이면 공식의 (1+t²/k) 항이 1이 되어 계산이 단순화됨
+<span class="step-label">[Step2]</span> f(0;10) = Γ(5.5) / (√(10π) * Γ(5))
+<span class="step-label">[Step3]</span> Γ(5)=4!=24, Γ(5.5)≈52.34, √(10π)≈5.605
+<span class="step-label">[Step4]</span> f(0;10) = 52.34 / (5.605*24) = 52.34/134.5 = <span class="result">0.389</span>
+<span class="step-label">[결론]</span> df=10 t분포는 t=0에서 높이 0.389 (참고: 표준정규분포는 1/√(2π)≈0.399로 이보다 약간 낮음)
+</div>
+<div class="quiz" data-qid="q2-1">
+<div class="q">Q. pdf(0, df) 값이 df가 커질수록(예: 5→30→∞) 어떻게 변하는가?</div>
+<label><input type="radio" name="q2-1" value="0">계속 작아진다</label>
+<label><input type="radio" name="q2-1" value="1">표준정규분포의 중심 높이(≈0.399)에 점점 가까워진다</label>
+<label><input type="radio" name="q2-1" value="2">항상 일정하다</label>
+<label><input type="radio" name="q2-1" value="3">0으로 수렴한다</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q2-1"]={correct:1, explain:"df가 커질수록 t분포는 표준정규분포에 수렴하므로, 중심 높이도 표준정규분포의 값(1/√(2π)≈0.399)에 가까워진다."};</script>
+</section>
+
+<!-- ============ CH3 cdf ============ -->
+<section class="chapter" id="ch3">
+<h2><span class="chnum">3</span>cdf(x, df) — 누적분포함수</h2>
+<h3>3.1 원리</h3>
+<p>왼쪽 끝(-∞)부터 t=x까지 곡선 아래 <b>면적을 누적</b>한 값, 즉 <b>P(T ≤ x)</b>를 반환한다. pdf를 -∞부터 x까지 적분한 것과 같다.</p>
+<div class="formula-box">
+\[ F(x)=P(T\le x)=\int_{-\infty}^{x} f(t)\,dt \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M10,85 L10,83.4 L20,81.93 L30,79.43 L40,75.53 L50,69.87 L60,62.27 L70,52.94 L80,42.54 L90,32.16 L100,23.23 L110,17.15 L120,15 L130,17.15 L140,23.23 L150,32.16 L160,42.54 L170,52.94 L178,60.53 L178,85 Z" fill="#9fe1cb" stroke="#0F6E56" stroke-width="0.5" stroke-linejoin="round"/>
+<path d="M10,83.4 L20,81.93 L30,79.43 L40,75.53 L50,69.87 L60,62.27 L70,52.94 L80,42.54 L90,32.16 L100,23.23 L110,17.15 L120,15 L130,17.15 L140,23.23 L150,32.16 L160,42.54 L170,52.94 L180,62.27 L190,69.87 L200,75.53 L210,79.43 L220,81.93 L230,83.4" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="178" y1="85" x2="178" y2="60.53" stroke-dasharray="3 3" stroke="#085041" stroke-width="1.4"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="178" y="97" text-anchor="middle" font-size="10" fill="#5a5044">t = 2</text>
+<text x="65" y="75" font-size="10" fill="#085041">P(T≤2)</text>
+</svg>
+</div>
+<h3>3.2 손계산 예제 (근사)</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> df=15에서 cdf(1.5, 15) ≈ ? (t분포표 활용)
+
+<span class="step-label">[Step1]</span> t분포표에서 df=15 행을 찾아 t=1.5 근처 값을 확인
+<span class="step-label">[Step2]</span> t(0.10,15)=1.341, t(0.05,15)=1.753 → 1.5는 그 사이
+<span class="step-label">[Step3]</span> 선형보간: (1.5-1.341)/(1.753-1.341) = 0.159/0.412 ≈ 0.386
+       상단꼬리확률 ≈ 0.10 - 0.386*(0.10-0.05) = 0.0807
+<span class="step-label">[Step4]</span> cdf(1.5,15) = 1 - 0.0807 ≈ <span class="result">0.919</span> (scipy 정확값: 0.9273)
+<span class="step-label">[결론]</span> P(T≤1.5) ≈ 0.92, 즉 t=1.5보다 작은 값이 나올 확률이 약 92%
+</div>
+<div class="callout warn">t분포표는 이산적인 몇 개 확률(0.10, 0.05, 0.025...)만 제공하므로 <b>정확한 cdf 값은 선형보간으로도 오차가 있다</b>. 실전에서는 <code>scipy.stats.t.cdf()</code>로 정확히 계산하는 것이 표준이다.</div>
+<div class="quiz" data-qid="q3-1">
+<div class="q">Q. cdf(x, df)의 값이 0.5라면 x는 어떤 값인가?</div>
+<label><input type="radio" name="q3-1" value="0">항상 1</label>
+<label><input type="radio" name="q3-1" value="1">0 (t분포는 0을 중심으로 좌우대칭이므로)</label>
+<label><input type="radio" name="q3-1" value="2">df 값과 같다</label>
+<label><input type="radio" name="q3-1" value="3">알 수 없다</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q3-1"]={correct:1, explain:"t분포는 0을 중심으로 좌우 대칭이므로 누적확률이 정확히 절반(0.5)이 되는 지점은 중앙값이자 평균인 0이다."};</script>
+</section>
+
+<!-- ============ CH4 sf ============ -->
+<section class="chapter" id="ch4">
+<h2><span class="chnum">4</span>sf(x, df) — 생존함수(우측 꼬리확률)</h2>
+<h3>4.1 원리</h3>
+<p>t=x부터 오른쪽 끝(+∞)까지의 면적, 즉 <b>P(T &gt; x)</b>를 반환한다. 정의상 <code>sf(x) = 1 - cdf(x)</code>이지만, x가 매우 클 때 <code>1-cdf(x)</code>는 부동소수점 정밀도 손실(1에 아주 가까운 수를 빼는 문제)이 생길 수 있어 <b>sf를 직접 계산하는 것이 더 정확</b>하다.</p>
+<div class="formula-box">
+\[ S(x)=P(T> x)=1-F(x)=\int_{x}^{\infty} f(t)\,dt \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M178,85 L178,60.53 L180,62.27 L190,69.87 L200,75.53 L210,79.43 L220,81.93 L230,83.4 L230,85 Z" fill="#f5c4b3" stroke="#712B13" stroke-width="0.5" stroke-linejoin="round"/>
+<path d="M10,83.4 L20,81.93 L30,79.43 L40,75.53 L50,69.87 L60,62.27 L70,52.94 L80,42.54 L90,32.16 L100,23.23 L110,17.15 L120,15 L130,17.15 L140,23.23 L150,32.16 L160,42.54 L170,52.94 L180,62.27 L190,69.87 L200,75.53 L210,79.43 L220,81.93 L230,83.4" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<line x1="178" y1="85" x2="178" y2="60.53" stroke-dasharray="3 3" stroke="#712B13" stroke-width="1.4"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="178" y="97" text-anchor="middle" font-size="10" fill="#5a5044">t = 2</text>
+<text x="207" y="66" font-size="10" fill="#712B13">P(T&gt;2)</text>
+</svg>
+</div>
+<h3>4.2 가설검정에서의 실전 활용 — p-value 계산</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 단일표본 t검정: n=16, t통계량=2.4, df=15. 단측검정(H1: μ&gt;μ0)의 p-value는?
+
+<span class="step-label">[Step1]</span> 단측(오른쪽) 검정이므로 p-value = P(T &gt; 2.4) = sf(2.4, 15)
+<span class="step-label">[Step2]</span> scipy 계산 결과 sf(2.4,15) ≈ <span class="result">0.0149</span>
+<span class="step-label">[Step3]</span> α=.05와 비교: 0.0149 &lt; 0.05
+<span class="step-label">[결론]</span> H0 기각 → 유의한 증가가 있다고 판단
+</div>
+<div class="callout tip">양측검정이라면 p-value = 2 × sf(|t|, df)로 계산한다. 관측된 t값이 어느 쪽 꼬리에 있든 절댓값을 취해 오른쪽 꼬리 면적을 구하고 2배 하면 된다.</div>
+<div class="quiz" data-qid="q4-1">
+<div class="q">Q. 양측 t검정에서 |t|=2.5, df=20일 때 p-value를 구하는 올바른 식은?</div>
+<label><input type="radio" name="q4-1" value="0">sf(2.5, 20)</label>
+<label><input type="radio" name="q4-1" value="1">2 * sf(2.5, 20)</label>
+<label><input type="radio" name="q4-1" value="2">cdf(2.5, 20)</label>
+<label><input type="radio" name="q4-1" value="3">1 - 2*sf(2.5,20)</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q4-1"]={correct:1, explain:"양측검정의 p-value는 양쪽 꼬리 면적의 합이므로 2 * sf(|t|, df)로 계산한다."};</script>
+</section>
+
+<!-- ============ CH5 ppf / isf ============ -->
+<section class="chapter" id="ch5">
+<h2><span class="chnum">5</span>ppf(q, df) / isf(q, df) — 역함수(임계값 찾기)</h2>
+<h3>5.1 원리 — cdf·sf의 반대 방향</h3>
+<p>cdf와 sf는 "t값을 알 때 확률을 구하는" 함수인 반면, <b>ppf(percent point function)</b>와 <b>isf(inverse survival function)</b>는 <b>확률을 알 때 t값을 역산</b>한다. 검정에서 <b>기각역의 경계(임계값)</b>를 구할 때 필수적으로 사용한다.</p>
+<div class="formula-box">
+\[ \text{ppf}(q,k) = F^{-1}(q) \quad \text{("누적확률이 } q\text{인 } t\text{는?")} \]
+\[ \text{isf}(q,k) = S^{-1}(q) = F^{-1}(1-q) \quad \text{("오른쪽 꼬리확률이 } q\text{인 } t\text{는?")} \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M10,83.4 L20,81.93 L30,79.43 L40,75.53 L50,69.87 L60,62.27 L70,52.94 L80,42.54 L90,32.16 L100,23.23 L110,17.15 L120,15 L130,17.15 L140,23.23 L150,32.16 L160,42.54 L170,52.94 L180,62.27 L190,69.87 L200,75.53 L210,79.43 L220,81.93 L230,83.4" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M185,85 L185,66.3 L190,69.87 L200,75.53 L210,79.43 L220,81.93 L230,83.4 L230,85 Z" fill="#fac775" stroke="#854F0B" stroke-width="0.5" stroke-linejoin="round"/>
+<line x1="185" y1="85" x2="185" y2="66.3" stroke-dasharray="3 3" stroke="#854F0B" stroke-width="1.4"/>
+<circle cx="185" cy="66.3" r="3.5" fill="#854F0B"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="185" y="97" text-anchor="middle" font-size="10" fill="#5a5044">t ≈ 2.23 (꼬리 2.5%)</text>
+<text x="215" y="78" font-size="10" fill="#854F0B">0.025</text>
+</svg>
+</div>
+<h3>5.2 손계산 예제 — 양측검정 임계값 구하기</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> df=18, α=.05 양측검정의 임계값(기각역 경계)을 구하시오
+
+<span class="step-label">[Step1]</span> 양측검정이므로 유의수준을 반으로 나눔: α/2 = 0.025
+<span class="step-label">[Step2]</span> 방법1: ppf(1-0.025, 18) = ppf(0.975, 18)
+<span class="step-label">[Step3]</span> 방법2: isf(0.025, 18) — 오른쪽 꼬리 확률이 0.025인 지점
+<span class="step-label">[Step4]</span> t분포표 df=18 행에서 확인: t(0.025,18) = <span class="result">2.101</span>
+<span class="step-label">[결론]</span> 기각역: t &lt; -2.101 또는 t &gt; +2.101 (두 방법 모두 동일한 값 2.101을 반환)
+</div>
+<div class="quiz" data-qid="q5-1">
+<div class="q">Q. 단측검정(왼쪽 꼬리)으로 α=.05, df=12일 때 기각역의 경계값을 구하는 올바른 코드는?</div>
+<label><input type="radio" name="q5-1" value="0">stats.t.ppf(0.05, 12)</label>
+<label><input type="radio" name="q5-1" value="1">stats.t.ppf(0.95, 12)</label>
+<label><input type="radio" name="q5-1" value="2">stats.t.sf(0.05, 12)</label>
+<label><input type="radio" name="q5-1" value="3">stats.t.pdf(0.05, 12)</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q5-1"]={correct:0, explain:"왼쪽 꼬리 5%이므로 누적확률 0.05인 지점을 구해야 한다 → ppf(0.05, 12) (음수값이 나옴)"};</script>
+</section>
+
+<!-- ============ CH6 interval ============ -->
+<section class="chapter" id="ch6">
+<h2><span class="chnum">6</span>interval(alpha, df) — 중심 신뢰구간</h2>
+<h3>6.1 원리</h3>
+<p>중심에서 <b>확률 α(예: 0.95)를 포함하는 대칭 구간</b>의 (하한, 상한)을 한 번에 반환한다. 내부적으로는 <code>ppf((1-α)/2)</code>와 <code>ppf(1-(1-α)/2)</code>를 각각 계산해 묶어주는 것과 같다.</p>
+<div class="formula-box">
+\[ \text{interval}(\alpha, k) = \left(F^{-1}\!\left(\tfrac{1-\alpha}{2}\right),\ F^{-1}\!\left(\tfrac{1+\alpha}{2}\right)\right) = \left(-t_{(1-\alpha)/2},\ +t_{(1-\alpha)/2}\right) \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M10,83.4 L20,81.93 L30,79.43 L40,75.53 L50,69.87 L60,62.27 L70,52.94 L80,42.54 L90,32.16 L100,23.23 L110,17.15 L120,15 L130,17.15 L140,23.23 L150,32.16 L160,42.54 L170,52.94 L180,62.27 L190,69.87 L200,75.53 L210,79.43 L220,81.93 L230,83.4" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M59,85 L59,63.13 L60,62.27 L70,52.94 L80,42.54 L90,32.16 L100,23.23 L110,17.15 L120,15 L130,17.15 L140,23.23 L150,32.16 L160,42.54 L170,52.94 L180,62.27 L181,63.13 L181,85 Z" fill="#cecbf6" stroke="#3C3489" stroke-width="0.5" stroke-linejoin="round"/>
+<line x1="59" y1="85" x2="59" y2="63.13" stroke-dasharray="3 3" stroke="#3C3489" stroke-width="1.4"/>
+<line x1="181" y1="85" x2="181" y2="63.13" stroke-dasharray="3 3" stroke="#3C3489" stroke-width="1.4"/>
+<line x1="10" y1="85" x2="230" y2="85" stroke="#8a7048" stroke-width="1"/>
+<text x="59" y="97" text-anchor="middle" font-size="10" fill="#5a5044">하한</text>
+<text x="181" y="97" text-anchor="middle" font-size="10" fill="#5a5044">상한</text>
+<text x="120" y="70" text-anchor="middle" font-size="10" fill="#3C3489">95%</text>
+</svg>
+</div>
+<h3>6.2 손계산 예제 — 평균의 95% 신뢰구간</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> n=20, x̄=52, s=8. 모평균의 95% 신뢰구간을 구하시오
+
+<span class="step-label">[Step1]</span> df = n-1 = 19, t_(0.025,19) = interval(0.95,19)의 경계값 = 2.093
+<span class="step-label">[Step2]</span> SE = s/√n = 8/√20 = 8/4.472 = 1.789
+<span class="step-label">[Step3]</span> 오차범위 = t * SE = 2.093 * 1.789 = <span class="result">3.745</span>
+<span class="step-label">[Step4]</span> 신뢰구간 = x̄ ± 오차범위 = 52 ± 3.745 = (<span class="result">48.26, 55.75</span>)
+<span class="step-label">[결론]</span> "모평균은 95% 신뢰수준에서 48.26~55.75 사이에 있다"고 추정
+</div>
+<div class="callout warn"><code>stats.t.interval()</code>은 <b>표준t분포(위치 0, 척도 1) 기준</b>의 구간만 반환한다. 실제 평균의 신뢰구간을 구하려면 <b>x̄ + 반환값 × SE</b> 형태로 직접 변환하거나, <code>loc</code>과 <code>scale</code> 파라미터에 x̄와 SE를 넣어 호출해야 한다.</div>
+<div class="quiz" data-qid="q6-1">
+<div class="q">Q. interval(0.90, 25)는 어떤 값들을 반환하는가?</div>
+<label><input type="radio" name="q6-1" value="0">중심 90%를 포함하는 대칭 구간의 (하한, 상한)</label>
+<label><input type="radio" name="q6-1" value="1">평균과 분산</label>
+<label><input type="radio" name="q6-1" value="2">단일 t값 하나</label>
+<label><input type="radio" name="q6-1" value="3">p-value</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q6-1"]={correct:0, explain:"interval(alpha, df)은 중심에서 alpha(여기선 90%) 확률을 포함하는 대칭 구간의 (하한,상한) 튜플을 반환한다."};</script>
+</section>
+
+<!-- ============ CH7 stats(moments) ============ -->
+<section class="chapter" id="ch7">
+<h2><span class="chnum">7</span>stats(df, moments='mv') — 분포의 요약통계</h2>
+<h3>7.1 원리</h3>
+<p>다른 함수들이 "곡선 위 한 점 또는 한 구간"에 대한 값이라면, <code>stats()</code>는 <b>분포 전체를 요약하는 통계량</b>(평균, 분산, 왜도, 첨도)을 반환한다. <code>moments</code> 인자로 어떤 통계량을 받을지 선택한다('m'=평균, 'v'=분산, 's'=왜도, 'k'=첨도).</p>
+<div class="formula-box">
+\[ E(T) = 0\ (df>1) \qquad Var(T) = \frac{k}{k-2}\ (df>2) \]
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 240 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;">
+<path d="M10,83.4 L20,81.93 L30,79.43 L40,75.53 L50,69.87 L60,62.27 L70,52.94 L80,42.54 L90,32.16 L100,23.23 L110,17.15 L120,15 L130,17.15 L140,23.23 L150,32.16 L160,42.54 L170,52.94 L180,62.27 L190,69.87 L200,75.53 L210,79.43 L220,81.93 L230,83.4" fill="none" stroke="#8a7048" stroke-width="1.6" stroke-linejoin="round"/>
+<circle cx="120" cy="85" r="3.5" fill="#185FA5"/>
+<text x="120" y="97" text-anchor="middle" font-size="10" fill="#5a5044">mean = 0</text>
+<line x1="80" y1="65" x2="160" y2="65" stroke="#0C447C" stroke-width="1.4"/>
+<line x1="80" y1="60" x2="80" y2="70" stroke="#0C447C" stroke-width="1.4"/>
+<line x1="160" y1="60" x2="160" y2="70" stroke="#0C447C" stroke-width="1.4"/>
+<text x="120" y="55" text-anchor="middle" font-size="10" fill="#0C447C">variance = df/(df-2)</text>
+</svg>
+</div>
+<h3>7.2 손계산 예제 — 분산이 df에 따라 어떻게 변하는가</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> df=5, df=10, df=100일 때 t분포의 분산을 각각 계산하시오
+
+<span class="step-label">[df=5]</span>  Var = 5/(5-2) = 5/3 = <span class="result">1.667</span>
+<span class="step-label">[df=10]</span> Var = 10/(10-2) = 10/8 = <span class="result">1.25</span>
+<span class="step-label">[df=100]</span> Var = 100/(100-2) = 100/98 = <span class="result">1.02</span>
+<span class="step-label">[결론]</span> df가 커질수록 분산이 표준정규분포의 분산(=1)에 점점 가까워진다 — 꼬리가 얇아지는 것과 같은 현상
+</div>
+<div class="callout warn">df ≤ 2이면 분산이 정의되지 않는다(무한대로 발산). df ≤ 1이면 평균조차 정의되지 않는다(코시분포와 동일해짐). 실무 데이터에서는 표본크기가 매우 작을 때(n=2, 3) 특히 주의해야 한다.</div>
+<div class="quiz" data-qid="q7-1">
+<div class="q">Q. df=4인 t분포의 분산은?</div>
+<label><input type="radio" name="q7-1" value="0">1</label>
+<label><input type="radio" name="q7-1" value="1">2</label>
+<label><input type="radio" name="q7-1" value="2">4</label>
+<label><input type="radio" name="q7-1" value="3">정의되지 않음</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q7-1"]={correct:1, explain:"Var = k/(k-2) = 4/(4-2) = 4/2 = 2"};</script>
+</section>
+
+<!-- ============ CH8 Python 실전 종합 ============ -->
+<section class="chapter" id="ch8">
+<h2><span class="chnum">8</span>Python 실전 코드 종합</h2>
+<div class="code-box">
+<span class="cm"># 7개 함수 한 번에 확인</span>
+<span class="kw">from</span> scipy <span class="kw">import</span> stats
+
+df = 10
+<span class="kw">print</span>(<span class="cm">"pdf(0,10)      :"</span>, stats.t.pdf(0, df))        <span class="cm"># 중심 밀도</span>
+<span class="kw">print</span>(<span class="cm">"cdf(2,10)      :"</span>, stats.t.cdf(2, df))        <span class="cm"># P(T<=2)</span>
+<span class="kw">print</span>(<span class="cm">"sf(2,10)       :"</span>, stats.t.sf(2, df))         <span class="cm"># P(T>2)</span>
+<span class="kw">print</span>(<span class="cm">"ppf(0.975,10)  :"</span>, stats.t.ppf(0.975, df))    <span class="cm"># 양측 alpha=.05 임계값</span>
+<span class="kw">print</span>(<span class="cm">"isf(0.025,10)  :"</span>, stats.t.isf(0.025, df))     <span class="cm"># 위와 동일한 값</span>
+<span class="kw">print</span>(<span class="cm">"interval(.95,10):"</span>, stats.t.interval(0.95, df))  <span class="cm"># 95% 중심구간</span>
+<span class="kw">print</span>(<span class="cm">"stats(mv)      :"</span>, stats.t.stats(df, moments=<span class="cm">'mv'</span>))
+</div>
+<div class="code-box">
+<span class="cm"># 실전: 평균의 95% 신뢰구간을 직접 구하기 (loc, scale 활용)</span>
+n, xbar, s = 20, 52, 8
+se = s / (n ** 0.5)
+ci = stats.t.interval(0.95, df=n-1, loc=xbar, scale=se)
+<span class="kw">print</span>(f<span class="cm">"95% CI: ({ci[0]:.2f}, {ci[1]:.2f})"</span>)
+<span class="cm"># 95% CI: (48.26, 55.75) → 6.2 손계산과 일치</span>
+</div>
+<div class="code-box">
+<span class="cm"># 실전: 양측 t검정의 p-value를 sf로 계산</span>
+t_stat, dfree = 2.5, 20
+p_value = 2 * stats.t.sf(abs(t_stat), dfree)
+<span class="kw">print</span>(f<span class="cm">"p-value = {p_value:.4f}"</span>)
+</div>
+<div class="callout tip"><code>ttest_1samp</code>, <code>ttest_ind</code> 같은 고수준 함수는 내부적으로 위 7개 저수준 함수(특히 sf, cdf)를 조합해 t값과 p-value를 계산한다. 저수준 함수를 이해하면 결과를 검증하거나 커스텀 검정을 직접 구현할 때 큰 도움이 된다.</div>
+</section>
+
+<!-- ============ CH9 종합정리 ============ -->
+<section class="chapter" id="ch9">
+<h2><span class="chnum">9</span>종합 정리 & 체크리스트</h2>
+<table>
+<tr><th>궁금한 것</th><th>사용할 함수</th></tr>
+<tr><td>특정 t값에서 곡선이 얼마나 높은가</td><td>pdf(x, df)</td></tr>
+<tr><td>t값 이하일 확률은?</td><td>cdf(x, df)</td></tr>
+<tr><td>t값 초과일 확률(단측 p-value)은?</td><td>sf(x, df)</td></tr>
+<tr><td>양측 p-value는?</td><td>2 * sf(|t|, df)</td></tr>
+<tr><td>누적확률 q가 되는 t값(임계값)은?</td><td>ppf(q, df)</td></tr>
+<tr><td>오른쪽 꼬리확률 q가 되는 t값은?</td><td>isf(q, df)</td></tr>
+<tr><td>중심 신뢰구간의 상하한은?</td><td>interval(alpha, df, loc, scale)</td></tr>
+<tr><td>분포 자체의 평균·분산은?</td><td>stats(df, moments='mv')</td></tr>
+</table>
+<div class="callout tip">
+✅ 원하는 것이 "확률"인지 "t값"인지 먼저 구분했는가? (방향이 다르면 함수도 다름)<br>
+✅ 단측검정인지 양측검정인지에 따라 sf/cdf 사용법과 α 분배(α vs α/2)를 구분했는가?<br>
+✅ interval()에 loc, scale을 지정하지 않으면 표준t분포 기준값만 반환된다는 것을 알고 있는가?<br>
+✅ ppf(0.975)와 isf(0.025)가 같은 값을 반환한다는 것을 확인했는가?<br>
+✅ df가 작을 때(df≤2) 분산·평균이 정의되지 않을 수 있음을 인지했는가?
+</div>
+</section>
+
+</main>
+</div>
+<a href="#top" class="top-btn" onclick="document.getElementById('main').scrollTo(0,0); window.scrollTo(0,0); return false;">↑</a>
+<script>
+const chapters = document.querySelectorAll('section.chapter');
+const toc = document.getElementById('toc');
+chapters.forEach(ch=>{
+  const h2 = ch.querySelector('h2');
+  const a = document.createElement('a');
+  a.href = '#'+ch.id;
+  a.textContent = h2.textContent.replace(/^\d+/,'').trim();
+  a.dataset.target = ch.id;
+  toc.appendChild(a);
+});
+function onScroll(){
+  let current = chapters[0].id;
+  chapters.forEach(ch=>{ const rect = ch.getBoundingClientRect(); if(rect.top < 140) current = ch.id; });
+  document.querySelectorAll('#toc a').forEach(a=>{ a.classList.toggle('active', a.dataset.target===current); });
+  const doc = document.documentElement;
+  const pct = (doc.scrollTop)/(doc.scrollHeight-doc.clientHeight)*100;
+  document.getElementById('progressBar').style.width = pct+'%';
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const qid = quiz.dataset.qid;
+  const answer = window.QUIZ_ANSWERS[qid];
+  const labels = quiz.querySelectorAll('label');
+  const feedback = quiz.querySelector('.feedback');
+  quiz.querySelectorAll('input[type=radio]').forEach(input=>{
+    input.addEventListener('change', ()=>{
+      const val = parseInt(input.value);
+      labels.forEach(lb=>{ lb.style.borderColor='var(--line)'; lb.style.background='#fffdf7'; });
+      if(!answer) return;
+      if(val === answer.correct){
+        labels[val].style.borderColor='var(--good)'; labels[val].style.background='#e5efe4';
+        feedback.className='feedback correct';
+        feedback.innerHTML = '<span class="badge-correct">정답입니다.</span> '+answer.explain;
+      } else {
+        labels[val].style.borderColor='var(--bad)'; labels[val].style.background='#f4e2dc';
+        labels[answer.correct].style.borderColor='var(--good)'; labels[answer.correct].style.background='#e5efe4';
+        feedback.className='feedback wrong';
+        feedback.innerHTML = '<span class="badge-wrong">오답입니다.</span> '+answer.explain;
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

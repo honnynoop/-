@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카이제곱검정(χ²) 완전정복</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css"></script>
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<style>
+:root{
+  --paper:#f7f1e6; --paper-2:#efe6d3; --ink:#2c2620; --ink-soft:#5a5044;
+  --line:#dcd0b8; --accent:#b5652f; --accent-2:#8a7048; --accent-soft:#e8d3b8;
+  --good:#3f7d5c; --bad:#b5432f; --card:#fffaf0; --shadow:0 2px 10px rgba(60,45,20,0.08); --radius:14px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:'Pretendard',-apple-system,sans-serif; line-height:1.75; font-size:16px;}
+h1,h2,h3,h4{font-family:'Spectral',serif; font-weight:700; color:var(--ink); line-height:1.3;}
+.layout{display:flex; max-width:1400px; margin:0 auto;}
+.sidebar{width:270px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto; padding:28px 18px; border-right:1px solid var(--line); background:var(--paper-2);}
+.sidebar h2{font-size:1.05rem; margin:0 0 4px; color:var(--accent);}
+.sidebar .sub{font-size:0.78rem; color:var(--ink-soft); margin-bottom:20px;}
+.sidebar nav a{display:block; padding:7px 10px; margin:2px 0; border-radius:8px; color:var(--ink-soft); text-decoration:none; font-size:0.86rem; border-left:3px solid transparent;}
+.sidebar nav a:hover{background:var(--accent-soft); color:var(--ink);}
+.sidebar nav a.active{background:var(--accent-soft); color:var(--accent); font-weight:600; border-left:3px solid var(--accent);}
+main{flex:1; min-width:0; padding:40px 56px 120px;}
+.hero{padding:36px 40px; background:linear-gradient(135deg,var(--card),var(--accent-soft)); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:44px; border:1px solid var(--line);}
+.hero h1{font-size:2.1rem; margin:0 0 10px;}
+.hero p{color:var(--ink-soft); font-size:1rem; margin:6px 0;}
+section.chapter{margin-bottom:70px; scroll-margin-top:20px;}
+section.chapter > h2{font-size:1.55rem; padding-bottom:10px; border-bottom:3px solid var(--accent); display:flex; align-items:center; gap:10px;}
+.chnum{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:var(--accent); color:#fff; font-family:'JetBrains Mono',monospace; font-size:0.85rem; flex-shrink:0;}
+h3{font-size:1.2rem; margin-top:32px; color:var(--accent-2); border-left:4px solid var(--accent-soft); padding-left:10px;}
+h4{font-size:1.02rem; color:var(--ink);}
+p{margin:10px 0;}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px 26px; margin:18px 0; box-shadow:var(--shadow);}
+.callout{border-left:4px solid var(--accent); background:var(--accent-soft); padding:14px 18px; border-radius:0 10px 10px 0; margin:16px 0; font-size:0.94rem;}
+.callout.tip{border-left-color:var(--good); background:#e5efe4;}
+.callout.warn{border-left-color:var(--bad); background:#f4e2dc;}
+.formula-box{background:#fffdf7; border:1px dashed var(--accent-2); border-radius:10px; padding:16px 20px; margin:16px 0; overflow-x:auto;}
+.calc-steps{background:#2c2620; color:#f7f1e6; border-radius:10px; padding:18px 22px; font-family:'JetBrains Mono',monospace; font-size:0.85rem; margin:16px 0; overflow-x:auto; line-height:1.9; white-space:pre-wrap;}
+.calc-steps .step-label{color:#e0a458; font-weight:700;}
+.calc-steps .result{color:#8fd19e;}
+.code-box{background:#1f2b23; color:#d8f0dc; border-radius:10px; padding:18px 22px; font-family:'JetBrains Mono',monospace; font-size:0.83rem; margin:16px 0; overflow-x:auto; line-height:1.7;}
+.code-box .cm{color:#7fae87;}
+.code-box .kw{color:#e0a458;}
+table{width:100%; border-collapse:collapse; margin:16px 0; font-size:0.92rem;}
+th,td{border:1px solid var(--line); padding:9px 12px; text-align:center;}
+th{background:var(--accent-soft); color:var(--ink);}
+tr:nth-child(even) td{background:#faf5e8;}
+.tag{display:inline-block; font-size:0.72rem; padding:2px 9px; border-radius:20px; background:var(--accent-2); color:#fff; margin-right:6px; font-family:'JetBrains Mono',monospace;}
+.diagram-wrap{background:#fffdf7; border:1px solid var(--line); border-radius:var(--radius); padding:16px; margin:18px 0; overflow-x:auto; text-align:center;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media (max-width:900px){.grid2{grid-template-columns:1fr;}}
+.quiz{background:var(--card); border:2px solid var(--accent-soft); border-radius:var(--radius); padding:20px 24px; margin:16px 0;}
+.quiz .q{font-weight:600; margin-bottom:10px;}
+.quiz label{display:block; padding:8px 12px; margin:5px 0; border-radius:8px; cursor:pointer; border:1px solid var(--line); background:#fffdf7; font-size:0.92rem;}
+.quiz label:hover{background:var(--accent-soft);}
+.quiz .feedback{margin-top:10px; padding:10px 14px; border-radius:8px; font-size:0.9rem; display:none;}
+.quiz .feedback.correct{display:block; background:#e5efe4; color:var(--good); border:1px solid var(--good);}
+.quiz .feedback.wrong{display:block; background:#f4e2dc; color:var(--bad); border:1px solid var(--bad);}
+.badge-correct{color:var(--good); font-weight:700;}
+.badge-wrong{color:var(--bad); font-weight:700;}
+.flow-note{font-size:0.82rem; color:var(--ink-soft); text-align:center; margin-top:6px;}
+code{background:#efe6d3; padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:0.86rem;}
+.top-btn{position:fixed; bottom:26px; right:26px; width:44px; height:44px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:var(--shadow); font-size:1.2rem; text-decoration:none; opacity:0.85;}
+.progress-bar{position:fixed; top:0; left:0; height:3px; background:var(--accent); z-index:99; transition:width .1s;}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="layout">
+<aside class="sidebar">
+  <h2>χ² 완전정복</h2>
+  <div class="sub">카이제곱검정의 원리·이론·계산·실전</div>
+  <nav id="toc"></nav>
+</aside>
+<main id="main">
+
+<div class="hero">
+  <h1>카이제곱검정(χ² Test) 완전정복</h1>
+  <p>카이제곱 분포는 어디서 왔는가, 왜 그 형태를 가지는가부터 4가지 검정의 원리·손계산·실전 문제까지</p>
+</div>
+
+<script>window.QUIZ_ANSWERS = {};</script>
+
+<!-- ============ CH0 카이제곱 분포의 정의와 유도 ============ -->
+<section class="chapter" id="ch0">
+<h2><span class="chnum">0</span>카이제곱 분포는 어디서 오는가</h2>
+
+<h3>0.1 정의</h3>
+<div class="card">
+<p>표준정규분포 \(Z \sim N(0,1)\)를 따르는 <b>서로 독립인 확률변수</b> \(Z_1, Z_2, \dots, Z_k\)가 있을 때, 이들의 <b>제곱합</b>은 자유도 k인 카이제곱분포를 따른다.</p>
+</div>
+<div class="formula-box">
+\[ \chi^2_{(k)} = Z_1^2 + Z_2^2 + \cdots + Z_k^2 = \sum_{i=1}^{k} Z_i^2 \]
+</div>
+<p>즉 카이제곱분포는 <b>"표준정규분포를 따르는 값들의 제곱합"</b>이 만드는 분포다. 편차를 제곱하는 순간 값은 항상 0 이상이 되므로, 카이제곱분포는 <b>음수를 갖지 않는 오른쪽 꼬리(right-skewed) 분포</b>가 된다. 이 정의로부터 카이제곱검정이 "관측값과 기대값의 차이를 제곱해서 더하는" 형태를 갖는 이유가 자연스럽게 설명된다.</p>
+
+<h3>0.2 왜 이런 형태를 갖는가 — 자유도에 따른 형태 변화</h3>
+<div class="diagram-wrap">
+<svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:640px;">
+<line x1="30" y1="190" x2="670" y2="190" stroke="#8a7048"/>
+<line x1="30" y1="190" x2="30" y2="10" stroke="#8a7048"/>
+<path d="M30,190 C50,190 55,15 90,15 C130,15 150,150 250,175 C350,187 500,190 670,190" fill="none" stroke="#b5432f" stroke-width="2.2"/>
+<text x="60" y="8" font-size="11" fill="#b5432f">df=1</text>
+<path d="M30,190 C90,190 110,60 170,60 C240,60 280,140 400,178 C500,188 600,190 670,190" fill="none" stroke="#b5652f" stroke-width="2.2"/>
+<text x="150" y="52" font-size="11" fill="#b5652f">df=3</text>
+<path d="M30,190 C130,190 160,120 230,110 C300,105 350,120 450,165 C540,183 620,190 670,190" fill="none" stroke="#8a7048" stroke-width="2.2"/>
+<text x="260" y="98" font-size="11" fill="#8a7048">df=6</text>
+<path d="M30,190 C180,190 210,150 300,140 C380,135 430,145 520,172 C580,183 640,190 670,190" fill="none" stroke="#3f7d5c" stroke-width="2.2"/>
+<text x="330" y="128" font-size="11" fill="#3f7d5c">df=10</text>
+<text x="350" y="210" text-anchor="middle" font-size="12" fill="#5a5044">df가 커질수록 오른쪽으로 이동하며 좌우대칭(정규분포)에 가까워짐</text>
+</svg>
+</div>
+<h3>0.3 평균과 분산</h3>
+<div class="formula-box">
+\[ E(\chi^2_{(k)}) = k \qquad Var(\chi^2_{(k)}) = 2k \]
+</div>
+<p>자유도(df)가 곧 평균이라는 점이 핵심이다. 관측빈도와 기대빈도가 완전히 일치하면(우연한 오차만 존재) χ² 통계량은 대략 df 근처의 값을 가지며, df보다 훨씬 크면 "우연이라 보기 힘든 큰 차이"로 해석한다.</p>
+
+<h3>0.4 카이제곱검정의 공통 아이디어</h3>
+<div class="callout">
+카이제곱검정은 항상 같은 질문을 한다 — <b>"관측된 값(O)이 기대한 값(E)에서 얼마나 멀리 떨어져 있는가?"</b> 그 거리를 표준화해서(기대값 대비 상대적 크기로) 제곱해 모두 더한 것이 검정통계량이다.
+</div>
+<div class="formula-box">
+\[ \chi^2 = \sum \frac{(O-E)^2}{E} \]
+</div>
+<p>분모에 E가 들어가는 이유: 기대빈도가 큰 범주에서의 차이 10과 기대빈도가 작은 범주에서의 차이 10은 <b>상대적 의미가 다르다</b>. E로 나누어 "상대적 이탈 정도"로 표준화한다.</p>
+
+<div class="quiz" data-qid="q0-1">
+<div class="q">Q. 표준정규분포를 따르는 서로 독립인 확률변수 4개의 제곱합은 어떤 분포를 따르는가?</div>
+<label><input type="radio" name="q0-1" value="0">자유도 4인 t분포</label>
+<label><input type="radio" name="q0-1" value="1">자유도 4인 카이제곱분포</label>
+<label><input type="radio" name="q0-1" value="2">표준정규분포</label>
+<label><input type="radio" name="q0-1" value="3">자유도 3인 카이제곱분포</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q0-1"]={correct:1, explain:"독립인 표준정규 확률변수 k개의 제곱합은 자유도 k인 카이제곱분포를 따른다. 여기선 4개이므로 df=4."};</script>
+
+<div class="quiz" data-qid="q0-2">
+<div class="q">Q. 카이제곱분포의 평균이 8이라면 자유도는?</div>
+<label><input type="radio" name="q0-2" value="0">4</label>
+<label><input type="radio" name="q0-2" value="1">16</label>
+<label><input type="radio" name="q0-2" value="2">8</label>
+<label><input type="radio" name="q0-2" value="3">2</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q0-2"]={correct:2, explain:"E(χ²)=k 이므로 평균이 8이면 자유도 k=8."};</script>
+</section>
+
+<!-- ============ CH1 검정의 4가지 종류 개관 ============ -->
+<section class="chapter" id="ch1">
+<h2><span class="chnum">1</span>카이제곱검정의 4가지 얼굴</h2>
+<div class="diagram-wrap">
+<svg viewBox="0 0 950 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:950px;">
+<defs><marker id="a0" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8a7048"/></marker></defs>
+<rect x="370" y="10" width="210" height="50" rx="12" fill="#2c2620"/>
+<text x="475" y="40" text-anchor="middle" fill="#e0a458" font-weight="700" font-size="14">카이제곱검정 χ²</text>
+<line x1="420" y1="60" x2="150" y2="110" stroke="#8a7048" marker-end="url(#a0)"/>
+<line x1="440" y1="60" x2="370" y2="110" stroke="#8a7048" marker-end="url(#a0)"/>
+<line x1="510" y1="60" x2="580" y2="110" stroke="#8a7048" marker-end="url(#a0)"/>
+<line x1="530" y1="60" x2="800" y2="110" stroke="#8a7048" marker-end="url(#a0)"/>
+
+<rect x="20" y="110" width="240" height="70" rx="10" fill="#e8d3b8" stroke="#b5652f"/>
+<text x="140" y="136" text-anchor="middle" font-weight="700" font-size="13">① 적합도검정</text>
+<text x="140" y="154" text-anchor="middle" font-size="11" fill="#5a5044">한 변수가 특정 분포를</text>
+<text x="140" y="168" text-anchor="middle" font-size="11" fill="#5a5044">따르는가 (2장)</text>
+
+<rect x="270" y="110" width="240" height="70" rx="10" fill="#e5efe4" stroke="#3f7d5c"/>
+<text x="390" y="136" text-anchor="middle" font-weight="700" font-size="13">② 독립성검정</text>
+<text x="390" y="154" text-anchor="middle" font-size="11" fill="#5a5044">두 범주형 변수가</text>
+<text x="390" y="168" text-anchor="middle" font-size="11" fill="#5a5044">서로 관련있는가 (3장)</text>
+
+<rect x="520" y="110" width="240" height="70" rx="10" fill="#f4e2dc" stroke="#b5432f"/>
+<text x="640" y="136" text-anchor="middle" font-weight="700" font-size="13">③ 동질성검정</text>
+<text x="640" y="154" text-anchor="middle" font-size="11" fill="#5a5044">여러 집단의 비율이</text>
+<text x="640" y="168" text-anchor="middle" font-size="11" fill="#5a5044">동일한가 (4장)</text>
+
+<rect x="700" y="200" width="240" height="55" rx="10" fill="#fffaf0" stroke="#8a7048" stroke-width="1.5" transform="translate(-30,-90)"/>
+
+<rect x="680" y="110" width="250" height="70" rx="10" fill="#fffaf0" stroke="#8a7048" stroke-width="1.5"/>
+<text x="805" y="136" text-anchor="middle" font-weight="700" font-size="13">④ 모분산검정</text>
+<text x="805" y="154" text-anchor="middle" font-size="11" fill="#5a5044">연속형 데이터의 분산이</text>
+<text x="805" y="168" text-anchor="middle" font-size="11" fill="#5a5044">특정값과 같은가 (5장)</text>
+
+<text x="475" y="215" text-anchor="middle" font-size="12" fill="#5a5044">①②③은 범주형(빈도) 자료, ④는 연속형 자료 — 공통점: 모두 "관측 vs 기대"의 제곱합 구조</text>
+</svg>
+</div>
+
+<table>
+<tr><th>구분</th><th>①적합도</th><th>②독립성</th><th>③동질성</th><th>④모분산</th></tr>
+<tr><td>표본 개수</td><td>1개</td><td>1개(변수 2개)</td><td>2개 이상</td><td>1개</td></tr>
+<tr><td>변수 개수</td><td>1개</td><td>2개</td><td>1개(집단별)</td><td>0(측정값 자체)</td></tr>
+<tr><td>자료 형태</td><td>범주형</td><td>범주형</td><td>범주형</td><td>연속형</td></tr>
+<tr><td>핵심 질문</td><td>이론적 비율과 같은가</td><td>두 변수가 독립인가</td><td>집단 간 비율이 같은가</td><td>분산이 특정값과 같은가</td></tr>
+</table>
+<div class="callout tip">실무에서는 ②독립성검정과 ③동질성검정의 계산 절차가 완전히 동일해서 혼동하기 쉽다. 차이는 <b>표본추출 설계</b>에 있다: 하나의 모집단에서 표본 하나를 뽑아 두 변수를 관찰했으면 독립성검정, 이미 정해진 여러 집단(예: 지역별)에서 각각 표본을 뽑았으면 동질성검정이라 부른다.</div>
+</section>
+
+<!-- ============ CH2 적합도검정 ============ -->
+<section class="chapter" id="ch2">
+<h2><span class="chnum">2</span>적합도검정 (Goodness of Fit Test)</h2>
+<h3>2.1 원리</h3>
+<p>하나의 범주형 변수가 <b>사전에 가정한 이론적 비율(분포)</b>과 일치하는지 검정한다. 예: 주사위가 공정한가(각 눈이 1/6씩), 특정 지역의 혈액형 비율이 전국 평균과 같은가.</p>
+<div class="formula-box">
+\[ H_0: p_1=p_{01},\ p_2=p_{02},\ \dots,\ p_k=p_{0k} \qquad H_1: \text{적어도 하나는 다르다} \]
+\[ \chi^2 = \sum_{i=1}^{k}\frac{(O_i-E_i)^2}{E_i},\quad E_i = n \times p_{0i},\quad df=k-1 \]
+</div>
+<h3>2.2 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 주사위를 120번 던져 나온 눈: 1(15) 2(18) 3(24) 4(17) 5(22) 6(24). 공정한 주사위인가? (α=.05)
+
+<span class="step-label">[Step1]</span> 기대빈도 E_i = 120 * (1/6) = 20 (모든 눈 동일)
+<span class="step-label">[Step2]</span> 각 항: (15-20)²/20=1.25, (18-20)²/20=0.2, (24-20)²/20=0.8,
+       (17-20)²/20=0.45, (22-20)²/20=0.2, (24-20)²/20=0.8
+<span class="step-label">[Step3]</span> χ² = 1.25+0.2+0.8+0.45+0.2+0.8 = <span class="result">3.7</span>
+<span class="step-label">[Step4]</span> df = 6-1 = 5, χ²(0.05,5) = 11.070
+<span class="step-label">[결론]</span> 3.7 &lt; 11.070 → H0 기각 못함, 주사위는 공정하다고 볼 수 있음
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:520px;">
+<g font-family="Pretendard" font-size="12">
+<line x1="50" y1="190" x2="570" y2="190" stroke="#8a7048"/>
+<g fill="#e8d3b8" stroke="#b5652f">
+<rect x="60" y="115" width="30" height="75"/><rect x="140" y="97" width="30" height="93"/>
+<rect x="220" y="55" width="30" height="135"/><rect x="300" y="105" width="30" height="85"/>
+<rect x="380" y="65" width="30" height="125"/><rect x="460" y="55" width="30" height="135"/>
+</g>
+<g fill="#3f7d5c" opacity="0.5" stroke="#3f7d5c">
+<rect x="95" y="90" width="30" height="100"/><rect x="175" y="90" width="30" height="100"/>
+<rect x="255" y="90" width="30" height="100"/><rect x="335" y="90" width="30" height="100"/>
+<rect x="415" y="90" width="30" height="100"/><rect x="495" y="90" width="30" height="100"/>
+</g>
+<text x="75" y="205" text-anchor="middle">1</text><text x="155" y="205" text-anchor="middle">2</text>
+<text x="235" y="205" text-anchor="middle">3</text><text x="315" y="205" text-anchor="middle">4</text>
+<text x="395" y="205" text-anchor="middle">5</text><text x="475" y="205" text-anchor="middle">6</text>
+<text x="300" y="20" text-anchor="middle" fill="#5a5044">주황: 관측빈도(O) / 초록: 기대빈도(E=20)</text>
+</g>
+</svg>
+</div>
+<div class="quiz" data-qid="q2-1">
+<div class="q">Q. 범주가 5개인 적합도검정에서 자유도는?</div>
+<label><input type="radio" name="q2-1" value="0">5</label>
+<label><input type="radio" name="q2-1" value="1">4</label>
+<label><input type="radio" name="q2-1" value="2">6</label>
+<label><input type="radio" name="q2-1" value="3">1</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q2-1"]={correct:1, explain:"적합도검정의 자유도는 k-1 (범주 수에서 1을 뺌) = 5-1 = 4"};</script>
+</section>
+
+<!-- ============ CH3 독립성검정 ============ -->
+<section class="chapter" id="ch3">
+<h2><span class="chnum">3</span>독립성검정 (Test of Independence)</h2>
+<h3>3.1 원리</h3>
+<p>같은 모집단에서 뽑은 표본에 대해 <b>두 범주형 변수가 서로 독립인지</b>(관련이 없는지) 검정한다. 두 변수가 독립이라면, 결합확률은 각 주변확률의 곱과 같아야 한다는 확률의 성질을 이용한다.</p>
+<div class="formula-box">
+\[ H_0: \text{두 변수는 독립이다} \quad(P(A\cap B)=P(A)P(B)) \qquad H_1: \text{독립이 아니다(관련이 있다)} \]
+\[ E_{ij} = \frac{(\text{i행 합계})\times(\text{j열 합계})}{\text{전체 합계}} \qquad df=(r-1)(c-1) \]
+</div>
+<h3>3.2 기대빈도 공식이 나오는 이유</h3>
+<div class="card">
+<p>두 변수가 독립이면 P(행=i, 열=j) = P(행=i) × P(열=j). 표본비율로 추정하면 P(행=i)≈행합계/전체, P(열=j)≈열합계/전체. 따라서 기대빈도 = 전체 n × P(행=i) × P(열=j) = (행합계×열합계)/전체합계가 된다.</p>
+</div>
+<h3>3.3 손계산 예제 — 흡연 여부와 폐질환</h3>
+<div class="calc-steps">
+<span class="step-label">[교차표]</span>            폐질환有   폐질환無    행합계
+              흡연자        30        70        100
+              비흡연자      10        90        100
+              열합계        40       160        200
+
+<span class="step-label">[Step1]</span> E(흡연,有)=100*40/200=20, E(흡연,無)=100*160/200=80
+       E(비흡연,有)=100*40/200=20, E(비흡연,無)=100*160/200=80
+<span class="step-label">[Step2]</span> χ² = (30-20)²/20 + (70-80)²/80 + (10-20)²/20 + (90-80)²/80
+       = 100/20 + 100/80 + 100/20 + 100/80 = 5+1.25+5+1.25 = <span class="result">12.5</span>
+<span class="step-label">[Step3]</span> df=(2-1)(2-1)=1, χ²(0.05,1)=3.841
+<span class="step-label">[결론]</span> 12.5 &gt; 3.841 → H0 기각, 흡연 여부와 폐질환 발생은 통계적으로 유의하게 관련 있음
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:420px;">
+<g font-family="Pretendard" font-size="12">
+<rect x="20" y="20" width="460" height="40" fill="#2c2620"/>
+<text x="130" y="45" text-anchor="middle" fill="#e0a458" font-weight="700"></text>
+<rect x="20" y="60" width="150" height="40" fill="#fffaf0" stroke="#dcd0b8"/><text x="95" y="85" text-anchor="middle">흡연자</text>
+<rect x="170" y="60" width="150" height="40" fill="#e8d3b8" stroke="#b5652f"/><text x="245" y="80" text-anchor="middle">O=30</text><text x="245" y="95" text-anchor="middle" fill="#5a5044" font-size="10">E=20</text>
+<rect x="320" y="60" width="160" height="40" fill="#e5efe4" stroke="#3f7d5c"/><text x="400" y="80" text-anchor="middle">O=70</text><text x="400" y="95" text-anchor="middle" fill="#5a5044" font-size="10">E=80</text>
+<rect x="20" y="100" width="150" height="40" fill="#fffaf0" stroke="#dcd0b8"/><text x="95" y="125" text-anchor="middle">비흡연자</text>
+<rect x="170" y="100" width="150" height="40" fill="#e8d3b8" stroke="#b5652f"/><text x="245" y="120" text-anchor="middle">O=10</text><text x="245" y="135" text-anchor="middle" fill="#5a5044" font-size="10">E=20</text>
+<rect x="320" y="100" width="160" height="40" fill="#e5efe4" stroke="#3f7d5c"/><text x="400" y="120" text-anchor="middle">O=90</text><text x="400" y="135" text-anchor="middle" fill="#5a5044" font-size="10">E=80</text>
+<text x="245" y="15" text-anchor="middle" fill="#5a5044">폐질환 有 (주황) / 폐질환 無 (초록) — O:관측, E:기대</text>
+</g>
+</svg>
+</div>
+<div class="callout warn"><b>2×2 교차표에서 기대빈도가 5 미만인 셀이 있으면</b> 카이제곱 근사가 부정확해진다. 이 경우 <b>Yates의 연속성 수정</b>을 적용하거나(분자에서 0.5씩 빼줌), 표본이 아주 작으면 <b>Fisher의 정확검정(Fisher's Exact Test)</b>을 사용해야 한다.</div>
+<div class="formula-box">
+\[ \text{Yates 수정: } \chi^2_{Yates} = \sum \frac{(|O-E|-0.5)^2}{E} \]
+</div>
+<div class="quiz" data-qid="q3-1">
+<div class="q">Q. 4×3 교차표에서 독립성검정의 자유도와, 기대빈도 5 미만 셀이 많을 때 대안으로 옳은 것은?</div>
+<label><input type="radio" name="q3-1" value="0">df=12, ANOVA 사용</label>
+<label><input type="radio" name="q3-1" value="1">df=6, Fisher의 정확검정 등 고려</label>
+<label><input type="radio" name="q3-1" value="2">df=7, t검정 사용</label>
+<label><input type="radio" name="q3-1" value="3">df=12, 그대로 사용해도 무방</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q3-1"]={correct:1, explain:"df=(4-1)(3-1)=6. 기대빈도가 작은 셀이 많으면 근사가 부정확해지므로 Fisher의 정확검정 등 대안을 고려한다."};</script>
+</section>
+
+<!-- ============ CH4 동질성검정 ============ -->
+<section class="chapter" id="ch4">
+<h2><span class="chnum">4</span>동질성검정 (Test of Homogeneity)</h2>
+<h3>4.1 원리 — 독립성검정과 무엇이 다른가</h3>
+<div class="grid2">
+<div class="card">
+<h4>독립성검정</h4>
+<p>하나의 모집단에서 표본 <b>1개</b>를 추출 → 그 표본에서 <b>두 변수</b>(예: 성별, 선호도)를 동시에 측정. "두 변수가 관련 있는가?"</p>
+</div>
+<div class="card">
+<h4>동질성검정</h4>
+<p>서로 다른 <b>여러 모집단(집단)</b>에서 각각 표본을 추출(행 합계가 사전에 고정) → 하나의 변수(범주)에 대한 <b>분포 비율이 집단 간에 같은가?</b></p>
+</div>
+</div>
+<p>수학적 계산 절차(기대빈도, χ² 통계량, 자유도)는 독립성검정과 완전히 동일하다. 차이는 <b>표본추출 설계와 연구 질문의 관점</b>뿐이다.</p>
+<div class="formula-box">
+\[ H_0: p_{1j}=p_{2j}=\cdots=p_{rj}\ (\text{모든 집단에서 범주 비율이 동일}) \qquad df=(r-1)(c-1) \]
+</div>
+<h3>4.2 손계산 예제 — 지역별 제품 만족도 비율 비교</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 세 지역(서울,부산,대구)에서 각각 100명씩 뽑아 만족/불만족 조사(행합계 고정=동질성검정)
+              만족   불만족   합계
+   서울        70      30      100
+   부산        55      45      100
+   대구        65      35      100
+   합계        190     110     300
+
+<span class="step-label">[Step1]</span> E(서울,만족)=100*190/300=63.33, E(서울,불만족)=100*110/300=36.67
+       E(부산,만족)=63.33, E(부산,불만족)=36.67 / E(대구,만족)=63.33, E(대구,불만족)=36.67
+<span class="step-label">[Step2]</span> χ² = (70-63.33)²/63.33 + (30-36.67)²/36.67
+             + (55-63.33)²/63.33 + (45-36.67)²/36.67
+             + (65-63.33)²/63.33 + (35-36.67)²/36.67
+       = 0.703+1.213+1.096+1.893+0.044+0.076 = <span class="result">5.03</span>
+<span class="step-label">[Step3]</span> df=(3-1)(2-1)=2, χ²(0.05,2)=5.991
+<span class="step-label">[결론]</span> 5.03 &lt; 5.991 → H0 기각 못함, 지역 간 만족도 비율이 유의하게 다르다고 할 수 없음
+</div>
+<div class="quiz" data-qid="q4-1">
+<div class="q">Q. 세 개 병원에서 각각 정해진 인원을 뽑아 치료 성공/실패 비율이 병원마다 같은지 검정하려 한다. 이는 어떤 검정인가?</div>
+<label><input type="radio" name="q4-1" value="0">적합도검정</label>
+<label><input type="radio" name="q4-1" value="1">독립성검정</label>
+<label><input type="radio" name="q4-1" value="2">동질성검정</label>
+<label><input type="radio" name="q4-1" value="3">모분산검정</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q4-1"]={correct:2, explain:"이미 정해진 여러 집단(병원)에서 각각 표본을 뽑아 비율이 같은지 비교하므로 동질성검정이다."};</script>
+</section>
+
+<!-- ============ CH5 모분산검정 ============ -->
+<section class="chapter" id="ch5">
+<h2><span class="chnum">5</span>모분산검정 (연속형 데이터)</h2>
+<h3>5.1 원리</h3>
+<p>정규모집단에서 뽑은 표본의 분산 s²을 이용해 <b>모분산 σ²이 특정 값과 같은지</b> 검정한다. 카이제곱검정 중 유일하게 범주형이 아닌 <b>개별 연속형 측정값</b>을 직접 다룬다.</p>
+<div class="formula-box">
+\[ \chi^2 = \frac{(n-1)s^2}{\sigma_0^2} \sim \chi^2_{(n-1)} \]
+</div>
+<p>이 통계량이 카이제곱분포를 따르는 이유: 정규분포를 따르는 데이터에서 각 관측값의 표준화 편차 \((x_i-\bar x)/\sigma\)들의 제곱합이 위 0장에서 정의한 "표준정규 제곱합" 구조와 동일하기 때문이다(자유도는 표본평균 추정으로 1 감소하여 n-1).</p>
+<h3>5.2 손계산 예제</h3>
+<div class="calc-steps">
+<span class="step-label">[문제]</span> 부품 무게(g, 정규분포 가정) 표본 n=20, s²=12.5. "모분산=8"이 맞는지 α=.05 양측검정
+
+<span class="step-label">[Step1]</span> χ² = (n-1)*s² / σ0² = 19*12.5 / 8 = 237.5/8 = <span class="result">29.69</span>
+<span class="step-label">[Step2]</span> df=19, 하한 χ²(0.975,19)=8.907, 상한 χ²(0.025,19)=32.852
+<span class="step-label">[Step3]</span> 8.907 &lt; 29.69 &lt; 32.852 → 기각역 밖
+<span class="step-label">[결론]</span> H0 기각 못함 → 모분산이 8이 아니라고 할 근거 없음
+</div>
+<div class="callout warn">모분산검정의 χ²분포는 <b>좌우 비대칭</b>이므로 두 집단 분산비교(F검정)와 달리 <b>상한·하한 임계값을 따로</b> 구해야 한다. 하한은 χ²(1-α/2, df), 상한은 χ²(α/2, df)를 사용한다.</div>
+<div class="quiz" data-qid="q5-1">
+<div class="q">Q. 정규모집단 표본 n=25, s²=18. "모분산=10"인지 검정할 때 χ² 통계량은?</div>
+<label><input type="radio" name="q5-1" value="0">43.2</label>
+<label><input type="radio" name="q5-1" value="1">45.0</label>
+<label><input type="radio" name="q5-1" value="2">30.0</label>
+<label><input type="radio" name="q5-1" value="3">18.0</label>
+<div class="feedback"></div>
+</div>
+<script>QUIZ_ANSWERS["q5-1"]={correct:0, explain:"χ²=(n-1)s²/σ0² = 24*18/10 = 432/10 = 43.2"};</script>
+</section>
+
+<!-- ============ CH6 전제조건과 주의사항 ============ -->
+<section class="chapter" id="ch6">
+<h2><span class="chnum">6</span>사용 시 전제조건과 흔한 오류</h2>
+<h3>6.1 카이제곱검정의 전제조건</h3>
+<table>
+<tr><th>조건</th><th>설명</th></tr>
+<tr><td>독립적 관측치</td><td>각 관측치(응답자 등)는 한 셀에만 속해야 함(중복 카운트 불가)</td></tr>
+<tr><td>충분한 표본크기</td><td>전체 표본 n이 충분히 커야 카이제곱 근사가 정확함</td></tr>
+<tr><td>기대빈도 ≥ 5</td><td>코크란(Cochran)의 규칙: 전체 셀의 80% 이상에서 E≥5, 어떤 셀도 E&lt;1이면 안 됨</td></tr>
+<tr><td>범주의 상호배타성</td><td>범주가 겹치지 않고 모든 경우를 포함해야 함</td></tr>
+</table>
+<h3>6.2 기대빈도가 작을 때의 대안</h3>
+<div class="grid2">
+<div class="card">
+<h4>범주 병합</h4>
+<p>의미상 가능하다면 빈도가 작은 인접 범주를 합쳐 기대빈도를 5 이상으로 만든다.</p>
+</div>
+<div class="card">
+<h4>Fisher의 정확검정</h4>
+<p>2×2 표에서 표본이 작을 때 카이제곱 근사 대신 초기하분포를 이용해 정확한 p-value를 직접 계산한다.</p>
+</div>
+</div>
+<h3>6.3 흔한 해석 오류</h3>
+<div class="callout warn">
+① <b>인과관계로 오해</b>: 독립성검정에서 유의한 결과가 나와도 "관련이 있다"는 것이지 "원인이다"는 아니다.<br>
+② <b>표본크기 민감성</b>: n이 매우 크면 실질적으로 무의미한 작은 차이도 유의하게 나올 수 있다(통계적 유의성 ≠ 실질적 중요성). 이때는 <b>Cramér's V</b> 같은 효과크기 지표를 함께 본다.<br>
+③ <b>순서형 변수에 독립성검정만 사용</b>: 순서가 있는 범주(예: 낮음/보통/높음)는 카이제곱검정이 순서 정보를 무시하므로, 경향성 검정(trend test) 등을 함께 고려하는 것이 좋다.
+</div>
+<div class="formula-box">
+\[ \text{Cramér's V} = \sqrt{\frac{\chi^2}{n\times \min(r-1,\ c-1)}} \quad (0\sim1,\ \text{연관성의 강도}) \]
+</div>
+</section>
+
+<!-- ============ CH7 Python 실전 사용법 ============ -->
+<section class="chapter" id="ch7">
+<h2><span class="chnum">7</span>Python(scipy)으로 실전 계산하기</h2>
+<h3>7.1 적합도검정</h3>
+<div class="code-box">
+<span class="cm"># 주사위 예제 (2장)</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> chisquare
+
+observed = [15, 18, 24, 17, 22, 24]
+expected = [20, 20, 20, 20, 20, 20]
+
+stat, p = chisquare(f_obs=observed, f_exp=expected)
+<span class="kw">print</span>(f<span class="cm">"chi2={stat:.3f}, p={p:.4f}"</span>)
+<span class="cm"># chi2=3.700, p=0.5934 → H0 기각 못함 (앞선 손계산과 일치)</span>
+</div>
+<h3>7.2 독립성검정 / 동질성검정</h3>
+<div class="code-box">
+<span class="cm"># 흡연-폐질환 교차표 예제 (3장)</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> chi2_contingency
+
+table = np.array([[30, 70], [10, 90]])
+chi2, p, dof, expected = chi2_contingency(table, correction=<span class="kw">False</span>)
+<span class="kw">print</span>(f<span class="cm">"chi2={chi2:.2f}, dof={dof}, p={p:.5f}"</span>)
+<span class="kw">print</span>(<span class="cm">"기대빈도:</span>\n<span class="cm">", expected)</span>
+<span class="cm"># correction=True (기본값)로 두면 2x2표에서 자동으로 Yates 연속성 수정 적용</span>
+</div>
+<h3>7.3 모분산검정 (직접 구현)</h3>
+<div class="code-box">
+<span class="cm"># scipy에는 모분산검정 전용 함수가 없어 chi2 분포로 직접 계산</span>
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> chi2
+
+n, s2, sigma0_sq = 20, 12.5, 8
+chi2_stat = (n - 1) * s2 / sigma0_sq
+lower, upper = chi2.ppf(0.025, df=n-1), chi2.ppf(0.975, df=n-1)
+<span class="kw">print</span>(f<span class="cm">"chi2={chi2_stat:.2f}, 임계구간=({lower:.2f}, {upper:.2f})"</span>)
+</div>
+<div class="callout tip"><code>chi2_contingency</code>는 기대빈도 행렬을 함께 반환하므로, 계산 후 <b>기대빈도 5 미만 셀이 있는지</b> 항상 확인하는 습관을 들이는 것이 좋다.</div>
+</section>
+
+<!-- ============ CH8 종합정리 ============ -->
+<section class="chapter" id="ch8">
+<h2><span class="chnum">8</span>종합 정리 & 체크리스트</h2>
+<table>
+<tr><th>검정</th><th>핵심 공식</th><th>자유도</th></tr>
+<tr><td>적합도검정</td><td>Σ(O-E)²/E</td><td>k-1</td></tr>
+<tr><td>독립성검정</td><td>Σ(O-E)²/E, E=행합×열합/전체</td><td>(r-1)(c-1)</td></tr>
+<tr><td>동질성검정</td><td>독립성검정과 동일한 계산</td><td>(r-1)(c-1)</td></tr>
+<tr><td>모분산검정</td><td>(n-1)s²/σ0²</td><td>n-1</td></tr>
+</table>
+<div class="callout tip">
+✅ 데이터가 범주형(빈도)인가, 연속형(측정값)인가 먼저 구분했는가?<br>
+✅ 표본추출 설계(단일표본+두 변수 vs 여러 집단)를 확인해 독립성/동질성을 구분했는가?<br>
+✅ 기대빈도가 5 미만인 셀이 있는지 확인하고 필요시 병합·Fisher 정확검정을 고려했는가?<br>
+✅ 모분산검정은 상한·하한 임계값을 따로(비대칭) 구했는가?<br>
+✅ 통계적 유의성과 함께 Cramér's V 등 효과크기도 함께 보고했는가?
+</div>
+</section>
+
+</main>
+</div>
+<a href="#top" class="top-btn" onclick="document.getElementById('main').scrollTo(0,0); window.scrollTo(0,0); return false;">↑</a>
+<script>
+const chapters = document.querySelectorAll('section.chapter');
+const toc = document.getElementById('toc');
+chapters.forEach(ch=>{
+  const h2 = ch.querySelector('h2');
+  const a = document.createElement('a');
+  a.href = '#'+ch.id;
+  a.textContent = h2.textContent.replace(/^\d+/,'').trim();
+  a.dataset.target = ch.id;
+  toc.appendChild(a);
+});
+function onScroll(){
+  let current = chapters[0].id;
+  chapters.forEach(ch=>{ const rect = ch.getBoundingClientRect(); if(rect.top < 140) current = ch.id; });
+  document.querySelectorAll('#toc a').forEach(a=>{ a.classList.toggle('active', a.dataset.target===current); });
+  const doc = document.documentElement;
+  const pct = (doc.scrollTop)/(doc.scrollHeight-doc.clientHeight)*100;
+  document.getElementById('progressBar').style.width = pct+'%';
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const qid = quiz.dataset.qid;
+  const answer = window.QUIZ_ANSWERS[qid];
+  const labels = quiz.querySelectorAll('label');
+  const feedback = quiz.querySelector('.feedback');
+  quiz.querySelectorAll('input[type=radio]').forEach(input=>{
+    input.addEventListener('change', ()=>{
+      const val = parseInt(input.value);
+      labels.forEach(lb=>{ lb.style.borderColor='var(--line)'; lb.style.background='#fffdf7'; });
+      if(!answer) return;
+      if(val === answer.correct){
+        labels[val].style.borderColor='var(--good)'; labels[val].style.background='#e5efe4';
+        feedback.className='feedback correct';
+        feedback.innerHTML = '<span class="badge-correct">정답입니다.</span> '+answer.explain;
+      } else {
+        labels[val].style.borderColor='var(--bad)'; labels[val].style.background='#f4e2dc';
+        labels[answer.correct].style.borderColor='var(--good)'; labels[answer.correct].style.background='#e5efe4';
+        feedback.className='feedback wrong';
+        feedback.innerHTML = '<span class="badge-wrong">오답입니다.</span> '+answer.explain;
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>
