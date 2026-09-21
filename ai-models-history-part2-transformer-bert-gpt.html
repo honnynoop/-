@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 모델 아키텍처의 계보 Part II — Transformer, BERT, GPT</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+  window.MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --paper:#faf6ef; --paper-card:#fffdf8; --ink:#2b2620; --ink-soft:#5c5548;
+    --accent:#b5502f; --accent-soft:#f1e0d3; --accent2:#7a6a4f; --line:#e6dcc9;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:'Pretendard', sans-serif; line-height:1.75; font-size:16px; }
+  h1,h2,h3,h4{ font-family:'Spectral', serif; color:#3a2f22; }
+  code, .mono { font-family:'JetBrains Mono', monospace; }
+
+  .layout{ display:flex; max-width:1280px; margin:0 auto; }
+  aside{
+    width:260px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+    padding:28px 18px; border-right:1px solid var(--line); background:var(--paper);
+  }
+  aside h2{ font-size:.95rem; letter-spacing:.03em; color:var(--accent2); margin:0 0 14px; text-transform:uppercase; }
+  aside ol{ list-style:none; padding:0; margin:0; counter-reset:ch; }
+  aside li{ counter-increment: ch; margin-bottom:4px; }
+  aside a{ display:block; padding:7px 10px; border-radius:8px; text-decoration:none; color:var(--ink-soft); font-size:.86rem; transition:.15s; }
+  aside a::before{ content: counter(ch) ". "; color:var(--accent); font-weight:600; }
+  aside a:hover, aside a.active{ background:var(--accent-soft); color:var(--accent); }
+  aside .prevlink{ display:block; margin-top:18px; padding:10px; border:1px dashed var(--line); border-radius:8px; font-size:.78rem; color:var(--ink-soft); text-decoration:none; }
+  aside .prevlink:hover{ border-color:var(--accent); color:var(--accent); }
+
+  main{ flex:1; min-width:0; padding:40px 48px 100px; }
+
+  header.hero{
+    background:linear-gradient(135deg,#3a2f22,#6b4226 60%,#b5502f);
+    color:#fdf6ec; border-radius:18px; padding:44px 40px; margin-bottom:34px;
+  }
+  header.hero h1{ color:#fff; font-size:2rem; margin:0 0 10px; }
+  header.hero p{ margin:4px 0; opacity:.92; font-size:.95rem; }
+  .badge-row{ margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; }
+  .badge{ background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); border-radius:999px; padding:4px 12px; font-size:.78rem; }
+
+  section{
+    background:var(--paper-card); border:1px solid var(--line); border-radius:14px;
+    padding:32px 36px; margin-bottom:26px; box-shadow:0 3px 10px rgba(90,70,40,.05);
+  }
+  section h2{ font-size:1.5rem; margin-top:0; padding-bottom:12px; border-bottom:2px solid var(--accent-soft); display:flex; align-items:center; gap:10px; }
+  section h2 .num{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; background:var(--accent); color:#fff; border-radius:9px; font-size:1rem; font-family:'JetBrains Mono'; }
+  section h3{ font-size:1.15rem; margin-top:28px; color:var(--accent2); }
+  p{ color:var(--ink); }
+
+  .callout{ background:var(--accent-soft); border-left:4px solid var(--accent); border-radius:8px; padding:14px 18px; margin:16px 0; font-size:.94rem; }
+  .callout strong{ color:var(--accent); }
+
+  ul.plain, ol.plain{ padding-left:22px; }
+  ul.plain li, ol.plain li{ margin-bottom:8px; }
+
+  figure{ margin:22px 0; text-align:center; }
+  figure svg{ max-width:100%; height:auto; background:var(--paper-card); }
+  figcaption{ font-size:.83rem; color:var(--ink-soft); margin-top:8px; }
+
+  table{ width:100%; border-collapse:collapse; margin:18px 0; font-size:.92rem; }
+  th, td{ border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top; }
+  th{ background:var(--accent-soft); color:#3a2f22; font-family:'Spectral'; font-weight:600; }
+  tr:nth-child(even) td{ background:#fbf7ef; }
+
+  .checklist{ list-style:none; padding:0; }
+  .checklist li{ padding:10px 14px; margin-bottom:8px; background:#fbf7ef; border:1px solid var(--line); border-radius:8px; display:flex; gap:10px; align-items:flex-start; font-size:.93rem; }
+  .checklist li::before{ content:"✓"; color:var(--accent); font-weight:700; }
+
+  .foot{ text-align:center; color:var(--ink-soft); font-size:.82rem; padding:30px 0 60px; }
+  .foot a{ color:var(--accent); }
+
+  @media (max-width: 900px){
+    .layout{ flex-direction:column; }
+    aside{ position:relative; width:100%; height:auto; border-right:none; border-bottom:1px solid var(--line); }
+    main{ padding:24px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <aside>
+    <h2>목차</h2>
+    <ol>
+      <li><a href="#s1">RNN을 벗겨내다</a></li>
+      <li><a href="#s2">Cross-Attention에서 Self-Attention으로</a></li>
+      <li><a href="#s3">Transformer 전체 구조 개관</a></li>
+      <li><a href="#s4">토큰화 (BPE)</a></li>
+      <li><a href="#s5">Positional Encoding</a></li>
+      <li><a href="#s6">Encoder — Multi-Head Attention</a></li>
+      <li><a href="#s7">Decoder — Right Shift</a></li>
+      <li><a href="#s8">Masked Multi-Head Attention</a></li>
+      <li><a href="#s9">BERT — MLM과 NSP</a></li>
+      <li><a href="#s10">GPT — Autoregressive 생성</a></li>
+      <li><a href="#s11">BERT vs GPT 종합비교</a></li>
+      <li><a href="#s12">체크리스트</a></li>
+    </ol>
+    <a class="prevlink" href="#" title="이전 편 참고용">◀ Part I: MLP → CNN → RNN → Attention</a>
+  </aside>
+
+  <main>
+    <header class="hero">
+      <h1>AI 모델 아키텍처의 계보 — Part II</h1>
+      <p>RNN을 완전히 걷어내고 Attention만 남긴 Transformer, 그리고 그 위에서 갈라진 BERT와 GPT</p>
+      <p style="font-size:.82rem; opacity:.75;">원문: Yang Kewen, "A Brief History Of AI Models — Part II" (Medium, 2023.09) 내용을 재구성·확장한 학습서</p>
+      <div class="badge-row">
+        <span class="badge">Self-Attention</span>
+        <span class="badge">Transformer Encoder/Decoder</span>
+        <span class="badge">BERT · MLM/NSP</span>
+        <span class="badge">GPT · Autoregressive</span>
+      </div>
+    </header>
+
+    <!-- 1 -->
+    <section id="s1">
+      <h2><span class="num">1</span>RNN을 벗겨내다 — Attention Is All You Need</h2>
+      <p>Part I에서는 MLP, CNN, RNN의 흐름과, RNN의 망각 문제를 해결하기 위해 그 위에 얹힌 Attention 메커니즘까지 다뤘습니다. 하지만 큰 문제가 하나 남아 있었습니다 — <strong>병렬 연산이 불가능하다는 점</strong>입니다. 이는 RNN 특유의 순환 구조 자체에서 비롯된 근본적인 한계였습니다.</p>
+      <p>연구자들은 이 문제를 우회하는 대신 훨씬 과감한 선택을 합니다: <strong>RNN 구조 자체를 완전히 제거하고, Attention 층만으로 모델을 구성</strong>한 것입니다. 이 전환에서 탄생한 것이 바로 SOTA(State-of-the-Art) 아키텍처인 <strong>Transformer</strong>입니다.</p>
+      <div class="callout">
+        <strong>Part I → Part II 연결고리</strong><br>
+        RNN + Attention은 "망각 문제"는 해결했지만 "병렬화 문제"는 그대로 남겼습니다. Transformer는 RNN을 제거함으로써 이 마지막 문제까지 해결합니다.
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <h2><span class="num">2</span>Cross-Attention에서 Self-Attention으로</h2>
+      <p>Transformer는 RNN의 은닉상태를 분해하는 대신, 전혀 다른 방식을 택합니다.</p>
+      <ol class="plain">
+        <li><strong>인코더에서의 토큰 분해</strong> — 은닉상태를 분해하는 대신, 인코더 안에서 각 텍스트 토큰을 직접 Key와 Value로 분해합니다.</li>
+        <li><strong>디코더에서의 Query 분해</strong> — 디코더에서는 텍스트를 Query로 분해합니다.</li>
+        <li><strong>Attention 계산</strong> — Transformer의 핵심은 Key와 Query 사이의 상관관계를 계산해, 입력 텍스트의 각 토큰이 출력 텍스트의 각 토큰과 얼마나 관련 있는지를 판단하는 데 있습니다.</li>
+        <li><strong>문맥 벡터 생성</strong> — Key-Query 상관관계로 얻은 attention score를 이용해 Value의 정보를 결합함으로써 문맥 벡터를 만듭니다. 이 문맥 벡터가 디코딩 과정에서 출력을 만드는 데 사용됩니다.</li>
+      </ol>
+      <p>여기까지는 인코더와 디코더가 분리된 구조에서의 <strong>Cross-Attention</strong>입니다. 다음 진화 단계에서는 인코더-디코더 구조를 벗어나, Attention 층을 <strong>하나의 시퀀스 안에서</strong> 직접 적용합니다. 이때는 입력 토큰 각각이 Key, Value, Query 세 가지 모두로 분해되고, 해당 토큰과 다른 모든 입력 토큰 사이의 상관관계를 계산합니다. 이것이 바로 <strong>Self-Attention</strong>의 본질입니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg">
+          <text x="170" y="22" text-anchor="middle" font-family="Pretendard" font-size="13" fill="#5c5548">Cross-Attention (인코더-디코더 간)</text>
+          <g font-family="JetBrains Mono" font-size="10">
+            <rect x="40" y="50" width="70" height="30" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="75" y="70" text-anchor="middle">K,V (입력)</text>
+            <rect x="40" y="95" width="70" height="30" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="75" y="115" text-anchor="middle">K,V (입력)</text>
+            <rect x="40" y="140" width="70" height="30" rx="5" fill="#dbeafe" stroke="#2563eb"/><text x="75" y="160" text-anchor="middle">K,V (입력)</text>
+            <rect x="240" y="95" width="70" height="30" rx="5" fill="#ede9fe" stroke="#7c3aed"/><text x="275" y="115" text-anchor="middle">Q (출력)</text>
+          </g>
+          <g stroke="#b5502f" stroke-width="1.5">
+            <line x1="110" y1="65" x2="240" y2="110"/><line x1="110" y1="110" x2="240" y2="110"/><line x1="110" y1="155" x2="240" y2="110"/>
+          </g>
+          <text x="170" y="200" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">인코더 토큰 = K,V / 디코더 토큰 = Q</text>
+
+          <line x1="340" y1="30" x2="340" y2="230" stroke="#e6dcc9" stroke-width="1" stroke-dasharray="4"/>
+
+          <text x="510" y="22" text-anchor="middle" font-family="Pretendard" font-size="13" fill="#5c5548">Self-Attention (단일 시퀀스 내부)</text>
+          <g font-family="JetBrains Mono" font-size="9">
+            <rect x="400" y="60" width="80" height="32" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="440" y="80" text-anchor="middle">Q,K,V</text>
+            <rect x="400" y="105" width="80" height="32" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="440" y="125" text-anchor="middle">Q,K,V</text>
+            <rect x="400" y="150" width="80" height="32" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="440" y="170" text-anchor="middle">Q,K,V</text>
+            <rect x="560" y="60" width="80" height="32" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="600" y="80" text-anchor="middle">Q,K,V</text>
+            <rect x="560" y="105" width="80" height="32" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="600" y="125" text-anchor="middle">Q,K,V</text>
+            <rect x="560" y="150" width="80" height="32" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="600" y="170" text-anchor="middle">Q,K,V</text>
+          </g>
+          <g stroke="#f59e0b" stroke-width="1" opacity="0.6">
+            <line x1="480" y1="76" x2="560" y2="76"/><line x1="480" y1="76" x2="560" y2="121"/><line x1="480" y1="76" x2="560" y2="166"/>
+            <line x1="480" y1="121" x2="560" y2="76"/><line x1="480" y1="121" x2="560" y2="121"/><line x1="480" y1="121" x2="560" y2="166"/>
+            <line x1="480" y1="166" x2="560" y2="76"/><line x1="480" y1="166" x2="560" y2="121"/><line x1="480" y1="166" x2="560" y2="166"/>
+          </g>
+          <text x="510" y="200" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">모든 토큰이 서로 Q,K,V를 갖고 전방위 상관관계 계산</text>
+        </svg>
+        <figcaption>그림 1. Cross-Attention(좌)과 Self-Attention(우) 비교 — 좌는 입력=K,V/출력=Q로 분리, 우는 모든 토큰이 Q,K,V를 동시에 가짐</figcaption>
+      </figure>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <h2><span class="num">3</span>Transformer 전체 구조 개관</h2>
+      <p>Transformer의 전체 구조는 크게 두 부분으로 나뉩니다 — 왼쪽의 <strong>인코더(Encoder)</strong>와 오른쪽의 <strong>디코더(Decoder)</strong>입니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 700 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Encoder stack -->
+          <text x="170" y="24" text-anchor="middle" font-family="Pretendard" font-size="13" fill="#5c5548" font-weight="600">Encoder</text>
+          <rect x="60" y="230" width="220" height="34" rx="6" fill="#fbf7ef" stroke="#7a6a4f"/><text x="170" y="252" text-anchor="middle" font-family="Pretendard" font-size="10">입력 임베딩 + Positional Encoding</text>
+          <path d="M170 226 L170 200" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a1)"/>
+          <rect x="60" y="150" width="220" height="50" rx="6" fill="#dbeafe" stroke="#2563eb"/><text x="170" y="172" text-anchor="middle" font-family="Pretendard" font-size="10">Multi-Head Attention</text><text x="170" y="188" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#5c5548">(Self-Attention)</text>
+          <path d="M170 146 L170 120" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a1)"/>
+          <rect x="60" y="70" width="220" height="50" rx="6" fill="#fef3c7" stroke="#f59e0b"/><text x="170" y="92" text-anchor="middle" font-family="Pretendard" font-size="10">Feed Forward</text><text x="170" y="108" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#5c5548">(Add &amp; Norm 포함)</text>
+          <text x="170" y="290" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#7a6a4f">※ 위 블록을 N번 반복</text>
+
+          <defs><marker id="a1" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 z" fill="#3a2f22"/></marker></defs>
+
+          <!-- arrow to decoder -->
+          <path d="M280 95 C 340 95, 340 95, 400 150" stroke="#b5502f" stroke-width="2" fill="none" marker-end="url(#a2)"/>
+          <defs><marker id="a2" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 z" fill="#b5502f"/></marker></defs>
+          <text x="345" y="80" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#b5502f">K, V 전달</text>
+
+          <!-- Decoder stack -->
+          <text x="520" y="24" text-anchor="middle" font-family="Pretendard" font-size="13" fill="#5c5548" font-weight="600">Decoder</text>
+          <rect x="410" y="230" width="220" height="34" rx="6" fill="#fbf7ef" stroke="#7a6a4f"/><text x="520" y="252" text-anchor="middle" font-family="Pretendard" font-size="10">출력 임베딩(Right-Shift) + Pos.Enc.</text>
+          <path d="M520 226 L520 200" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a1)"/>
+          <rect x="410" y="150" width="220" height="42" rx="6" fill="#fde2e2" stroke="#dc2626"/><text x="520" y="168" text-anchor="middle" font-family="Pretendard" font-size="10">Masked Multi-Head Attention</text><text x="520" y="182" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#5c5548">(미래 토큰 마스킹)</text>
+          <path d="M520 146 L520 120" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a1)"/>
+          <rect x="410" y="70" width="220" height="50" rx="6" fill="#dbeafe" stroke="#2563eb"/><text x="520" y="88" text-anchor="middle" font-family="Pretendard" font-size="10">Multi-Head Attention</text><text x="520" y="104" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#5c5548">(Cross-Attention, Encoder K,V 사용)</text>
+          <text x="520" y="290" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#7a6a4f">※ 위 블록을 N번 반복 → 다음 단어 확률 출력</text>
+        </svg>
+        <figcaption>그림 2. Transformer 전체 구조 — 인코더는 Self-Attention, 디코더는 Masked Self-Attention + Cross-Attention을 순서대로 통과</figcaption>
+      </figure>
+
+      <p>입력 문장은 다음 순서로 처리됩니다: <strong>문장 → 토큰화 → 인덱스화(임베딩) → Positional Encoding 추가 → Multi-Head Attention → Feed Forward</strong>. 이 과정을 순서대로 3~5절에서 살펴봅니다.</p>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <h2><span class="num">4</span>토큰화 (BPE)</h2>
+      <p>문장은 먼저 토큰(token) 단위로 쪼개진 뒤 인덱스로 변환됩니다. 이 작업은 보통 <strong>토크나이저(tokenizer)</strong>가 담당하며, 대표적인 방식이 <strong>Byte-Pair Encoding(BPE)</strong>입니다. BPE는 자주 등장하는 문자(또는 부분단어) 쌍을 반복적으로 병합해 어휘 사전을 구축하는 방식으로, 이를 통해 처음 보는 단어도 더 작은 서브워드 단위로 쪼개서 처리할 수 있게 됩니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 640 130" xmlns="http://www.w3.org/2000/svg">
+          <g font-family="JetBrains Mono" font-size="12">
+            <rect x="10" y="45" width="110" height="40" rx="6" fill="#fbf7ef" stroke="#7a6a4f"/><text x="65" y="70" text-anchor="middle">문장</text>
+            <path d="M120 65 L155 65" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a3)"/>
+            <rect x="160" y="45" width="130" height="40" rx="6" fill="#f1e0d3" stroke="#b5502f"/><text x="225" y="70" text-anchor="middle">서브워드 토큰열</text>
+            <path d="M290 65 L325 65" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a3)"/>
+            <rect x="330" y="45" width="110" height="40" rx="6" fill="#dbeafe" stroke="#2563eb"/><text x="385" y="70" text-anchor="middle">인덱스열</text>
+            <path d="M440 65 L475 65" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a3)"/>
+            <rect x="480" y="45" width="130" height="40" rx="6" fill="#ede9fe" stroke="#7c3aed"/><text x="545" y="70" text-anchor="middle">임베딩 벡터</text>
+          </g>
+          <defs><marker id="a3" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 z" fill="#3a2f22"/></marker></defs>
+          <text x="320" y="115" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">BPE는 자주 등장하는 문자쌍을 반복 병합해 서브워드 어휘사전을 구축</text>
+        </svg>
+        <figcaption>그림 3. BPE 토큰화의 단순화된 처리 흐름</figcaption>
+      </figure>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <h2><span class="num">5</span>Positional Encoding</h2>
+      <p>Attention 층은 RNN과 달리 입력 시퀀스의 <strong>1차원 순서 정보를 내재적으로 갖고 있지 않습니다</strong>. RNN은 구조상 한 단어씩 순차적으로 처리하므로 순서가 자연히 보존되지만, Attention은 모든 토큰을 동시에 바라보기 때문에 "몇 번째 단어인지"라는 정보가 별도로 없으면 순서를 구분할 수 없습니다.</p>
+      <p>이 때문에 각 토큰의 위치(1, 2, 3, …)를 나타내는 <strong>Positional Encoding</strong>을 만들어 토큰 임베딩에 더해줍니다. 이렇게 하면 Attention 층도 "이 단어가 문장의 어느 위치에 있었는지"를 알 수 있게 됩니다.</p>
+      <div class="callout">
+        <strong>왜 필요한가</strong> — RNN은 구조 자체가 순서를 암묵적으로 인코딩하지만, Transformer는 모든 토큰을 병렬로 처리하기 때문에 그 대가로 순서 정보를 명시적으로 다시 주입해줘야 합니다.
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <h2><span class="num">6</span>Encoder — Multi-Head Attention</h2>
+      <p>텍스트 임베딩과 Positional Encoding이 더해진 벡터는 <strong>Multi-Head Attention</strong> 층에 입력됩니다. 이 층은 입력 토큰마다 문맥 벡터(context vector)를 생성해, 시퀀스 내 토큰들 사이의 관계와 의존성을 효과적으로 포착합니다. "Multi-Head"라는 이름처럼, 하나의 Attention 계산을 병렬로 여러 개("헤드") 두어 서로 다른 관점에서의 관계를 동시에 학습하는 것이 특징입니다.</p>
+      <p>이는 Transformer가 시퀀스를 이해하고 처리하는 능력의 핵심 단계입니다.</p>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <h2><span class="num">7</span>Decoder — Right Shift</h2>
+      <p>디코더 구조는 인코더와 미묘하게 다릅니다. 디코더는 출력 시퀀스를 <strong>한 칸 오른쪽으로 밀어서(right-shift)</strong> 입력으로 사용합니다.</p>
+      <p>왜 이런 조정이 필요할까요? 디코더에서 각 단어의 예측은 그 이전 텍스트에 의존하며, 특히 <strong>첫 번째 단어의 예측은 인코더의 출력 임베딩에 의존</strong>합니다. 따라서 오른쪽으로 한 칸 밀어주는 작업은 인코더 입력이 들어갈 자리를 마련해, 디코더가 출력 시퀀스를 올바르게 처리할 수 있도록 준비하는 역할을 합니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg">
+          <text x="150" y="20" text-anchor="middle" font-family="Pretendard" font-size="11" fill="#5c5548">원래 출력 시퀀스</text>
+          <g font-family="JetBrains Mono" font-size="11">
+            <rect x="30" y="35" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="60" y="55" text-anchor="middle">w1</text>
+            <rect x="95" y="35" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="125" y="55" text-anchor="middle">w2</text>
+            <rect x="160" y="35" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="190" y="55" text-anchor="middle">w3</text>
+          </g>
+          <path d="M270 50 L310 50" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a4)"/>
+          <defs><marker id="a4" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 z" fill="#3a2f22"/></marker></defs>
+          <text x="290" y="38" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#b5502f">우측 시프트</text>
+
+          <text x="465" y="20" text-anchor="middle" font-family="Pretendard" font-size="11" fill="#5c5548">디코더 입력 (shifted)</text>
+          <g font-family="JetBrains Mono" font-size="11">
+            <rect x="330" y="35" width="60" height="30" fill="#fde2e2" stroke="#dc2626"/><text x="360" y="55" text-anchor="middle">&lt;s&gt;</text>
+            <rect x="395" y="35" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="425" y="55" text-anchor="middle">w1</text>
+            <rect x="460" y="35" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="490" y="55" text-anchor="middle">w2</text>
+            <rect x="525" y="35" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="555" y="55" text-anchor="middle">w3</text>
+          </g>
+          <text x="360" y="90" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#dc2626">시작 토큰(빨간칸)이 인코더 정보를 받을 첫 슬롯</text>
+          <text x="300" y="120" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">각 위치는 "이전까지의 단어"만 보고 다음 단어를 예측하도록 정렬됨</text>
+        </svg>
+        <figcaption>그림 4. 디코더의 Right-Shift — 출력 시퀀스를 한 칸 밀어 시작 토큰 자리를 확보</figcaption>
+      </figure>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <h2><span class="num">8</span>Masked Multi-Head Attention</h2>
+      <p>그렇다면 왜 디코더의 텍스트 예측은 인코더처럼 양방향이 아니라 <strong>이전 텍스트에만 의존</strong>할까요? 그 답은 <strong>Masked Multi-Head Attention</strong>에 있습니다.</p>
+      <p>학습 과정에서 이 메커니즘은 현재 위치 이후에 등장하는 모든 텍스트를 마스킹(가림)합니다. 이는 사람이 말을 배우는 방식과 비슷합니다 — 자연어에서 문장을 만들 때 우리는 아직 나오지 않은 미래의 단어를 미리 알 수 없습니다. 마스킹 방식은 바로 이 점을 그대로 반영해, 디코더가 문맥에 맞는 방식으로 학습하도록 보장합니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+          <text x="210" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#5c5548">Causal Mask (하삼각행렬)</text>
+          <g font-family="JetBrains Mono" font-size="10">
+          <!-- header -->
+          <text x="80" y="45" text-anchor="middle">w1</text><text x="140" y="45" text-anchor="middle">w2</text><text x="200" y="45" text-anchor="middle">w3</text><text x="260" y="45" text-anchor="middle">w4</text>
+          <!-- rows -->
+          <text x="30" y="75" text-anchor="middle">w1</text>
+          <rect x="55" y="60" width="50" height="30" fill="#fde68a"/><rect x="115" y="60" width="50" height="30" fill="#fecaca"/><rect x="175" y="60" width="50" height="30" fill="#fecaca"/><rect x="235" y="60" width="50" height="30" fill="#fecaca"/>
+
+          <text x="30" y="105" text-anchor="middle">w2</text>
+          <rect x="55" y="90" width="50" height="30" fill="#fde68a"/><rect x="115" y="90" width="50" height="30" fill="#fde68a"/><rect x="175" y="90" width="50" height="30" fill="#fecaca"/><rect x="235" y="90" width="50" height="30" fill="#fecaca"/>
+
+          <text x="30" y="135" text-anchor="middle">w3</text>
+          <rect x="55" y="120" width="50" height="30" fill="#fde68a"/><rect x="115" y="120" width="50" height="30" fill="#fde68a"/><rect x="175" y="120" width="50" height="30" fill="#fde68a"/><rect x="235" y="120" width="50" height="30" fill="#fecaca"/>
+
+          <text x="30" y="165" text-anchor="middle">w4</text>
+          <rect x="55" y="150" width="50" height="30" fill="#fde68a"/><rect x="115" y="150" width="50" height="30" fill="#fde68a"/><rect x="175" y="150" width="50" height="30" fill="#fde68a"/><rect x="235" y="150" width="50" height="30" fill="#fde68a"/>
+          </g>
+          <g stroke="#e6dcc9"><rect x="55" y="60" width="230" height="120" fill="none"/></g>
+
+          <rect x="60" y="205" width="16" height="16" fill="#fde68a"/><text x="85" y="218" font-family="Pretendard" font-size="10" fill="#5c5548">허용(과거·자기 자신)</text>
+          <rect x="60" y="228" width="16" height="16" fill="#fecaca"/><text x="85" y="241" font-family="Pretendard" font-size="10" fill="#5c5548">마스킹(미래 토큰, 참조 금지)</text>
+        </svg>
+        <figcaption>그림 5. Causal Mask — 각 위치(행)는 자기 자신 포함 이전 토큰(노랑)만 보고, 이후 토큰(빨강)은 마스킹되어 참조하지 못함</figcaption>
+      </figure>
+
+      <p>인코더와 디코더의 나머지 구성요소(Add &amp; Norm, Feed-Forward 등)는 서로 동일하며, 일반적인 피드포워드 신경망에서도 흔히 쓰이는 요소이므로 여기서는 상세히 다루지 않습니다.</p>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <h2><span class="num">9</span>BERT — MLM과 NSP</h2>
+      <p><strong>BERT(Bidirectional Encoder Representations from Transformers)</strong>는 Transformer의 <strong>인코더 부분만</strong>을 사용하는 모델입니다. 양방향 구조 덕분에 한 단어의 앞뒤 문맥을 모두 고려할 수 있다는 점이 특징이며, 이는 앞쪽 문맥만 보는 GPT 계열과 대비됩니다.</p>
+      <p>BERT의 사전학습(pretraining)에는 두 가지 방식이 사용됩니다.</p>
+
+      <h3>9-1. Masked Language Modeling (MLM)</h3>
+      <p>학습 데이터셋에서 무작위로 일부 단어를 마스킹(특수 토큰으로 대체)한 뒤, BERT가 그 가려진 단어를 맞히도록 학습시킵니다. 일종의 "빈칸 채우기" 문제를 푸는 훈련이라고 볼 수 있으며, 이를 통해 모델은 문맥을 보고 빠진 정보를 추론하는 능력을 기릅니다.</p>
+
+      <h3>9-2. Next Sentence Prediction (NSP)</h3>
+      <p>두 문장을 이어 붙인 뒤, 두 번째 문장이 첫 번째 문장과 실제로 이어지는 내용인지 아닌지를 BERT가 예측하도록 학습시킵니다. 이 과제는 텍스트 분류, 질의응답, 문서 요약 등 다양한 NLP 응용에서 중요한, <strong>문장과 문장 사이의 관계</strong>를 모델이 파악하도록 돕습니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
+          <text x="160" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#5c5548" font-weight="600">MLM (빈칸 채우기)</text>
+          <g font-family="JetBrains Mono" font-size="11">
+            <rect x="20" y="40" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="50" y="60" text-anchor="middle">The</text>
+            <rect x="85" y="40" width="60" height="30" fill="#fde2e2" stroke="#dc2626"/><text x="115" y="60" text-anchor="middle">[MASK]</text>
+            <rect x="150" y="40" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="180" y="60" text-anchor="middle">sat</text>
+            <rect x="215" y="40" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="245" y="60" text-anchor="middle">down</text>
+          </g>
+          <path d="M115 75 L115 100" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a5)"/>
+          <defs><marker id="a5" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 z" fill="#3a2f22"/></marker></defs>
+          <rect x="70" y="105" width="90" height="34" rx="6" fill="#b5502f"/><text x="115" y="127" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#fff">"cat" 예측</text>
+          <text x="150" y="170" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">가려진 단어를 양방향 문맥으로부터 추론</text>
+
+          <line x1="330" y1="10" x2="330" y2="210" stroke="#e6dcc9" stroke-dasharray="4"/>
+
+          <text x="480" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#5c5548" font-weight="600">NSP (다음 문장 예측)</text>
+          <rect x="360" y="40" width="110" height="30" fill="#dbeafe" stroke="#2563eb"/><text x="415" y="60" text-anchor="middle" font-family="Pretendard" font-size="9">문장 A</text>
+          <rect x="480" y="40" width="110" height="30" fill="#ede9fe" stroke="#7c3aed"/><text x="535" y="60" text-anchor="middle" font-family="Pretendard" font-size="9">문장 B</text>
+          <path d="M475 90 L475 100" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a5)"/>
+          <rect x="420" y="105" width="110" height="34" rx="6" fill="#b5502f"/><text x="475" y="127" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#fff">IsNext? Yes/No</text>
+          <text x="475" y="170" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">두 문장의 연관성 여부를 이진 분류</text>
+        </svg>
+        <figcaption>그림 6. BERT의 두 가지 사전학습 과제 — MLM(좌)과 NSP(우)</figcaption>
+      </figure>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <h2><span class="num">10</span>GPT — Autoregressive 생성</h2>
+      <p><strong>GPT(Generative Pre-trained Transformer)</strong>는 BERT와 달리 <strong>단 하나의 사전학습 방식</strong>만 사용합니다 — 바로 시퀀스의 다음 단어를 예측하는 것입니다. GPT는 이전까지의 텍스트를 바탕으로 다음 단어를 예측하는 데 집중합니다.</p>
+      <p>다만 중요한 트레이드오프가 있습니다. GPT의 추론(inference) 과정은 병렬 연산을 제대로 지원하지 않습니다. 다음 단어의 예측이 현재 단어의 예측 결과에 의존하기 때문인데, 이는 RNN의 순차적 특성과 본질적으로 닮아 있습니다. 그 결과 GPT처럼 <strong>디코더만 사용하는(decoder-only)</strong> 모델의 추론 속도는, 이러한 순차 의존성이 없는 <strong>인코더만 사용하는(encoder-only)</strong> 모델(예: BERT)에 비해 상대적으로 느린 경향이 있습니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg">
+          <g font-family="JetBrains Mono" font-size="11">
+            <rect x="20" y="45" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="50" y="65" text-anchor="middle">The</text>
+            <rect x="85" y="45" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="115" y="65" text-anchor="middle">cat</text>
+            <rect x="150" y="45" width="60" height="30" fill="#f1e0d3" stroke="#b5502f" stroke-width="2"/><text x="180" y="65" text-anchor="middle">sat</text>
+            <text x="180" y="35" text-anchor="middle" fill="#b5502f" font-size="9">예측①</text>
+          </g>
+          <path d="M215 60 L245 60" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a6)"/>
+          <defs><marker id="a6" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 z" fill="#3a2f22"/></marker></defs>
+          <g font-family="JetBrains Mono" font-size="11">
+            <rect x="250" y="45" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="280" y="65" text-anchor="middle">The</text>
+            <rect x="315" y="45" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="345" y="65" text-anchor="middle">cat</text>
+            <rect x="380" y="45" width="60" height="30" fill="#fbf7ef" stroke="#7a6a4f"/><text x="410" y="65" text-anchor="middle">sat</text>
+            <rect x="445" y="45" width="60" height="30" fill="#f1e0d3" stroke="#b5502f" stroke-width="2"/><text x="475" y="65" text-anchor="middle">down</text>
+            <text x="475" y="35" text-anchor="middle" fill="#b5502f" font-size="9">예측②</text>
+          </g>
+          <text x="300" y="115" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">예측②는 예측①의 결과("sat")에 의존 → 한 단어씩 순차적으로만 생성 가능</text>
+        </svg>
+        <figcaption>그림 7. GPT의 자기회귀(Autoregressive) 생성 — RNN처럼 이전 예측 결과가 다음 예측의 입력이 됨</figcaption>
+      </figure>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11">
+      <h2><span class="num">11</span>BERT vs GPT 종합비교</h2>
+      <table>
+        <tr><th>구분</th><th>BERT</th><th>GPT</th></tr>
+        <tr><td>사용하는 부분</td><td>Transformer 인코더만 사용</td><td>Transformer 디코더만 사용</td></tr>
+        <tr><td>문맥 참조 방향</td><td>양방향 (앞뒤 문맥 모두 참조)</td><td>단방향 (왼쪽/이전 문맥만 참조)</td></tr>
+        <tr><td>사전학습 방식</td><td>MLM(빈칸 채우기) + NSP(다음 문장 예측) — 2가지</td><td>다음 단어 예측(next-word prediction) — 1가지</td></tr>
+        <tr><td>강점</td><td>텍스트 이해(understanding) 과제에 강함</td><td>텍스트 생성(generation) 과제에 강함</td></tr>
+        <tr><td>추론 시 병렬화</td><td>가능 (양방향 동시 처리)</td><td>불가 — 이전 단어 예측 결과에 의존해 순차적으로만 생성</td></tr>
+        <tr><td>대표 활용</td><td>분류, 질의응답, 문장관계 판단</td><td>문장 생성, 대화, 요약 등 생성형 작업</td></tr>
+      </table>
+      <div class="callout">
+        <strong>계보 요약</strong> — MLP → CNN/RNN → (RNN+)Attention → <strong>Transformer(Self-Attention만으로 구성)</strong> → 이 Transformer의 인코더만 떼어내 <strong>BERT</strong>, 디코더만 떼어내 <strong>GPT</strong> 계열이 갈라져 나왔습니다.
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section id="s12">
+      <h2><span class="num">12</span>학습 체크리스트</h2>
+      <ul class="checklist">
+        <li>RNN+Attention 구조가 병렬화 문제를 왜 해결하지 못했는지 설명할 수 있다</li>
+        <li>Cross-Attention과 Self-Attention의 차이(K,V/Q의 출처)를 구분할 수 있다</li>
+        <li>Transformer 인코더와 디코더 각각의 블록 구성을 그림 없이도 설명할 수 있다</li>
+        <li>BPE 토큰화가 어떤 문제(미등록 단어 등)를 해결하기 위한 것인지 이해하고 있다</li>
+        <li>Positional Encoding이 필요한 이유를 RNN과의 대비로 설명할 수 있다</li>
+        <li>디코더의 Right-Shift가 왜 필요한지 설명할 수 있다</li>
+        <li>Masked Multi-Head Attention의 역할(미래 토큰 차단)을 설명할 수 있다</li>
+        <li>BERT의 MLM과 NSP 두 사전학습 과제의 목적을 구분해서 설명할 수 있다</li>
+        <li>GPT의 추론이 병렬화되지 않는 이유(자기회귀적 의존성)를 설명할 수 있다</li>
+        <li>BERT(encoder-only)와 GPT(decoder-only)의 구조·강점 차이를 표 없이도 비교할 수 있다</li>
+      </ul>
+    </section>
+
+    <p class="foot">
+      원문: <a href="https://medium.com/@yangkewenvigorous/a-brief-history-of-ai-models-part-ii-a6a565985bb" target="_blank" rel="noopener">Yang Kewen, "A Brief History Of AI Models — Part II" (Medium, 2023)</a><br>
+      이 학습서는 원문의 핵심 개념을 재구성·확장하여 작성한 것으로, 모든 다이어그램은 원문의 그림을 재현한 것이 아니라 본 학습서를 위해 새로 제작한 오리지널 일러스트입니다.
+    </p>
+
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('aside a');
+  const sections = document.querySelectorAll('main section');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const id = e.target.id;
+        const match = document.querySelector(`aside a[href="#${id}"]`);
+        if(match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s=>io.observe(s));
+</script>
+
+</body>
+</html>

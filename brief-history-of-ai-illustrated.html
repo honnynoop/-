@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Brief History of AI (Artificial Intelligence) — Illustrated</title>
+<style>
+  :root {
+    --bg: #fafaf8;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #5b6470;
+    --accent: #2563eb;
+    --accent2: #7c3aed;
+    --accent-soft: #eef2ff;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.7;
+  }
+  header.hero {
+    background: linear-gradient(135deg, #1e3a8a, #2563eb 55%, #7c3aed);
+    color: #fff;
+    padding: 50px 24px 20px;
+    text-align: center;
+    overflow: hidden;
+  }
+  header.hero h1 { font-size: 2.1rem; margin: 0 0 10px; font-weight: 700; }
+  header.hero p.subtitle { font-size: 1.05rem; opacity: 0.92; max-width: 700px; margin: 0 auto 6px; }
+  header.hero p.meta { font-size: 0.82rem; opacity: 0.75; margin: 14px 0 0; }
+  .hero-art { max-width: 480px; margin: 10px auto 0; }
+
+  main { max-width: 860px; margin: -30px auto 60px; padding: 0 20px; }
+
+  nav.toc {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 22px 26px; margin-bottom: 30px; box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+  nav.toc h2 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-top: 0; }
+  nav.toc ol { padding-left: 20px; margin: 0; columns: 1; }
+  nav.toc li { margin-bottom: 6px; }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+
+  section {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 30px 32px; margin-bottom: 26px; box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  }
+  section h2 {
+    color: #1e3a8a; font-size: 1.35rem; margin-top: 0;
+    border-bottom: 2px solid var(--accent-soft); padding-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  section h2 svg { width: 26px; height: 26px; flex-shrink: 0; }
+  section h3 { color: #1e40af; font-size: 1.05rem; margin-top: 24px; }
+
+  figure { margin: 18px 0; text-align: center; }
+  figure svg { max-width: 100%; height: auto; }
+  figcaption { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
+
+  .timeline { list-style: none; padding: 0; margin: 0; border-left: 3px solid var(--accent-soft); }
+  .timeline li { position: relative; padding: 0 0 20px 26px; }
+  .timeline li::before {
+    content: ""; position: absolute; left: -9px; top: 4px; width: 14px; height: 14px;
+    background: var(--accent); border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 2px var(--accent-soft);
+  }
+  .timeline .year { font-weight: 700; color: var(--accent); display: block; }
+
+  .concept-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 12px; }
+  @media (min-width: 640px) { .concept-grid.two-col { grid-template-columns: 1fr 1fr; } }
+  .concept-card { background: var(--accent-soft); border-radius: 10px; padding: 16px 18px; }
+  .concept-card strong { color: #1e3a8a; }
+
+  ul.plain { padding-left: 20px; }
+  ul.plain li { margin-bottom: 8px; }
+
+  .source { font-size: 0.85rem; color: var(--muted); margin-top: 30px; text-align: center; padding: 20px 0; }
+  .source a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>A Brief History of AI (Artificial Intelligence)</h1>
+  <p class="subtitle">AI milestones, guiding distinctions and concepts, and application examples</p>
+  <p class="meta">Original article by WAITS Software- und Prozessberatungsgesellsch. mbH (Peter Bormann) · August 2024 · Illustrated overview</p>
+
+  <!-- Hero illustration: abstract network / brain -->
+  <div class="hero-art">
+    <svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg">
+      <g opacity="0.9">
+        <line x1="80" y1="60" x2="200" y2="40" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+        <line x1="80" y1="60" x2="180" y2="120" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+        <line x1="200" y1="40" x2="320" y2="60" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+        <line x1="180" y1="120" x2="320" y2="60" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+        <line x1="180" y1="120" x2="260" y2="170" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+        <line x1="320" y1="60" x2="420" y2="90" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+        <line x1="260" y1="170" x2="420" y2="90" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+        <line x1="120" y1="150" x2="180" y2="120" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+        <line x1="120" y1="150" x2="260" y2="170" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+      </g>
+      <g fill="#ffffff">
+        <circle cx="80" cy="60" r="7"/>
+        <circle cx="200" cy="40" r="9"/>
+        <circle cx="180" cy="120" r="10"/>
+        <circle cx="320" cy="60" r="8"/>
+        <circle cx="260" cy="170" r="9"/>
+        <circle cx="420" cy="90" r="7"/>
+        <circle cx="120" cy="150" r="6"/>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<main>
+
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#intro">Introduction</a></li>
+      <li><a href="#history">Historical development of AI approaches</a></li>
+      <li><a href="#concept">From "what is AI" to "how is AI conceptualized"</a></li>
+      <li><a href="#distinctions">Guiding distinctions in AI</a></li>
+      <li><a href="#future">Future prospects for AI</a></li>
+      <li><a href="#summary">Summary</a></li>
+    </ol>
+  </nav>
+
+  <section id="intro">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+      1. Introduction
+    </h2>
+    <p>The article opens by noting that enthusiasm around generative AI cooled somewhat after a sharp stock-market drop in early August 2024, when the combined market value of the so-called "Magnificent Seven" tech companies (Alphabet, Amazon, Apple, Meta, Microsoft, Nvidia, Tesla) fell sharply. Even so, the author expects the broader AI trend to keep advancing, while stressing that every organization still needs to evaluate whether and how AI genuinely fits its specific use cases. The piece serves as an orientation map — covering historical milestones, core conceptual distinctions, and illustrative applications — before a planned series on implementing AI projects in organizations.</p>
+  </section>
+
+  <section id="history">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M4 19V5M4 5l4 4M4 5l-4 4" transform="translate(2,0)"/><path d="M4 12h16M15 7l5 5-5 5"/></svg>
+      2. Historical Development of AI Approaches
+    </h2>
+    <p>AI research dates back to the 1950s and has gone through repeated cycles of hype and disillusionment ("AI winters"). Key milestones highlighted in the article include:</p>
+
+    <figure>
+      <svg viewBox="0 0 760 140" xmlns="http://www.w3.org/2000/svg">
+        <line x1="20" y1="70" x2="740" y2="70" stroke="#c7d2fe" stroke-width="4"/>
+        <g font-family="Segoe UI, Arial" font-size="11" fill="#1e3a8a" text-anchor="middle">
+          <circle cx="60" cy="70" r="7" fill="#2563eb"/><text x="60" y="55">1956</text><text x="60" y="95" fill="#5b6470">McCarthy</text>
+          <circle cx="180" cy="70" r="7" fill="#2563eb"/><text x="180" y="55">1970s</text><text x="180" y="95" fill="#5b6470">AI winter I</text>
+          <circle cx="300" cy="70" r="7" fill="#2563eb"/><text x="300" y="55">1997</text><text x="300" y="95" fill="#5b6470">Deep Blue</text>
+          <circle cx="420" cy="70" r="7" fill="#7c3aed"/><text x="420" y="55">2012</text><text x="420" y="95" fill="#5b6470">AlexNet</text>
+          <circle cx="520" cy="70" r="7" fill="#7c3aed"/><text x="520" y="55">2016</text><text x="520" y="95" fill="#5b6470">AlphaGo</text>
+          <circle cx="620" cy="70" r="7" fill="#7c3aed"/><text x="620" y="55">2020</text><text x="620" y="95" fill="#5b6470">GPT-3</text>
+          <circle cx="710" cy="70" r="7" fill="#f59e0b"/><text x="710" y="55">2022</text><text x="710" y="95" fill="#5b6470">ChatGPT</text>
+        </g>
+      </svg>
+      <figcaption>Selected milestones on the AI timeline (illustrative, not to exact scale)</figcaption>
+    </figure>
+
+    <ul class="timeline">
+      <li><span class="year">1956</span>John McCarthy coins the term "artificial intelligence" at the Dartmouth Conference — originally more of a funding and marketing label for a new research field than a settled concept.</li>
+      <li><span class="year">1966</span>Joseph Weizenbaum builds ELIZA, widely regarded as the first chatbot.</li>
+      <li><span class="year">1970s</span>The first AI winter: unmet expectations, limited computing power, and weak algorithms cause funding and interest to collapse.</li>
+      <li><span class="year">1980s</span>A resurgence driven by rule-based expert systems that deliver useful results in narrow domains such as medicine.</li>
+      <li><span class="year">1987</span>A second AI winter, worsened by the collapse of the market for specialized LISP machines and the high cost/unreliability of expert systems.</li>
+      <li><span class="year">1997</span>IBM's Deep Blue defeats world chess champion Garry Kasparov.</li>
+      <li><span class="year">2000s</span>Growing data volumes ("big data") and GPU-driven parallel computing reignite progress.</li>
+      <li><span class="year">2011</span>IBM Watson wins the quiz show Jeopardy! by understanding natural language and answering complex questions.</li>
+      <li><span class="year">2012</span>AlexNet, a convolutional neural network, wins the ImageNet competition — a landmark deep-learning breakthrough.</li>
+      <li><span class="year">2016</span>DeepMind's AlphaGo defeats Go champion Lee Sedol 4–1.</li>
+      <li><span class="year">2017</span>AlphaGo Zero learns Go purely through self-play (no human game data) and decisively outperforms the version that beat Lee Sedol.</li>
+      <li><span class="year">2020</span>OpenAI releases GPT-3, a 175-billion-parameter large language model.</li>
+      <li><span class="year">2021</span>OpenAI releases DALL·E, generating images from text prompts.</li>
+      <li><span class="year">2022</span>ChatGPT launches, showing the general public that deep-learning-based AI can hold near-human conversations across languages.</li>
+      <li><span class="year">2023</span>GPT-4 is released, exceeding one trillion parameters with markedly improved capability and accuracy.</li>
+      <li><span class="year">2024</span>Meta releases the Llama 3.x family of scalable, efficient open-source language models.</li>
+      <li><span class="year">Aug 2024</span>A NASDAQ correction tied to the "Magnificent Seven" sell-off prompts a more sober, risk-aware assessment of generative AI's costs and economic impact.</li>
+    </ul>
+  </section>
+
+  <section id="concept">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.6.5 1 1.3 1 2.1V17h6v-1.4c0-.8.4-1.6 1-2.1A6 6 0 0012 3z"/></svg>
+      3. From "What Is AI?" to "How Is AI Conceptualized?"
+    </h2>
+    <p>The author argues that asking "What is AI, really?" inevitably produces many competing definitions, mirroring how varied and contested the concept of human intelligence itself is. AI spans everything from simple rule-based systems to adaptive machine-learning models, and it offers businesses both the chance to automate existing processes and the opportunity to innovate new business models. Rather than chase an essentialist definition, the article shifts to asking <em>how</em> AI is conceptualized in practice — i.e. through which guiding distinctions.</p>
+  </section>
+
+  <section id="distinctions">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="7" cy="17" r="3"/><circle cx="17" cy="17" r="3"/></svg>
+      4. Guiding Distinctions in the Domain of AI
+    </h2>
+
+    <h3>a. Weak vs. Strong AI</h3>
+    <div class="concept-grid two-col">
+      <div class="concept-card"><strong>Weak (narrow) AI</strong> — specializes in specific tasks (e.g. Siri, Alexa, chess engines). It has no self-awareness and cannot generalize beyond its programmed scope.</div>
+      <div class="concept-card"><strong>Strong AI</strong> — a still-hypothetical form of AI capable of any intellectual task a human can perform, potentially with self-consciousness. Whether current systems could ever reach this remains an open question.</div>
+    </div>
+
+    <h3>b. Connectionist (Sub-symbolic) vs. Symbolic AI</h3>
+    <figure>
+      <svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg">
+        <g>
+          <circle cx="60" cy="30" r="6" fill="#2563eb"/><circle cx="60" cy="65" r="6" fill="#2563eb"/><circle cx="60" cy="100" r="6" fill="#2563eb"/>
+          <circle cx="140" cy="20" r="6" fill="#2563eb"/><circle cx="140" cy="50" r="6" fill="#2563eb"/><circle cx="140" cy="80" r="6" fill="#2563eb"/><circle cx="140" cy="110" r="6" fill="#2563eb"/>
+          <circle cx="220" cy="45" r="6" fill="#2563eb"/><circle cx="220" cy="85" r="6" fill="#2563eb"/>
+          <g stroke="#c7d2fe" stroke-width="1">
+            <line x1="60" y1="30" x2="140" y2="20"/><line x1="60" y1="30" x2="140" y2="50"/>
+            <line x1="60" y1="65" x2="140" y2="20"/><line x1="60" y1="65" x2="140" y2="50"/><line x1="60" y1="65" x2="140" y2="80"/>
+            <line x1="60" y1="100" x2="140" y2="80"/><line x1="60" y1="100" x2="140" y2="110"/>
+            <line x1="140" y1="20" x2="220" y2="45"/><line x1="140" y1="50" x2="220" y2="45"/>
+            <line x1="140" y1="80" x2="220" y2="85"/><line x1="140" y1="110" x2="220" y2="85"/>
+          </g>
+        </g>
+        <text x="140" y="128" text-anchor="middle" font-size="12" fill="#5b6470" font-family="Segoe UI, Arial">Connectionist: layered neural network</text>
+
+        <g transform="translate(300,0)">
+          <rect x="0" y="15" width="80" height="24" rx="4" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="40" y="31" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="Segoe UI, Arial">IF...THEN</text>
+          <path d="M40 39 v14" stroke="#7c3aed"/>
+          <rect x="0" y="55" width="80" height="24" rx="4" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="40" y="71" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="Segoe UI, Arial">RULE 2</text>
+          <path d="M40 79 v14" stroke="#7c3aed"/>
+          <rect x="0" y="95" width="80" height="24" rx="4" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="40" y="111" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="Segoe UI, Arial">RESULT</text>
+        </g>
+        <text x="340" y="128" text-anchor="middle" font-size="12" fill="#5b6470" font-family="Segoe UI, Arial">Symbolic: explicit rules &amp; logic</text>
+      </svg>
+    </figure>
+    <div class="concept-grid two-col">
+      <div class="concept-card"><strong>Connectionist AI</strong> — neural-network/deep-learning approaches modeled loosely on the brain (e.g. GPT-4, BERT), able to account for surrounding context in language tasks.</div>
+      <div class="concept-card"><strong>Symbolic AI</strong> — an older, now less prominent approach using explicit rules, logic, and formal symbols, exemplified by rule-based systems and early expert systems.</div>
+    </div>
+
+    <h3>c. Machine Learning vs. Deep Learning</h3>
+    <div class="concept-grid two-col">
+      <div class="concept-card"><strong>Machine learning</strong> — algorithms (e.g. decision trees, support vector machines) that learn patterns from data without being explicitly rule-programmed.</div>
+      <div class="concept-card"><strong>Deep learning</strong> — a subset of ML using multi-layer neural networks (e.g. CNNs, RNNs) to detect complex patterns in large datasets.</div>
+    </div>
+
+    <h3>d. Large Language Models vs. Small Language Models</h3>
+    <div class="concept-grid two-col">
+      <div class="concept-card"><strong>LLMs</strong> — models such as GPT-4 and BERT with billions of parameters; versatile but computationally expensive and less accessible.</div>
+      <div class="concept-card"><strong>SLMs</strong> — smaller models such as DistilBERT and Microsoft's Phi-3; more resource-efficient and cost-effective, making them attractive to smaller organizations.</div>
+    </div>
+
+    <h3>e. Generative vs. Predictive AI</h3>
+    <div class="concept-grid two-col">
+      <div class="concept-card"><strong>Generative AI</strong> — produces new content (text, images), as with ChatGPT and DALL·E.</div>
+      <div class="concept-card"><strong>Predictive AI</strong> — forecasts future outcomes from historical data, e.g. predictive text or security-threat detection.</div>
+    </div>
+
+    <h3>f. Monomodal vs. Multimodal AI</h3>
+    <figure>
+      <svg viewBox="0 0 500 100" xmlns="http://www.w3.org/2000/svg">
+        <g>
+          <rect x="20" y="30" width="60" height="40" rx="6" fill="#eef2ff" stroke="#2563eb"/>
+          <text x="50" y="54" text-anchor="middle" font-size="11" fill="#1e3a8a" font-family="Segoe UI, Arial">Text</text>
+          <path d="M85 50h30" stroke="#2563eb" marker-end="url(#arrow1)"/>
+          <rect x="120" y="30" width="60" height="40" rx="6" fill="#dbeafe" stroke="#2563eb"/>
+          <text x="150" y="54" text-anchor="middle" font-size="11" fill="#1e3a8a" font-family="Segoe UI, Arial">Model</text>
+        </g>
+        <text x="100" y="92" text-anchor="middle" font-size="12" fill="#5b6470" font-family="Segoe UI, Arial">Monomodal</text>
+
+        <g transform="translate(260,0)">
+          <rect x="0" y="10" width="55" height="26" rx="5" fill="#eef2ff" stroke="#2563eb"/><text x="27" y="27" text-anchor="middle" font-size="9" fill="#1e3a8a" font-family="Segoe UI, Arial">Text</text>
+          <rect x="0" y="42" width="55" height="26" rx="5" fill="#ede9fe" stroke="#7c3aed"/><text x="27" y="59" text-anchor="middle" font-size="9" fill="#5b21b6" font-family="Segoe UI, Arial">Image</text>
+          <rect x="0" y="74" width="55" height="26" rx="5" fill="#fef3c7" stroke="#f59e0b"/><text x="27" y="91" text-anchor="middle" font-size="9" fill="#92400e" font-family="Segoe UI, Arial">Audio</text>
+          <path d="M60 23 L110 50 M60 55 L110 50 M60 87 L110 50" stroke="#94a3b8" fill="none"/>
+          <rect x="110" y="35" width="60" height="30" rx="6" fill="#e2e8f0" stroke="#334155"/>
+          <text x="140" y="55" text-anchor="middle" font-size="10" fill="#1f2328" font-family="Segoe UI, Arial">Model</text>
+        </g>
+        <text x="345" y="92" text-anchor="middle" font-size="12" fill="#5b6470" font-family="Segoe UI, Arial">Multimodal</text>
+        <defs><marker id="arrow1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#2563eb"/></marker></defs>
+      </svg>
+    </figure>
+    <p>Monomodal systems (e.g. GPT-3, RoBERTa, basic predictive-text engines) process a single data type such as text. Multimodal systems (e.g. GPT-4, DALL·E) combine multiple data types — text, images, audio — for richer generation or prediction. Cited real-world examples of multimodal prediction include forecasting the next line in an instructional video, disease-progression prediction from mixed media, predictive maintenance, and consumer-trend and demand forecasting. The article also notes that generative and predictive capabilities can be blended, citing Siemens' addition of generative AI to its "Senseye" predictive-maintenance product to improve usability.</p>
+
+    <h3>g. Further AI Variants</h3>
+    <ul class="plain">
+      <li><strong>Reinforcement learning</strong> — learning via reward and punishment (e.g. AlphaGo).</li>
+      <li><strong>Transfer learning</strong> — adapting a pre-trained model (e.g. BERT) to a new task.</li>
+      <li><strong>Federated learning</strong> — training models across decentralized data sources without central storage (e.g. Google's approach).</li>
+      <li><strong>Explainable AI (XAI)</strong> — tools such as LIME that clarify what ML classifiers are doing.</li>
+      <li><strong>Edge AI</strong> — running inference on-device (e.g. via TensorFlow Lite) rather than in the cloud.</li>
+    </ul>
+
+    <h3>h. Hybrid Solutions</h3>
+    <p>Hybrid systems combine symbolic, rule-based components with connectionist machine learning to get the best of both: rules handle simple, repeatable tasks while ML handles complex, variable ones. Examples cited include Cognex VisionPro ViDi (rule-based vision plus deep learning for inspection tasks) and IBM's Watson Knowledge Studio (rule-based entity/relationship recognition combinable with ML for hybrid text-analysis models).</p>
+  </section>
+
+  <section id="future">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.3 5.6L21 11l-5.7 2.4L13 19l-2.3-5.6L5 11l5.7-2.4L13 3z"/></svg>
+      5. Future Prospects for AI
+    </h2>
+    <ul class="plain">
+      <li><strong>Autonomous agents</strong> — generative AI is moving beyond text generation toward agents that perform tasks and manage complex interactions autonomously (the article references a McKinsey report on this trend).</li>
+      <li><strong>Wider adoption of Edge AI</strong> — enabling local, low-latency, real-time processing on devices.</li>
+      <li><strong>Growth of Small Language Models</strong> — expected to prevail in many use cases where full-scale LLMs are unnecessarily costly or overpowered.</li>
+      <li><strong>Artificial General Intelligence (AGI)</strong> — still speculative; forecasts range from under 10 years to 20–50 years out, and it would raise significant ethical, social, and safety challenges. A "technological singularity" is treated as speculation bordering on science fiction at this stage.</li>
+    </ul>
+  </section>
+
+  <section id="summary">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg>
+      6. Summary
+    </h2>
+    <p>The article traces AI's path from McCarthy's 1956 coinage of the term to the 2024 tech-stock correction, then reframes the inquiry from "What is AI?" to "How is AI conceptualized?" via six guiding distinctions: weak vs. strong AI, connectionist vs. symbolic AI, machine learning vs. deep learning, LLMs vs. SLMs, generative vs. predictive AI, and monomodal vs. multimodal AI. Looking ahead, it points to the rise of autonomous agents, broader Edge AI adoption, growing reliance on smaller, cheaper language models, and the still-uncertain long-term prospect of AGI.</p>
+  </section>
+
+  <p class="source">
+    Overview summarized and illustrated from: <a href="https://medium.com/how-to-realize-ai-projects-in-organizations-a/a-brief-history-of-ai-artificial-intelligence-c6d47d315949" target="_blank" rel="noopener">"A Brief History of AI (Artificial Intelligence)"</a> by WAITS Software- und Prozessberatungsgesellsch. mbH (Peter Bormann), Medium, August 2024. All diagrams on this page are original illustrations created for this summary, not reproductions from the source article. See the original for full detail and the author's own images/links.
+  </p>
+
+</main>
+</body>
+</html>

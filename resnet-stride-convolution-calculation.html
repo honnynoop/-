@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResNet 합성곱·스트라이드 출력크기 완전정복</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+  window.MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --paper:#faf6ef; --paper-card:#fffdf8; --ink:#2b2620; --ink-soft:#5c5548;
+    --accent:#b5502f; --accent-soft:#f1e0d3; --accent2:#7a6a4f; --line:#e6dcc9;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:'Pretendard', sans-serif; line-height:1.75; font-size:16px; }
+  h1,h2,h3,h4{ font-family:'Spectral', serif; color:#3a2f22; }
+  code, .mono { font-family:'JetBrains Mono', monospace; }
+
+  .layout{ display:flex; max-width:1280px; margin:0 auto; }
+  aside{
+    width:260px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+    padding:28px 18px; border-right:1px solid var(--line); background:var(--paper);
+  }
+  aside h2{ font-size:.95rem; letter-spacing:.03em; color:var(--accent2); margin:0 0 14px; text-transform:uppercase; }
+  aside ol{ list-style:none; padding:0; margin:0; counter-reset:ch; }
+  aside li{ counter-increment: ch; margin-bottom:4px; }
+  aside a{ display:block; padding:7px 10px; border-radius:8px; text-decoration:none; color:var(--ink-soft); font-size:.86rem; transition:.15s; }
+  aside a::before{ content: counter(ch) ". "; color:var(--accent); font-weight:600; }
+  aside a:hover, aside a.active{ background:var(--accent-soft); color:var(--accent); }
+
+  main{ flex:1; min-width:0; padding:40px 48px 100px; }
+
+  header.hero{
+    background:linear-gradient(135deg,#3a2f22,#6b4226 60%,#b5502f);
+    color:#fdf6ec; border-radius:18px; padding:44px 40px; margin-bottom:34px;
+  }
+  header.hero h1{ color:#fff; font-size:2rem; margin:0 0 10px; }
+  header.hero p{ margin:4px 0; opacity:.92; font-size:.95rem; }
+  .badge-row{ margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; }
+  .badge{ background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); border-radius:999px; padding:4px 12px; font-size:.78rem; }
+
+  section{
+    background:var(--paper-card); border:1px solid var(--line); border-radius:14px;
+    padding:32px 36px; margin-bottom:26px; box-shadow:0 3px 10px rgba(90,70,40,.05);
+  }
+  section h2{ font-size:1.5rem; margin-top:0; padding-bottom:12px; border-bottom:2px solid var(--accent-soft); display:flex; align-items:center; gap:10px; }
+  section h2 .num{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; background:var(--accent); color:#fff; border-radius:9px; font-size:1rem; font-family:'JetBrains Mono'; }
+  section h3{ font-size:1.15rem; margin-top:28px; color:var(--accent2); }
+  p{ color:var(--ink); }
+
+  .callout{ background:var(--accent-soft); border-left:4px solid var(--accent); border-radius:8px; padding:14px 18px; margin:16px 0; font-size:.94rem; }
+  .callout strong{ color:var(--accent); }
+
+  ul.plain, ol.plain{ padding-left:22px; }
+  ul.plain li, ol.plain li{ margin-bottom:8px; }
+
+  figure{ margin:22px 0; text-align:center; }
+  figure svg{ max-width:100%; height:auto; background:var(--paper-card); }
+  figcaption{ font-size:.83rem; color:var(--ink-soft); margin-top:8px; }
+
+  table{ width:100%; border-collapse:collapse; margin:18px 0; font-size:.9rem; }
+  th, td{ border:1px solid var(--line); padding:9px 11px; text-align:center; vertical-align:middle; }
+  th{ background:var(--accent-soft); color:#3a2f22; font-family:'Spectral'; font-weight:600; }
+  tr:nth-child(even) td{ background:#fbf7ef; }
+  td.left, th.left{ text-align:left; }
+
+  .formula-box{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px 20px; margin:16px 0; text-align:center; overflow-x:auto; }
+  .calc-box{
+    background:#fff8ec; border:1px solid #e8c9a0; border-radius:10px; padding:16px 20px; margin:14px 0;
+    font-family:'JetBrains Mono', monospace; font-size:.92rem; overflow-x:auto;
+  }
+  .calc-box .step{ color:var(--accent); font-weight:700; }
+
+  .checklist{ list-style:none; padding:0; }
+  .checklist li{ padding:10px 14px; margin-bottom:8px; background:#fbf7ef; border:1px solid var(--line); border-radius:8px; display:flex; gap:10px; align-items:flex-start; font-size:.93rem; }
+  .checklist li::before{ content:"✓"; color:var(--accent); font-weight:700; }
+
+  .foot{ text-align:center; color:var(--ink-soft); font-size:.82rem; padding:30px 0 60px; }
+  .foot a{ color:var(--accent); }
+
+  @media (max-width: 900px){
+    .layout{ flex-direction:column; }
+    aside{ position:relative; width:100%; height:auto; border-right:none; border-bottom:1px solid var(--line); }
+    main{ padding:24px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <aside>
+    <h2>목차</h2>
+    <ol>
+      <li><a href="#s1">합성곱 출력 크기 공식</a></li>
+      <li><a href="#s2">ResNet-50 아키텍처 스펙</a></li>
+      <li><a href="#s3">Stage별 손계산 — Conv1·Pool</a></li>
+      <li><a href="#s4">Stage별 손계산 — Stage 1~4</a></li>
+      <li><a href="#s5">Bottleneck 블록과 스트라이드 위치</a></li>
+      <li><a href="#s6">전체 파이프라인 다이어그램</a></li>
+      <li><a href="#s7">Receptive Field 누적 계산</a></li>
+      <li><a href="#s8">종합 정리표</a></li>
+      <li><a href="#s9">체크리스트</a></li>
+    </ol>
+  </aside>
+
+  <main>
+    <header class="hero">
+      <h1>ResNet 합성곱·스트라이드 출력크기 완전정복</h1>
+      <p>He et al. (2015) "Deep Residual Learning for Image Recognition" 논문의 ResNet-50 아키텍처 스펙을 이용해, 224×224 입력이 각 단계에서 어떤 크기로 줄어드는지 손계산으로 직접 추적합니다</p>
+      <div class="badge-row">
+        <span class="badge">Convolution Output Formula</span>
+        <span class="badge">Stride 기반 다운샘플링</span>
+        <span class="badge">ResNet-50 Table 1</span>
+        <span class="badge">Bottleneck Block</span>
+      </div>
+    </header>
+
+    <!-- 1 -->
+    <section id="s1">
+      <h2><span class="num">1</span>합성곱 출력 크기 공식</h2>
+      <p>합성곱(또는 풀링) 층을 통과한 뒤 특징 맵의 한 변 크기는 다음 공식으로 계산합니다.</p>
+      <div class="formula-box">
+        $$ O = \left\lfloor \frac{N + 2P - K}{S} \right\rfloor + 1 $$
+      </div>
+      <table>
+        <tr><th class="left">기호</th><th class="left">의미</th></tr>
+        <tr><td class="left">$N$</td><td class="left">입력 특징 맵의 한 변 크기</td></tr>
+        <tr><td class="left">$P$</td><td class="left">패딩(padding) — 이미지 양쪽에 추가되는 픽셀 수이므로 $2P$로 계산</td></tr>
+        <tr><td class="left">$K$</td><td class="left">커널(필터) 크기</td></tr>
+        <tr><td class="left">$S$</td><td class="left">스트라이드 — 커널이 한 번에 이동하는 픽셀 수</td></tr>
+        <tr><td class="left">$O$</td><td class="left">출력 특징 맵의 한 변 크기</td></tr>
+      </table>
+      <div class="callout">
+        <strong>핵심 관찰</strong> — 스트라이드 $S$가 분모에 있기 때문에, <strong>$S=1$이면 크기 변화가 거의 없고(패딩으로 보존 가능), $S=2$이면 출력 크기가 대략 절반으로 줄어듭니다.</strong> ResNet은 이 성질을 이용해 풀링 없이도 순수 합성곱만으로 다운샘플링을 수행하는 구간을 여러 곳에 배치합니다.
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <h2><span class="num">2</span>ResNet-50 아키텍처 스펙 (논문 Table 1 기준)</h2>
+      <p>He et al.의 논문 Table 1에 정리된 ResNet-50 구조를 합성곱 계산에 필요한 값(커널 크기·스트라이드·패딩)과 함께 재구성하면 다음과 같습니다. 입력은 $224\times224\times3$ 이미지입니다.</p>
+      <table>
+        <tr><th class="left">단계</th><th>커널</th><th>출력 채널</th><th>스트라이드</th><th>패딩</th><th>반복 수</th><th>출력 크기(H×W)</th></tr>
+        <tr><td class="left">Conv1</td><td>7×7</td><td>64</td><td>2</td><td>3</td><td>1</td><td>112×112</td></tr>
+        <tr><td class="left">MaxPool</td><td>3×3</td><td>64</td><td>2</td><td>1</td><td>1</td><td>56×56</td></tr>
+        <tr><td class="left">Stage 1 (conv2_x)</td><td>1×1,3×3,1×1</td><td>256</td><td>1</td><td>1(3×3만)</td><td>3</td><td>56×56</td></tr>
+        <tr><td class="left">Stage 2 (conv3_x)</td><td>1×1,3×3,1×1</td><td>512</td><td>첫블록만 2</td><td>1(3×3만)</td><td>4</td><td>28×28</td></tr>
+        <tr><td class="left">Stage 3 (conv4_x)</td><td>1×1,3×3,1×1</td><td>1024</td><td>첫블록만 2</td><td>1(3×3만)</td><td>6</td><td>14×14</td></tr>
+        <tr><td class="left">Stage 4 (conv5_x)</td><td>1×1,3×3,1×1</td><td>2048</td><td>첫블록만 2</td><td>1(3×3만)</td><td>3</td><td>7×7</td></tr>
+        <tr><td class="left">Global AvgPool</td><td>7×7</td><td>2048</td><td>-</td><td>-</td><td>1</td><td>1×1</td></tr>
+        <tr><td class="left">FC</td><td>-</td><td>1000</td><td>-</td><td>-</td><td>1</td><td>1×1</td></tr>
+      </table>
+      <p>다음 절부터는 이 표의 출력 크기 값들을 1절의 공식을 이용해 <strong>실제로 직접 손계산</strong>해서, 표의 수치가 어떻게 나오는지 확인합니다.</p>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <h2><span class="num">3</span>Stage별 손계산 — Conv1 · MaxPool</h2>
+
+      <h3>3-1. Conv1: 7×7, 64채널, stride 2, padding 3</h3>
+      <p>입력: $224\times224\times3$</p>
+      <div class="calc-box">
+<span class="step">[계산]</span> O = ⌊(N + 2P − K) / S⌋ + 1
+     = ⌊(224 + 2×3 − 7) / 2⌋ + 1
+     = ⌊(224 + 6 − 7) / 2⌋ + 1
+     = ⌊223 / 2⌋ + 1
+     = 111 + 1
+     = <span class="step">112</span>
+      </div>
+      <p>→ Conv1 통과 후 크기: <strong>$112\times112\times64$</strong> (출력 채널 수 64는 사용한 필터 개수와 같음)</p>
+
+      <h3>3-2. MaxPool: 3×3, stride 2, padding 1</h3>
+      <p>입력: $112\times112\times64$</p>
+      <div class="calc-box">
+<span class="step">[계산]</span> O = ⌊(112 + 2×1 − 3) / 2⌋ + 1
+     = ⌊(112 + 2 − 3) / 2⌋ + 1
+     = ⌊111 / 2⌋ + 1
+     = 55 + 1
+     = <span class="step">56</span>
+      </div>
+      <p>→ MaxPool 통과 후 크기: <strong>$56\times56\times64$</strong></p>
+
+      <figure>
+        <svg viewBox="0 0 640 150" xmlns="http://www.w3.org/2000/svg">
+          <g font-family="Pretendard" font-size="11">
+            <rect x="10" y="40" width="110" height="70" rx="6" fill="#fbf7ef" stroke="#7a6a4f"/>
+            <text x="65" y="70" text-anchor="middle" font-weight="600">입력</text>
+            <text x="65" y="88" text-anchor="middle" font-family="JetBrains Mono" font-size="10">224×224×3</text>
+
+            <rect x="170" y="40" width="130" height="70" rx="6" fill="#dbeafe" stroke="#2563eb"/>
+            <text x="235" y="62" text-anchor="middle" font-weight="600">Conv1</text>
+            <text x="235" y="78" text-anchor="middle" font-family="JetBrains Mono" font-size="9">7×7, s=2, p=3</text>
+            <text x="235" y="94" text-anchor="middle" font-family="JetBrains Mono" font-size="10">→112×112×64</text>
+
+            <rect x="360" y="40" width="130" height="70" rx="6" fill="#fef3c7" stroke="#f59e0b"/>
+            <text x="425" y="62" text-anchor="middle" font-weight="600">MaxPool</text>
+            <text x="425" y="78" text-anchor="middle" font-family="JetBrains Mono" font-size="9">3×3, s=2, p=1</text>
+            <text x="425" y="94" text-anchor="middle" font-family="JetBrains Mono" font-size="10">→56×56×64</text>
+
+            <rect x="550" y="45" width="70" height="60" rx="6" fill="#b5502f"/>
+            <text x="585" y="72" text-anchor="middle" fill="#fff" font-size="10">Stage1로</text>
+            <text x="585" y="88" text-anchor="middle" fill="#fff" font-size="10">입력</text>
+          </g>
+          <g stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a1)">
+            <path d="M120 75 L166 75"/><path d="M300 75 L356 75"/><path d="M490 75 L546 75"/>
+          </g>
+          <defs><marker id="a1" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 z" fill="#3a2f22"/></marker></defs>
+        </svg>
+        <figcaption>그림 1. 입력부터 MaxPool까지 크기 변화 — 224→112(Conv1, ÷2)→56(Pool, ÷2)</figcaption>
+      </figure>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <h2><span class="num">4</span>Stage별 손계산 — Stage 1~4</h2>
+      <p>ResNet의 Bottleneck 블록은 $1\times1 \to 3\times3 \to 1\times1$ 세 개의 합성곱으로 구성됩니다. 이 중 크기를 줄이는 역할은 오직 <strong>중간의 $3\times3$ 합성곱</strong>이 담당하며, 각 Stage의 <strong>첫 번째 블록에서만 stride=2</strong>를 적용해 다운샘플링을 수행합니다. 나머지 블록들은 모두 stride=1로 크기를 유지합니다.</p>
+
+      <h3>4-1. Stage 1 (conv2_x): stride 1 — 크기 유지</h3>
+      <p>입력: $56\times56\times64$, 3×3 conv (K=3, S=1, P=1)</p>
+      <div class="calc-box">
+<span class="step">[계산]</span> O = ⌊(56 + 2×1 − 3) / 1⌋ + 1
+     = ⌊55 / 1⌋ + 1
+     = 55 + 1
+     = <span class="step">56</span>
+      </div>
+      <p>→ Stage 1 출력: <strong>$56\times56\times256$</strong> (stride=1이므로 크기 변화 없음, 채널만 256으로 확장)</p>
+
+      <h3>4-2. Stage 2 (conv3_x): 첫 블록 stride 2 — 절반으로 축소</h3>
+      <p>입력: $56\times56\times256$, 3×3 conv (K=3, S=2, P=1)</p>
+      <div class="calc-box">
+<span class="step">[계산]</span> O = ⌊(56 + 2×1 − 3) / 2⌋ + 1
+     = ⌊55 / 2⌋ + 1
+     = 27 + 1
+     = <span class="step">28</span>
+      </div>
+      <p>→ Stage 2 출력: <strong>$28\times28\times512$</strong></p>
+
+      <h3>4-3. Stage 3 (conv4_x): 첫 블록 stride 2</h3>
+      <p>입력: $28\times28\times512$, 3×3 conv (K=3, S=2, P=1)</p>
+      <div class="calc-box">
+<span class="step">[계산]</span> O = ⌊(28 + 2×1 − 3) / 2⌋ + 1
+     = ⌊27 / 2⌋ + 1
+     = 13 + 1
+     = <span class="step">14</span>
+      </div>
+      <p>→ Stage 3 출력: <strong>$14\times14\times1024$</strong></p>
+
+      <h3>4-4. Stage 4 (conv5_x): 첫 블록 stride 2</h3>
+      <p>입력: $14\times14\times1024$, 3×3 conv (K=3, S=2, P=1)</p>
+      <div class="calc-box">
+<span class="step">[계산]</span> O = ⌊(14 + 2×1 − 3) / 2⌋ + 1
+     = ⌊13 / 2⌋ + 1
+     = 6 + 1
+     = <span class="step">7</span>
+      </div>
+      <p>→ Stage 4 출력: <strong>$7\times7\times2048$</strong></p>
+
+      <h3>4-5. Global Average Pooling</h3>
+      <p>$7\times7\times2048$ 특징 맵 각 채널을 통째로 평균 내어 $1\times1\times2048$ 벡터로 압축한 뒤, Fully-Connected 층을 거쳐 1000개 클래스에 대한 확률을 출력합니다.</p>
+
+      <div class="callout">
+        <strong>패턴 확인</strong> — Stage 2, 3, 4는 모두 "$3\times3$, K=3, S=2, P=1" 동일한 설정을 사용하며, 계산 결과 각각 <strong>정확히 절반씩</strong> 줄어드는 것을 확인할 수 있습니다: 56→28→14→7. 이는 $S=2$일 때 $K=3, P=1$ 조합이 "정확히 절반으로 나누기"를 만드는 표준적인 설계 패턴이기 때문입니다.
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <h2><span class="num">5</span>Bottleneck 블록과 스트라이드 위치</h2>
+      <p>왜 stride=2를 $1\times1$이 아니라 <strong>중간의 $3\times3$ 합성곱</strong>에 배치할까요? $1\times1$ 합성곱은 공간 정보를 전혀 훑지 않고 채널 방향의 선형결합만 수행하므로, 여기에 stride를 적용하면 픽셀을 그냥 건너뛰며 버리는 셈이 되어 정보 손실이 커집니다. 반면 $3\times3$ 합성곱은 이웃 픽셀 정보를 실제로 종합하면서 이동하므로, 같은 stride=2라도 더 적은 정보 손실로 다운샘플링할 수 있습니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
+          <text x="320" y="20" text-anchor="middle" font-family="Pretendard" font-size="13" fill="#5c5548" font-weight="600">Bottleneck 블록 내부 구조 (Stage 첫 블록 예시)</text>
+
+          <g font-family="JetBrains Mono" font-size="10">
+            <rect x="20" y="60" width="110" height="60" rx="6" fill="#fbf7ef" stroke="#7a6a4f"/>
+            <text x="75" y="85" text-anchor="middle" font-family="Pretendard" font-size="10">입력</text>
+            <text x="75" y="102" text-anchor="middle">56×56×256</text>
+
+            <rect x="170" y="60" width="110" height="60" rx="6" fill="#dbeafe" stroke="#2563eb"/>
+            <text x="225" y="80" text-anchor="middle" font-family="Pretendard" font-size="10">1×1 conv</text>
+            <text x="225" y="96" text-anchor="middle" font-size="9">s=1 (채널 축소)</text>
+            <text x="225" y="110" text-anchor="middle" font-size="9">→56×56×128</text>
+
+            <rect x="320" y="50" width="110" height="80" rx="6" fill="#fecaca" stroke="#dc2626" stroke-width="2"/>
+            <text x="375" y="70" text-anchor="middle" font-family="Pretendard" font-size="10" font-weight="700" fill="#991b1b">3×3 conv</text>
+            <text x="375" y="86" text-anchor="middle" font-size="9" fill="#991b1b">★ s=2 (다운샘플링)</text>
+            <text x="375" y="102" text-anchor="middle" font-size="9">p=1</text>
+            <text x="375" y="118" text-anchor="middle" font-size="9">→28×28×128</text>
+
+            <rect x="470" y="60" width="110" height="60" rx="6" fill="#bbf7d0" stroke="#16a34a"/>
+            <text x="525" y="80" text-anchor="middle" font-family="Pretendard" font-size="10">1×1 conv</text>
+            <text x="525" y="96" text-anchor="middle" font-size="9">s=1 (채널 확장)</text>
+            <text x="525" y="110" text-anchor="middle" font-size="9">→28×28×512</text>
+          </g>
+          <g stroke="#3a2f22" stroke-width="1.5" marker-end="url(#a2)">
+            <path d="M130 90 L166 90"/><path d="M280 90 L316 90"/><path d="M430 90 L466 90"/>
+          </g>
+          <defs><marker id="a2" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 z" fill="#3a2f22"/></marker></defs>
+
+          <text x="320" y="165" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">스트라이드는 오직 가운데 3×3 합성곱에만 적용 — 양끝 1×1은 항상 s=1</text>
+          <text x="320" y="185" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#7a6a4f">(shortcut 경로도 동일하게 1×1 conv, s=2로 크기를 맞춰줌 — 그림 3 참고)</text>
+        </svg>
+        <figcaption>그림 2. Bottleneck 블록에서 다운샘플링(stride=2)은 중간 3×3 합성곱에만 적용됨</figcaption>
+      </figure>
+
+      <p>이때 skip connection(shortcut) 경로도 출력 크기·채널 수를 맞춰야 하므로, 각 Stage의 첫 블록에서는 shortcut에도 $1\times1$ 합성곱을 stride=2로 적용해 <strong>공간 크기와 채널 수를 본류(main path)와 일치</strong>시킵니다 (이를 projection shortcut이라 부릅니다).</p>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <h2><span class="num">6</span>전체 파이프라인 다이어그램</h2>
+      <figure>
+        <svg viewBox="0 0 740 200" xmlns="http://www.w3.org/2000/svg">
+          <line x1="30" y1="110" x2="710" y2="110" stroke="#e6dcc9" stroke-width="3"/>
+          <g font-family="JetBrains Mono" font-size="10" text-anchor="middle">
+            <circle cx="60" cy="110" r="8" fill="#7a6a4f"/><text x="60" y="90" font-family="Pretendard" fill="#3a2f22">입력</text><text x="60" y="135">224²</text>
+            <circle cx="160" cy="110" r="8" fill="#2563eb"/><text x="160" y="90" font-family="Pretendard" fill="#3a2f22">Conv1</text><text x="160" y="135">112²</text>
+            <circle cx="250" cy="110" r="8" fill="#f59e0b"/><text x="250" y="90" font-family="Pretendard" fill="#3a2f22">Pool</text><text x="250" y="135">56²</text>
+            <circle cx="340" cy="110" r="8" fill="#16a34a"/><text x="340" y="90" font-family="Pretendard" fill="#3a2f22">Stage1</text><text x="340" y="135">56²</text>
+            <circle cx="440" cy="110" r="8" fill="#dc2626"/><text x="440" y="90" font-family="Pretendard" fill="#3a2f22">Stage2</text><text x="440" y="135">28²</text>
+            <circle cx="530" cy="110" r="8" fill="#7c3aed"/><text x="530" y="90" font-family="Pretendard" fill="#3a2f22">Stage3</text><text x="530" y="135">14²</text>
+            <circle cx="620" cy="110" r="8" fill="#b5502f"/><text x="620" y="90" font-family="Pretendard" fill="#3a2f22">Stage4</text><text x="620" y="135">7²</text>
+            <circle cx="690" cy="110" r="8" fill="#3a2f22"/><text x="690" y="90" font-family="Pretendard" fill="#3a2f22">GAP+FC</text><text x="690" y="135">1²</text>
+          </g>
+          <text x="370" y="170" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">stride=2 지점(Conv1, Pool, Stage2·3·4 첫블록)마다 공간 크기가 절반으로 감소 — 총 5회 ÷2, 224→7</text>
+        </svg>
+        <figcaption>그림 3. 전체 224→7 축소 경로 — stride=2가 적용되는 지점(5곳)마다 크기가 절반씩 줄어듦</figcaption>
+      </figure>
+
+      <p>정리하면 224에서 7까지 줄어드는 과정은 <strong>총 5번의 stride=2 다운샘플링</strong>(Conv1, MaxPool, Stage2·3·4의 첫 블록)으로 이루어지며, $224 / 2^5 = 224/32 = 7$로 정확히 맞아떨어지는 것을 확인할 수 있습니다.</p>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <h2><span class="num">7</span>Receptive Field 누적 계산 (심화)</h2>
+      <p>각 층을 통과할 때마다 출력의 한 픽셀이 "실제로 입력 이미지에서 얼마나 넓은 영역을 보고 있는지"를 <strong>수용영역(Receptive Field, RF)</strong>이라 합니다. 누적 공식은 다음과 같습니다.</p>
+      <div class="formula-box">
+        $$ RF_{l} = RF_{l-1} + (K_l - 1)\times \prod_{i=1}^{l-1}S_i $$
+      </div>
+      <p>Conv1(K=7,S=2)과 MaxPool(K=3,S=2)만 적용한 경우를 손계산해보면:</p>
+      <div class="calc-box">
+<span class="step">[Conv1]</span>  RF₁ = 1 + (7−1)×1 = 7
+<span class="step">[Pool]</span>   RF₂ = 7 + (3−1)×2 = 7 + 4 = 11
+      </div>
+      <p>즉 MaxPool 직후의 특징 맵 픽셀 하나는 이미 원본 이미지에서 $11\times11$ 크기의 영역 정보를 담고 있습니다. Stage를 거듭할수록 이 값은 누적되어, Stage4 끝에서는 수용영역이 입력 이미지 전체를 훨씬 뛰어넘는 크기로 커집니다 — 이는 네트워크 뒷단으로 갈수록 더 넓은 문맥(전역적 패턴)을 반영할 수 있게 되는 이유이기도 합니다.</p>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <h2><span class="num">8</span>종합 정리표</h2>
+      <table>
+        <tr><th class="left">단계</th><th>연산</th><th>K</th><th>S</th><th>P</th><th>입력크기</th><th>출력크기</th></tr>
+        <tr><td class="left">Conv1</td><td>Conv</td><td>7</td><td>2</td><td>3</td><td>224</td><td>112</td></tr>
+        <tr><td class="left">MaxPool</td><td>Pool</td><td>3</td><td>2</td><td>1</td><td>112</td><td>56</td></tr>
+        <tr><td class="left">Stage1 첫블록</td><td>3×3 Conv</td><td>3</td><td>1</td><td>1</td><td>56</td><td>56</td></tr>
+        <tr><td class="left">Stage2 첫블록</td><td>3×3 Conv</td><td>3</td><td>2</td><td>1</td><td>56</td><td>28</td></tr>
+        <tr><td class="left">Stage3 첫블록</td><td>3×3 Conv</td><td>3</td><td>2</td><td>1</td><td>28</td><td>14</td></tr>
+        <tr><td class="left">Stage4 첫블록</td><td>3×3 Conv</td><td>3</td><td>2</td><td>1</td><td>14</td><td>7</td></tr>
+        <tr><td class="left">GAP</td><td>Global Avg</td><td>7</td><td>-</td><td>-</td><td>7</td><td>1</td></tr>
+      </table>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <h2><span class="num">9</span>학습 체크리스트</h2>
+      <ul class="checklist">
+        <li>합성곱 출력 크기 공식 $\lfloor(N+2P-K)/S\rfloor+1$의 각 기호가 무엇을 뜻하는지 설명할 수 있다</li>
+        <li>ResNet-50의 Conv1(7×7,s=2,p=3)이 224→112를 만드는 과정을 손으로 계산할 수 있다</li>
+        <li>MaxPool(3×3,s=2,p=1)이 112→56을 만드는 과정을 손으로 계산할 수 있다</li>
+        <li>Stage 2·3·4에서 왜 항상 첫 번째 블록에서만 stride=2를 쓰는지 설명할 수 있다</li>
+        <li>Bottleneck 블록 안에서 stride가 왜 1×1이 아니라 3×3 conv에 적용되는지 설명할 수 있다</li>
+        <li>56→28→14→7로 이어지는 3단계 절반 축소를 직접 손계산으로 재현할 수 있다</li>
+        <li>224에서 7까지 줄어드는 데 몇 번의 stride=2가 필요한지, $224/2^n=7$ 관계로 설명할 수 있다</li>
+        <li>Projection shortcut이 왜 필요한지(본류와 크기·채널을 맞추기 위함) 설명할 수 있다</li>
+        <li>Receptive Field 누적 공식을 이용해 두 층을 통과한 뒤의 RF를 손계산할 수 있다</li>
+      </ul>
+    </section>
+
+    <p class="foot">
+      참고 논문 구조: He, K., Zhang, X., Ren, S., &amp; Sun, J. (2015). <em>Deep Residual Learning for Image Recognition.</em> (ResNet-50, Table 1 아키텍처 스펙 기준)<br>
+      이 학습서의 모든 수치는 논문에 공개된 아키텍처 스펙(커널·스트라이드·패딩)을 바탕으로 본 학습서에서 직접 손계산·검증한 것이며, 모든 다이어그램은 원본 논문의 그림을 재현한 것이 아니라 새로 제작한 오리지널 일러스트입니다.
+    </p>
+
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('aside a');
+  const sections = document.querySelectorAll('main section');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const id = e.target.id;
+        const match = document.querySelector(`aside a[href="#${id}"]`);
+        if(match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s=>io.observe(s));
+</script>
+
+</body>
+</html>

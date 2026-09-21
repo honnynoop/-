@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인공신경망 · 딥러닝 역사 완전학습서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<script>
+MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+<style>
+:root{
+  --paper:#faf6ef; --paper-alt:#f3ece0; --ink:#2c241b; --ink-soft:#6b5f51;
+  --accent:#bd603a; --accent-deep:#8c4426; --accent-soft:#ecd3bf; --accent-pale:#f6e7d8;
+  --line:#e3d5c1; --code-bg:#fcf9f3; --sidebar-bg:#f5ecdd;
+  --blue:#3c5a78; --blue-bg:#e2ebf2; --green:#4c6b3c; --green-bg:#e9edda; --purple:#6a4a8a; --purple-bg:#ece3f2;
+  --shadow:0 2px 10px rgba(120,90,60,0.08);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{ margin:0; background:var(--paper); color:var(--ink); font-family:'Pretendard','Spectral',serif; line-height:1.75; font-size:16px;}
+h1,h2,h3,h4{ font-family:'Spectral','Pretendard',serif; color:var(--accent-deep); font-weight:600; line-height:1.35;}
+.layout{ display:flex; max-width:1400px; margin:0 auto;}
+nav.sidebar{
+  width:260px; flex-shrink:0; position:sticky; top:0; align-self:flex-start; height:100vh;
+  overflow-y:auto; background:var(--sidebar-bg); border-right:1px solid var(--line); padding:28px 16px 60px;
+}
+nav.sidebar h2{ font-size:14px; letter-spacing:0.04em; color:var(--accent-deep); border-bottom:2px solid var(--accent-soft); padding-bottom:10px; margin-top:0;}
+nav.sidebar ul{ list-style:none; padding:0; margin:0;}
+nav.sidebar li{ margin:2px 0;}
+nav.sidebar a{ display:block; padding:7px 10px; border-radius:8px; color:var(--ink-soft); text-decoration:none; font-size:12.6px; border-left:3px solid transparent; transition:all .15s;}
+nav.sidebar a:hover{ background:var(--accent-pale); color:var(--accent-deep);}
+nav.sidebar a.active{ background:var(--accent-soft); color:var(--accent-deep); font-weight:600; border-left:3px solid var(--accent);}
+main{ flex:1; min-width:0; padding:46px 58px 130px; max-width:960px;}
+header.hero{ padding-bottom:26px; margin-bottom:34px; border-bottom:3px double var(--accent-soft);}
+header.hero .eyebrow{ color:var(--accent); font-weight:600; letter-spacing:0.1em; font-size:13px; text-transform:uppercase;}
+header.hero h1{ font-size:30px; margin:10px 0 12px;}
+header.hero p.lead{ color:var(--ink-soft); font-size:16px; max-width:740px;}
+section{ margin-bottom:56px; scroll-margin-top:24px;}
+section h2{ font-size:22px; display:flex; align-items:center; gap:12px; padding-bottom:9px; border-bottom:2px solid var(--line);}
+section h2 .num{ display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:var(--accent); color:#fff; font-size:14px; font-family:'JetBrains Mono',monospace; flex-shrink:0;}
+section h2 .year{ font-size:13px; color:var(--ink-soft); font-weight:400; margin-left:auto; font-family:'JetBrains Mono',monospace;}
+h3{ font-size:18px; margin-top:28px;}
+h4{ font-size:15.5px; color:var(--accent);}
+p{ margin:11px 0;}
+ul,ol{ padding-left:22px;}
+li{ margin:5px 0;}
+strong{ color:var(--accent-deep);}
+.card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:19px 23px; margin:16px 0; box-shadow:var(--shadow);}
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+@media (max-width:820px){ .grid2{grid-template-columns:1fr;} .grid3{grid-template-columns:1fr;} }
+.badge{ display:inline-block; padding:3px 11px; border-radius:20px; font-size:12px; font-weight:600; margin-right:6px;}
+.badge.era1{ background:var(--accent-pale); color:var(--accent-deep);}
+.badge.era2{ background:#eee; color:#666;}
+.badge.era3{ background:var(--blue-bg); color:var(--blue);}
+.badge.era4{ background:var(--green-bg); color:var(--green);}
+.person-card{ background:#fff; border:1.5px solid var(--line); border-radius:16px; padding:20px 24px; margin:18px 0; box-shadow:var(--shadow);}
+.person-card .who{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
+.person-card .who .name{ font-size:20px; font-weight:700; color:var(--accent-deep); font-family:'Spectral',serif;}
+.person-card .who .yr{ font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--accent); font-weight:600;}
+.person-card .paper{ font-size:13.5px; color:var(--ink-soft); font-style:italic; margin:4px 0 14px;}
+.note{ background:var(--accent-pale); border-left:4px solid var(--accent); border-radius:0 10px 10px 0; padding:13px 17px; margin:16px 0; font-size:14.3px;}
+.note.tip{ background:var(--green-bg); border-left-color:var(--green);}
+.note.warn{ background:#fbeeea; border-left-color:#c1523c;}
+.note.info{ background:var(--blue-bg); border-left-color:var(--blue);}
+table{ width:100%; border-collapse:collapse; margin:14px 0; font-size:13.8px;}
+th,td{ border:1px solid var(--line); padding:8px 10px; text-align:left;}
+th{ background:var(--accent-pale); color:var(--accent-deep); font-weight:600;}
+tr:nth-child(even) td{ background:#fbf8f3;}
+code{ font-family:'JetBrains Mono',monospace; background:var(--accent-pale); padding:1px 5px; border-radius:4px; font-size:13.2px;}
+figure{ margin:18px 0; text-align:center;}
+figure svg{ max-width:100%; height:auto; background:#fff; border:1px solid var(--line); border-radius:12px;}
+figcaption{ font-size:12.5px; color:var(--ink-soft); margin-top:6px;}
+.legend{ display:flex; gap:14px; justify-content:center; margin-top:8px; flex-wrap:wrap; font-size:12px; color:var(--ink-soft);}
+.legend span{ display:inline-flex; align-items:center; gap:5px;}
+.dot{ width:10px; height:10px; border-radius:50%; display:inline-block;}
+.checklist{ list-style:none; padding-left:0;}
+.checklist li{ padding:9px 13px; margin:6px 0; background:#fff; border:1px solid var(--line); border-radius:8px; display:flex; gap:9px; align-items:flex-start;}
+.checklist li::before{ content:"✓"; color:var(--green); font-weight:700; flex-shrink:0;}
+.progress-bar{ position:fixed; top:0; left:0; height:3px; background:var(--accent); z-index:100; width:0%;}
+::-webkit-scrollbar{ width:9px;}
+::-webkit-scrollbar-thumb{ background:var(--accent-soft); border-radius:6px;}
+.next-arrow{ text-align:center; color:var(--accent); font-size:13px; margin:20px 0 0; font-weight:600;}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="layout">
+<nav class="sidebar">
+  <h2>인공신경망·딥러닝 역사</h2>
+  <ul id="navList">
+    <li><a href="#overview">0. 개관 · 타임라인</a></li>
+    <li><a href="#mcp">1. McCulloch–Pitts (1943)</a></li>
+    <li><a href="#rosenblatt">2. Rosenblatt (1958)</a></li>
+    <li><a href="#widrow">3. Widrow–Hoff (1960)</a></li>
+    <li><a href="#minsky">4. Minsky–Papert (1969)</a></li>
+    <li><a href="#rumelhart">5. Rumelhart·Hinton·Williams (1986)</a></li>
+    <li><a href="#hinton">6. Hinton — Boltzmann Machine (1985~)</a></li>
+    <li><a href="#lecun">7. LeCun — CNN·LeNet (1989/1998)</a></li>
+    <li><a href="#hintonruslan">8. Hinton & Salakhutdinov (2006)</a></li>
+    <li><a href="#krizhevsky">9. Krizhevsky (2012)</a></li>
+    <li><a href="#vaswani">10. Vaswani 등 (2017)</a></li>
+    <li><a href="#genealogy">11. 연구 계보도</a></li>
+    <li><a href="#summary">12. 종합 비교표</a></li>
+    <li><a href="#checklist">13. 체크리스트</a></li>
+  </ul>
+</nav>
+<main>
+
+<header class="hero">
+  <div class="eyebrow">History of Neural Networks &amp; Deep Learning — Complete Study Guide</div>
+  <h1>인공신경망·딥러닝 역사 완전학습서</h1>
+  <p class="lead">1943년 최초의 인공 뉴런 모델부터 2017년 트랜스포머까지, 신경망 연구를 만든 10개의 결정적 순간을 시간순으로 정리합니다. 각 연구가 <strong>무엇을 새로 제안했고, 어떤 한계를 넘었으며, 다음 연구로 어떻게 이어지는지</strong>를 원문 논문 정보·수식·그림과 함께 다룹니다.</p>
+</header>
+
+<!-- 0. Overview -->
+<section id="overview">
+  <h2><span class="num">0</span>개관 — 4막으로 보는 신경망 연구사</h2>
+  <div class="grid2">
+    <div class="card">
+      <span class="badge era1">제1막 · 태동기 (1943–1960)</span>
+      <p style="font-size:14px; margin-top:8px;">McCulloch-Pitts의 수학적 뉴런 모델에서 시작해, Rosenblatt의 퍼셉트론과 Widrow-Hoff의 ADALINE으로 "학습하는 기계"의 기초가 놓임.</p>
+    </div>
+    <div class="card">
+      <span class="badge era2">제2막 · 1차 AI 겨울 (1969–1986)</span>
+      <p style="font-size:14px; margin-top:8px;">Minsky-Papert가 단층 퍼셉트론의 근본적 한계(XOR 문제)를 수학적으로 증명하며 연구 자금과 관심이 급격히 줄어든 침체기.</p>
+    </div>
+    <div class="card">
+      <span class="badge era3">제3막 · 역전파 부흥과 재침체 (1986–2006)</span>
+      <p style="font-size:14px; margin-top:8px;">Rumelhart·Hinton·Williams의 오차역전파로 다층 신경망 학습이 가능해졌으나, 다시 SVM 등에 밀려 2차 침체를 겪음. 이 시기에도 Hinton과 LeCun은 각각 Boltzmann Machine과 CNN 연구를 이어감.</p>
+    </div>
+    <div class="card">
+      <span class="badge era4">제4막 · 딥러닝 시대 (2006–현재)</span>
+      <p style="font-size:14px; margin-top:8px;">Hinton·Salakhutdinov의 심층 신뢰망(2006)이 "딥러닝"이라는 용어와 함께 부흥을 알렸고, Krizhevsky의 AlexNet(2012)이 산업계를 뒤흔들었으며, Vaswani 등의 트랜스포머(2017)가 오늘날 LLM 시대의 토대가 됨.</p>
+    </div>
+  </div>
+
+  <figure>
+    <svg id="svg-timeline" viewBox="0 0 1000 260" xmlns="http://www.w3.org/2000/svg"></svg>
+    <figcaption>그림 0-1. 1943~2017 신경망 연구 타임라인 — 색 구간은 위 4막에 대응</figcaption>
+  </figure>
+</section>
+
+<!-- 1. McCulloch-Pitts -->
+<section id="mcp">
+  <h2><span class="num">1</span>McCulloch &amp; Pitts<span class="year">1943</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">Warren McCulloch &amp; Walter Pitts</span><span class="yr">1943</span></div>
+    <div class="paper">"A Logical Calculus of the Ideas Immanent in Nervous Activity", <em>Bulletin of Mathematical Biophysics</em>, 5(4), 115–133.</div>
+
+    <h4>핵심 내용</h4>
+    <p>신경생리학자 매컬럭과 논리학에 밝은 소년 수학자 피츠가 함께, 생물학적 뉴런을 <strong>수학적·논리적 모델(MCP 뉴런)</strong>로 단순화했습니다. 여러 입력을 받아 가중합을 구하고, 그 값이 <strong>임계값(threshold)</strong>을 넘으면 "발화(1)", 넘지 않으면 "비발화(0)"하는 <strong>이진 출력 모델</strong>입니다.</p>
+    <p>$$y = \begin{cases} 1 & \text{if } \sum_i w_i x_i \ge \theta \\ 0 & \text{otherwise} \end{cases}$$</p>
+
+    <figure>
+      <svg id="svg-mcp" viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 1-1. MCP 뉴런 — 가중합이 임계값을 넘으면 발화하는 이진 모델</figcaption>
+    </figure>
+
+    <h4>의의와 한계</h4>
+    <ul>
+      <li>MCP 뉴런의 조합만으로 <strong>AND, OR, NOT 등 모든 논리 게이트</strong>를 구현할 수 있음을 보여, "뇌 = 논리 연산을 수행하는 회로"라는 관점을 처음 제시했습니다.</li>
+      <li><strong>가중치(weight)가 학습되지 않는다</strong>는 근본적 한계가 있었습니다 — 사람이 가중치와 임계값을 직접 설계해야 했습니다.</li>
+    </ul>
+    <div class="note">이 "학습되지 않는 가중치" 문제를 처음으로 해결하려 한 것이 15년 뒤 Rosenblatt의 퍼셉트론입니다.</div>
+  </div>
+</section>
+
+<!-- 2. Rosenblatt -->
+<section id="rosenblatt">
+  <h2><span class="num">2</span>Rosenblatt<span class="year">1958</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">Frank Rosenblatt</span><span class="yr">1958</span></div>
+    <div class="paper">"The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain", <em>Psychological Review</em>, 65(6), 386–408. (1957년 코넬 항공연구소 리포트가 선행연구, 1958년 하드웨어 Mark I Perceptron 제작)</div>
+
+    <h4>핵심 내용</h4>
+    <p>Rosenblatt는 MCP 뉴런에 <strong>가중치를 스스로 조정하는 학습 규칙</strong>을 추가했습니다. 입력을 넣어 예측하고, 정답과 다르면 오차만큼 가중치를 갱신하는 퍼셉트론 학습 규칙(perceptron learning rule)입니다.</p>
+    <p>$$w_i \leftarrow w_i + \eta\,(y_{\text{true}} - y_{\text{pred}})\,x_i$$</p>
+    <p>여기서 $\eta$는 학습률입니다. 오답일 때만 가중치가 갱신되고, 맞으면 그대로 둡니다.</p>
+
+    <figure>
+      <svg id="svg-perceptron" viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 2-1. 퍼셉트론 — 가중합 후 계단함수(step function)로 이진 분류, 오차 기반으로 가중치를 스스로 학습</figcaption>
+    </figure>
+
+    <h4>의의와 한계</h4>
+    <ul>
+      <li>"기계가 스스로 가중치를 학습한다"는 개념을 최초로 구현 — <strong>기계학습(machine learning)의 출발점</strong> 중 하나로 평가됩니다.</li>
+      <li>선형분리가능(linearly separable)한 문제에서는 유한 번의 갱신 후 반드시 수렴한다는 <strong>퍼셉트론 수렴 정리</strong>가 성립합니다.</li>
+      <li>하지만 <strong>단층(single-layer)</strong> 구조라, 선형분리가 불가능한 문제(대표적으로 XOR)는 풀 수 없다는 한계가 훗날 Minsky-Papert에 의해 지적됩니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 3. Widrow-Hoff -->
+<section id="widrow">
+  <h2><span class="num">3</span>Widrow &amp; Hoff<span class="year">1960</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">Bernard Widrow &amp; Marcian "Ted" Hoff</span><span class="yr">1960</span></div>
+    <div class="paper">"Adaptive Switching Circuits", <em>IRE WESCON Convention Record</em>, 96–104 — ADALINE(Adaptive Linear Neuron)과 LMS(Least Mean Squares, 델타 규칙) 알고리즘 발표.</div>
+
+    <h4>핵심 내용</h4>
+    <p>ADALINE은 퍼셉트론과 구조는 비슷하지만 결정적인 차이가 있습니다 — 퍼셉트론은 <strong>계단함수를 통과한 이진 출력</strong>과 정답의 차이로 학습하는 반면, ADALINE은 <strong>계단함수 통과 전의 연속적인 값(가중합 그 자체)</strong>과 정답의 차이(오차)로 학습합니다.</p>
+    <p>$$E = \frac{1}{2}(y_{\text{true}} - \hat{y})^2, \qquad \hat{y}=\sum_i w_i x_i \quad (\text{활성함수 통과 전 값})$$</p>
+    <p>이 오차를 최소화하는 방향으로 가중치를 갱신하는 것이 <strong>LMS(델타 규칙)</strong>이며, 수학적으로 오차의 기울기(gradient)를 따라 내려가는 <strong>경사하강법(gradient descent)의 초기 형태</strong>입니다.</p>
+    <p>$$w_i \leftarrow w_i + \eta\,(y_{\text{true}}-\hat y)\,x_i$$</p>
+
+    <figure>
+      <svg id="svg-adaline" viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 3-1. ADALINE — 활성화 이전의 연속값을 기준으로 오차를 계산(LMS/델타 규칙)한다는 점이 퍼셉트론과의 핵심 차이</figcaption>
+    </figure>
+
+    <h4>의의와 한계</h4>
+    <ul>
+      <li>LMS(델타 규칙)는 이후 <strong>역전파(backpropagation)의 수학적 조상</strong>으로 평가됩니다 — "오차의 기울기를 따라 가중치를 조금씩 고친다"는 아이디어가 그대로 이어집니다.</li>
+      <li>전화선 회선의 <strong>에코 제거(echo cancellation)</strong>에 실전 적용된, 신경망 계열 중 최초로 실용화된 사례 중 하나입니다.</li>
+      <li>ADALINE 역시 본질적으로 <strong>선형모델</strong>이라 XOR 같은 비선형 문제는 풀 수 없었습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 4. Minsky-Papert -->
+<section id="minsky">
+  <h2><span class="num">4</span>Minsky &amp; Papert<span class="year">1969</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">Marvin Minsky &amp; Seymour Papert</span><span class="yr">1969</span></div>
+    <div class="paper">"Perceptrons: An Introduction to Computational Geometry", MIT Press.</div>
+
+    <h4>핵심 내용</h4>
+    <p>두 사람은 엄밀한 수학적 분석으로 <strong>단층 퍼셉트론이 선형분리 불가능한 문제를 풀 수 없다</strong>는 것을 증명했습니다. 가장 유명한 예가 <strong>XOR(배타적 논리합)</strong> 문제입니다.</p>
+
+    <figure>
+      <svg id="svg-xor" viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 4-1. XOR 문제 — 같은 클래스의 점을 한 직선으로 절대 나눌 수 없다(선형분리 불가능)</figcaption>
+    </figure>
+
+    <table>
+      <tr><th>입력 x1</th><th>입력 x2</th><th>AND</th><th>OR</th><th>XOR</th></tr>
+      <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+      <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+      <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td></tr>
+    </table>
+    <p>AND·OR는 직선 하나로 0과 1 그룹을 나눌 수 있지만(선형분리 가능), XOR은 (0,0)&(1,1)이 한 그룹, (0,1)&(1,0)이 다른 그룹이라 <strong>어떤 직선으로도 나눌 수 없습니다.</strong> 이론적으로는 은닉층을 추가한 <strong>다층 퍼셉트론(MLP)</strong>이면 XOR도 풀 수 있었지만, 당시에는 다층 구조를 학습시킬 효율적인 알고리즘이 없었습니다.</p>
+
+    <h4>의의와 한계(영향)</h4>
+    <ul>
+      <li>이 책은 단층 퍼셉트론의 근본적 한계를 엄밀하게 증명한 뛰어난 수학적 성과였지만, 다층 신경망 자체의 가능성까지 비관적으로 여겨지게 만들며 <strong>신경망 연구 자금이 급격히 줄어드는 "1차 AI 겨울(AI Winter)"</strong>의 주요 계기가 되었습니다.</li>
+      <li>이후 약 15~17년간 신경망 연구는 상대적으로 침체되었고, 이 정체를 깬 것이 1986년 Rumelhart·Hinton·Williams의 역전파 알고리즘입니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5. Rumelhart -->
+<section id="rumelhart">
+  <h2><span class="num">5</span>Rumelhart, Hinton &amp; Williams<span class="year">1986</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">David Rumelhart, Geoffrey Hinton &amp; Ronald Williams</span><span class="yr">1986</span></div>
+    <div class="paper">"Learning representations by back-propagating errors", <em>Nature</em>, 323, 533–536.</div>
+
+    <h4>핵심 내용</h4>
+    <p><strong>오차역전파(Backpropagation)</strong>는 다층 신경망의 출력에서 발생한 오차를, <strong>연쇄법칙(chain rule)</strong>을 이용해 출력층에서 입력층 방향으로 거슬러 전파시키며 각 층의 가중치를 갱신하는 알고리즘입니다. 이로써 Minsky-Papert가 지적했던 "다층 구조를 어떻게 학습시킬 것인가"라는 문제가 실용적으로 해결되었습니다.</p>
+    <p>$$\frac{\partial E}{\partial w_{ij}} = \frac{\partial E}{\partial y_j}\cdot\frac{\partial y_j}{\partial net_j}\cdot\frac{\partial net_j}{\partial w_{ij}}$$</p>
+
+    <figure>
+      <svg id="svg-backprop" viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 5-1. 다층 신경망과 역전파 — 순전파(forward)로 예측하고, 오차를 출력층에서 입력층 방향으로 연쇄법칙에 따라 역전파(backward)하며 가중치 갱신</figcaption>
+    </figure>
+
+    <h4>의의와 한계</h4>
+    <ul>
+      <li>은닉층(hidden layer)이 입력 데이터에서 <strong>스스로 유용한 특징(feature)을 학습</strong>할 수 있음을 보였습니다 — 이는 사람이 특징을 직접 설계하던 기존 방식과의 근본적 차이입니다.</li>
+      <li>이 알고리즘의 핵심 아이디어(연쇄법칙을 이용한 오차 전파) 자체는 Linnainmaa(1970, 역방향 자동미분)나 Werbos(1974) 등이 먼저 제시한 바 있지만, 이 1986년 Nature 논문이 신경망 학계에 널리 알려지고 실용화되는 결정적 계기가 되었습니다.</li>
+      <li>역전파는 이후 나오는 <strong>거의 모든 딥러닝 모델(CNN, RNN, Transformer 등)의 공통된 학습 엔진</strong>이 됩니다.</li>
+      <li>다만 층이 아주 깊어지면 기울기가 점점 작아지는 <strong>기울기 소실(vanishing gradient)</strong> 문제가 있어, 실제로 아주 깊은 네트워크의 학습은 이후 20년 가까이 더 어려운 과제로 남습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 6. Hinton - Boltzmann -->
+<section id="hinton">
+  <h2><span class="num">6</span>Hinton — Boltzmann Machine<span class="year">1985~</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">Geoffrey Hinton</span> (with David Ackley &amp; Terrence Sejnowski)<span class="yr">1985</span></div>
+    <div class="paper">"A Learning Algorithm for Boltzmann Machines", <em>Cognitive Science</em>, 9(1), 147–169.</div>
+
+    <h4>핵심 내용</h4>
+    <p>Boltzmann Machine은 통계물리학의 <strong>에너지 기반 모델(energy-based model)</strong> 개념을 신경망에 접목한 것입니다. 각 뉴런은 확률적으로 켜지거나(1) 꺼지며(0), 네트워크 전체는 하나의 "에너지 함수"를 가집니다. 학습은 이 에너지 함수를 조정해, 네트워크가 관측 데이터와 비슷한 분포를 스스로 만들어내도록(생성모델) 하는 방식입니다.</p>
+
+    <figure>
+      <svg id="svg-boltzmann" viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 6-1. Boltzmann Machine — 가시층(visible)과 은닉층(hidden) 뉴런들이 대칭적으로 완전연결되어 확률분포를 학습</figcaption>
+    </figure>
+
+    <h4>의의 — Hinton의 지속적 기여</h4>
+    <ul>
+      <li>Boltzmann Machine은 데이터를 분류하는 <strong>판별모델</strong>이 아니라, 데이터가 어떻게 "생성"되는지를 학습하는 <strong>생성모델(generative model)</strong>의 초기 형태로, 훗날 제한 볼츠만 머신(RBM)·심층 신뢰망(DBN, 2006)의 토대가 됩니다.</li>
+      <li>Hinton은 1986년 역전파 논문의 공동저자이자, 1985년 Boltzmann Machine, 2006년 심층 신뢰망(아래 8장), 2012년 AlexNet(아래 9장)까지 <strong>신경망 연구사의 여러 결정적 순간에 반복적으로 등장</strong>하는 인물로, "딥러닝의 대부(Godfather of Deep Learning)"라 불립니다.</li>
+      <li>이 Boltzmann Machine 연구는 2024년 <strong>노벨 물리학상</strong> 수상 이유 중 하나로 공식 언급되었습니다(통계물리학 개념을 정보처리에 적용한 공로).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 7. LeCun -->
+<section id="lecun">
+  <h2><span class="num">7</span>LeCun — CNN · LeNet<span class="year">1989 / 1998</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">Yann LeCun</span> 등<span class="yr">1989 / 1998</span></div>
+    <div class="paper">"Backpropagation Applied to Handwritten Zip Code Recognition"(1989, <em>Neural Computation</em>) → "Gradient-Based Learning Applied to Document Recognition"(1998, <em>Proceedings of the IEEE</em>, 86(11), 2278–2324) — LeNet-5</div>
+
+    <h4>핵심 내용</h4>
+    <p>LeCun은 1987~88년 토론토 대학에서 Hinton 연구실 박사후연구원으로 있으며 역전파를 접했고, 이를 <strong>합성곱 신경망(Convolutional Neural Network, CNN)</strong>에 적용해 손글씨 우편번호·숫자 인식을 실용 수준으로 끌어올렸습니다. CNN의 핵심은 이미지 전체에 같은 필터(가중치)를 반복 적용하는 <strong>합성곱(convolution)</strong>과, 위치 변화에 덜 민감하게 만드는 <strong>서브샘플링(풀링)</strong>입니다.</p>
+
+    <figure>
+      <svg id="svg-lenet" viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 7-1. LeNet-5 구조(1998) — 합성곱과 서브샘플링(풀링)을 번갈아 쌓고 마지막에 완전연결층으로 분류</figcaption>
+    </figure>
+
+    <h4>의의와 한계</h4>
+    <ul>
+      <li>사람이 손으로 특징을 뽑던 기존 컴퓨터 비전과 달리, <strong>픽셀에서 곧바로 특징을 학습</strong>하는 end-to-end 파이프라인을 실제로 동작시킨 초기 성공 사례입니다.</li>
+      <li>LeNet-5는 미국 은행 수표의 자동 판독 등에 상업적으로 실사용되었습니다.</li>
+      <li>당시엔 컴퓨팅 자원과 데이터가 부족해 CNN이 학계의 주류로 곧바로 이어지지는 못했고, 2012년 <strong>AlexNet(GPU + 대규모 데이터)</strong>이 등장하기까지 다시 한동안 기다려야 했습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 8. Hinton & Ruslan -->
+<section id="hintonruslan">
+  <h2><span class="num">8</span>Hinton &amp; Salakhutdinov<span class="year">2006</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">Geoffrey Hinton &amp; Ruslan Salakhutdinov</span><span class="yr">2006</span></div>
+    <div class="paper">"Reducing the Dimensionality of Data with Neural Networks", <em>Science</em>, 313(5786), 504–507.</div>
+
+    <h4>핵심 내용</h4>
+    <p>이 논문은 <strong>깊은(여러 층) 오토인코더(autoencoder)</strong>를 효과적으로 학습시키는 방법을 제시했습니다. 핵심 아이디어는 <strong>제한 볼츠만 머신(RBM)을 한 층씩 쌓아 비지도 사전학습(pretraining)</strong>한 뒤, 그렇게 얻은 좋은 초기 가중치에서 출발해 역전파로 미세조정(fine-tuning)하는 2단계 전략입니다.</p>
+
+    <figure>
+      <svg id="svg-dbn" viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 8-1. 심층 오토인코더 — RBM을 층층이 쌓아 비지도 사전학습한 뒤, 병목층(code)에서 저차원 표현을 얻고 역전파로 미세조정</figcaption>
+    </figure>
+
+    <h4>의의와 한계</h4>
+    <ul>
+      <li>깊은 오토인코더로 얻은 저차원 코드가 <strong>PCA보다 원본 데이터를 훨씬 잘 복원</strong>한다는 것을 보여, "층을 깊게 쌓는 것"의 실질적 이점을 처음으로 명확히 입증했습니다.</li>
+      <li>이 논문을 기점으로 학계에서 <strong>"딥러닝(Deep Learning)"이라는 용어가 본격적으로 퍼지기 시작</strong>했고, 1990년대 이후 SVM 등에 밀려 침체되어 있던 신경망 연구가 다시 주목받는 계기가 되었습니다.</li>
+      <li>사전학습(pretraining) 전략은 이후 대규모 라벨 데이터와 GPU 연산이 보편화되며 점차 <strong>불필요해졌지만</strong>("그냥 처음부터 깊게 학습해도 잘 된다"는 것이 2012년 AlexNet 이후 입증됨), 그 이전까지 깊은 신경망 학습을 가능케 한 결정적 다리 역할을 했습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 9. Krizhevsky -->
+<section id="krizhevsky">
+  <h2><span class="num">9</span>Krizhevsky, Sutskever &amp; Hinton — AlexNet<span class="year">2012</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">Alex Krizhevsky, Ilya Sutskever &amp; Geoffrey Hinton</span><span class="yr">2012</span></div>
+    <div class="paper">"ImageNet Classification with Deep Convolutional Neural Networks", <em>NeurIPS(NIPS) 2012</em>. (Krizhevsky와 Sutskever는 Hinton의 토론토대 박사과정 제자)</div>
+
+    <h4>핵심 내용</h4>
+    <p>AlexNet은 LeCun의 CNN 아이디어를 훨씬 더 <strong>깊고 크게</strong>(5개 합성곱층 + 3개 완전연결층, 약 6천만 파라미터) 만들고, 다음 기법들을 결합해 대규모 이미지 데이터셋(ImageNet, 100만 장 이상)에서 학습시켰습니다.</p>
+    <ul>
+      <li><strong>ReLU 활성함수</strong>: 기존 sigmoid/tanh보다 학습 속도를 크게 높임</li>
+      <li><strong>Dropout</strong>: 학습 중 일부 뉴런을 무작위로 꺼서 과적합 방지</li>
+      <li><strong>GPU 병렬학습</strong>: GTX 580 GPU 2장으로 5~6일간 학습</li>
+      <li><strong>데이터 증강(augmentation)</strong>: 이미지 변형으로 학습 데이터 확장</li>
+    </ul>
+
+    <figure>
+      <svg id="svg-alexnet" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 9-1. AlexNet 구조 개략도 — LeNet보다 훨씬 깊은 합성곱층 + ReLU + Dropout + GPU 병렬학습</figcaption>
+    </figure>
+
+    <div class="note tip">
+      <strong>ILSVRC-2012(ImageNet 대회) 결과:</strong> AlexNet은 top-5 오류율 <strong>15.3%</strong>를 기록해, 2위 팀(전통적 방법, 26.2%)을 압도적 격차로 따돌리며 우승했습니다. 이 사건이 이후 수년간 이어지는 <strong>"딥러닝 붐"의 직접적 기폭제</strong>가 되었습니다.
+    </div>
+
+    <h4>의의</h4>
+    <ul>
+      <li>"사전학습 없이도, 데이터와 연산량만 충분하면 깊은 신경망을 처음부터 잘 학습시킬 수 있다"는 것을 실증적으로 보여 딥러닝의 패러다임을 바꿨습니다.</li>
+      <li>이후 VGGNet, GoogLeNet, ResNet 등 더 깊은 CNN들이 잇따라 등장하며 컴퓨터 비전 전반의 성능이 비약적으로 향상되었습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 10. Vaswani -->
+<section id="vaswani">
+  <h2><span class="num">10</span>Vaswani 등 — Transformer<span class="year">2017</span></h2>
+  <div class="person-card">
+    <div class="who"><span class="name">Ashish Vaswani 등 (Google Brain / Google Research)</span><span class="yr">2017</span></div>
+    <div class="paper">"Attention Is All You Need", <em>NeurIPS 2017</em> (arXiv:1706.03762).</div>
+
+    <h4>핵심 내용</h4>
+    <p>그때까지 자연어 처리의 주류였던 RNN·LSTM은 문장을 <strong>순서대로 한 단어씩</strong> 처리해야 해서 느리고, 먼 거리의 단어 관계를 학습하기 어려웠습니다. Transformer는 순환구조를 완전히 없애고 <strong>어텐션(attention) 메커니즘만으로</strong> 문장 내 모든 단어 쌍의 관계를 한 번에 계산합니다.</p>
+    <p>$$\text{Attention}(Q,K,V) = \text{softmax}\!\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$</p>
+    <p>인코더 6층 + 디코더 6층 구조이며, 여러 개의 어텐션을 동시에 두는 <strong>멀티헤드 어텐션(multi-head attention)</strong>과, 순서 정보를 넣기 위한 <strong>위치 인코딩(positional encoding)</strong>을 사용합니다.</p>
+
+    <figure>
+      <svg id="svg-transformer" viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg"></svg>
+      <figcaption>그림 10-1. Transformer 구조 개략도 — 순환구조 없이 셀프 어텐션 + 피드포워드 블록을 쌓은 인코더-디코더</figcaption>
+    </figure>
+
+    <h4>의의</h4>
+    <ul>
+      <li>단어를 순서대로 처리할 필요가 없어 <strong>병렬 연산이 가능</strong>해졌고, 학습 속도와 장거리 문맥 파악 능력이 크게 향상되었습니다.</li>
+      <li>원래는 기계번역을 위해 제안되었지만, 이 구조가 이후 <strong>BERT, GPT 계열 등 거의 모든 대규모 언어모델(LLM)의 근간 아키텍처</strong>가 되었습니다.</li>
+      <li>이미지(Vision Transformer), 음성, 멀티모달 모델 등으로도 확장되며 현재 딥러닝 아키텍처의 사실상 표준으로 자리잡았습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 11. Genealogy -->
+<section id="genealogy">
+  <h2><span class="num">11</span>연구 계보도 — 누가 누구와 연결되는가</h2>
+  <p>이 10개의 연구는 독립된 사건들이 아니라, 사제관계·공동연구·아이디어의 계승으로 서로 얽혀 있습니다.</p>
+  <figure>
+    <svg id="svg-genealogy" viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg"></svg>
+    <figcaption>그림 11-1. 인물·아이디어 계보도 — 실선 화살표는 직접적 사제/공동연구 관계, 점선 화살표는 아이디어의 계승</figcaption>
+  </figure>
+  <ul>
+    <li><strong>LeCun</strong>은 1987~88년 토론토 대학에서 <strong>Hinton</strong>의 박사후연구원으로 있으며 역전파를 배웠습니다.</li>
+    <li><strong>Krizhevsky·Sutskever·Salakhutdinov</strong>는 모두 토론토 대학에서 <strong>Hinton</strong>의 박사과정 지도학생이었습니다.</li>
+    <li><strong>Rumelhart·Hinton·Williams</strong>의 역전파(1986)는 <strong>Widrow-Hoff</strong>의 LMS 규칙(1960)이 다층 구조로 일반화된 것으로 볼 수 있습니다.</li>
+    <li><strong>Minsky-Papert</strong>(1969)가 지적한 한계는 <strong>Rumelhart·Hinton·Williams</strong>(1986)가 극복했습니다.</li>
+    <li><strong>Hinton·Salakhutdinov</strong>(2006)의 딥러닝 부흥은 <strong>Krizhevsky</strong>(2012)의 AlexNet으로 실증적 정점을 찍었습니다.</li>
+    <li><strong>Vaswani 등</strong>(2017)은 Google Brain/Research 소속으로, 계보상 Hinton 사단과는 별도 흐름이지만 역전파라는 공통 기반 위에서 딥러닝 붐의 연장선에 있습니다.</li>
+  </ul>
+</section>
+
+<!-- 12. Summary -->
+<section id="summary">
+  <h2><span class="num">12</span>종합 비교표</h2>
+  <table>
+    <tr><th>연도</th><th>연구자</th><th>핵심 개념</th><th>해결한 문제 / 남긴 한계</th></tr>
+    <tr><td>1943</td><td>McCulloch &amp; Pitts</td><td>MCP 뉴런(이진 임계값 모델)</td><td>논리게이트 구현 가능 / 가중치 학습 불가</td></tr>
+    <tr><td>1958</td><td>Rosenblatt</td><td>퍼셉트론 학습 규칙</td><td>가중치 자동 학습 / 단층이라 XOR 불가</td></tr>
+    <tr><td>1960</td><td>Widrow &amp; Hoff</td><td>ADALINE · LMS(델타 규칙)</td><td>연속오차 기반 경사하강 원형 / 여전히 선형모델</td></tr>
+    <tr><td>1969</td><td>Minsky &amp; Papert</td><td>퍼셉트론의 한계 증명(XOR)</td><td>단층 퍼셉트론 한계 규명 / 1차 AI 겨울 촉발</td></tr>
+    <tr><td>1985</td><td>Hinton(Ackley, Sejnowski)</td><td>Boltzmann Machine</td><td>확률적 생성모델 토대 / 학습이 매우 느림</td></tr>
+    <tr><td>1986</td><td>Rumelhart, Hinton, Williams</td><td>오차역전파(Backpropagation)</td><td>다층 신경망 학습 가능 / 기울기 소실 문제 잔존</td></tr>
+    <tr><td>1989/1998</td><td>LeCun 등</td><td>CNN · LeNet-5</td><td>이미지 특징 자동학습 / 당시 데이터·연산력 부족</td></tr>
+    <tr><td>2006</td><td>Hinton &amp; Salakhutdinov</td><td>심층 오토인코더(DBN 사전학습)</td><td>깊은 망 학습 가능성 입증 / 딥러닝 용어·부흥의 시작</td></tr>
+    <tr><td>2012</td><td>Krizhevsky, Sutskever, Hinton</td><td>AlexNet(ReLU·Dropout·GPU)</td><td>ImageNet 압도적 우승 / 딥러닝 붐 기폭제</td></tr>
+    <tr><td>2017</td><td>Vaswani 등</td><td>Transformer(Self-Attention)</td><td>RNN의 순차처리 한계 극복 / 오늘날 LLM의 토대</td></tr>
+  </table>
+</section>
+
+<!-- 13. Checklist -->
+<section id="checklist">
+  <h2><span class="num">13</span>체크리스트</h2>
+  <ul class="checklist">
+    <li>MCP 뉴런(1943)에는 학습 능력이 없었고, Rosenblatt(1958)가 처음으로 가중치를 스스로 학습하는 규칙을 도입했다는 순서를 설명할 수 있는가?</li>
+    <li>퍼셉트론과 ADALINE의 차이(이진 출력 기준 오차 vs 활성화 이전 연속값 기준 오차)를 설명할 수 있는가?</li>
+    <li>Minsky-Papert가 지적한 XOR 문제가 무엇이고, 왜 단층 퍼셉트론으로는 풀 수 없는지 설명할 수 있는가?</li>
+    <li>역전파(1986)가 연쇄법칙을 이용해 오차를 어떻게 각 층으로 전달하는지 설명할 수 있는가?</li>
+    <li>Hinton이 1985년(Boltzmann Machine), 1986년(역전파), 2006년(심층 오토인코더), 2012년(AlexNet) 각각에서 어떤 역할을 했는지 구분할 수 있는가?</li>
+    <li>LeCun의 CNN(1989/1998)과 Krizhevsky의 AlexNet(2012)의 관계 — 같은 아이디어가 왜 2012년에서야 폭발적으로 성공했는지(데이터·GPU) 설명할 수 있는가?</li>
+    <li>Transformer(2017)가 RNN 계열과 근본적으로 다른 점(순차처리 vs 병렬 어텐션)을 설명할 수 있는가?</li>
+    <li>10개 연구를 시간순으로 나열하고, 각 연구가 이전 연구의 어떤 한계를 극복했는지 스스로 정리해볼 수 있는가?</li>
+  </ul>
+</section>
+
+</main>
+</div>
+
+<script>
+// ---------- helpers ----------
+function rectBox(x,y,w,h,fill,stroke,label,labelColor,fontsize){
+  fontsize = fontsize||11.5;
+  let s = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fill}" stroke="${stroke}" stroke-width="1.6"/>`;
+  if(label){
+    s += `<text x="${x+w/2}" y="${y+h/2+4}" text-anchor="middle" font-family="Pretendard" font-size="${fontsize}" fill="${labelColor||'#2c241b'}" font-weight="600">${label}</text>`;
+  }
+  return s;
+}
+function arrowLine(x1,y1,x2,y2,color,dash){
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="1.8" ${dash?`stroke-dasharray="${dash}"`:''} marker-end="url(#ah)"/>`;
+}
+const ARROW_DEFS = `<defs>
+  <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#8c4426"/></marker>
+  <marker id="ahb" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#3c5a78"/></marker>
+</defs>`;
+
+// ---------- Figure 0: timeline ----------
+function buildTimeline(){
+  const y0 = 1943, y1 = 2017;
+  function xOf(year){ return 60 + (year-y0)/(y1-y0)*880; }
+  let s = ARROW_DEFS;
+  // era bands
+  const eras = [
+    {from:1943, to:1968, color:'#f6e7d8', label:'제1막 태동기'},
+    {from:1968, to:1985, color:'#ececec', label:'제2막 AI 겨울'},
+    {from:1985, to:2006, color:'#e2ebf2', label:'제3막 부흥·재침체'},
+    {from:2006, to:2017, color:'#e9edda', label:'제4막 딥러닝 시대'}
+  ];
+  eras.forEach(e=>{
+    s += `<rect x="${xOf(e.from)}" y="60" width="${xOf(e.to)-xOf(e.from)}" height="130" fill="${e.color}" opacity="0.6"/>`;
+    s += `<text x="${(xOf(e.from)+xOf(e.to))/2}" y="50" text-anchor="middle" font-family="Pretendard" font-size="11" fill="#6b5f51" font-weight="600">${e.label}</text>`;
+  });
+  s += `<line x1="60" y1="125" x2="940" y2="125" stroke="#8c4426" stroke-width="2"/>`;
+
+  const events = [
+    {year:1943, label:'McCulloch–Pitts', above:true},
+    {year:1958, label:'Rosenblatt', above:false},
+    {year:1960, label:'Widrow–Hoff', above:true},
+    {year:1969, label:'Minsky–Papert', above:false},
+    {year:1985, label:'Hinton(Boltzmann)', above:true},
+    {year:1986, label:'Rumelhart·Hinton', above:false},
+    {year:1998, label:'LeCun(LeNet-5)', above:true},
+    {year:2006, label:'Hinton·Salakhutdinov', above:false},
+    {year:2012, label:'Krizhevsky(AlexNet)', above:true},
+    {year:2017, label:'Vaswani(Transformer)', above:false}
+  ];
+  events.forEach(ev=>{
+    const x = xOf(ev.year);
+    s += `<circle cx="${x}" cy="125" r="6" fill="#bd603a" stroke="#fff" stroke-width="1.5"/>`;
+    if(ev.above){
+      s += `<line x1="${x}" y1="119" x2="${x}" y2="95" stroke="#bd603a" stroke-width="1"/>`;
+      s += `<text x="${x}" y="88" text-anchor="middle" font-family="Pretendard" font-size="10.5" fill="#8c4426" font-weight="600">${ev.label}</text>`;
+      s += `<text x="${x}" y="102" text-anchor="middle" font-family="JetBrains Mono" font-size="9.5" fill="#6b5f51">${ev.year}</text>`;
+    } else {
+      s += `<line x1="${x}" y1="131" x2="${x}" y2="155" stroke="#bd603a" stroke-width="1"/>`;
+      s += `<text x="${x}" y="170" text-anchor="middle" font-family="Pretendard" font-size="10.5" fill="#8c4426" font-weight="600">${ev.label}</text>`;
+      s += `<text x="${x}" y="184" text-anchor="middle" font-family="JetBrains Mono" font-size="9.5" fill="#6b5f51">${ev.year}</text>`;
+    }
+  });
+  document.getElementById('svg-timeline').innerHTML = s;
+}
+buildTimeline();
+
+// ---------- Figure 1: MCP neuron ----------
+function buildMCP(){
+  let s = ARROW_DEFS;
+  const inputs = [{y:40,label:'x1'},{y:100,label:'x2'},{y:160,label:'x3'}];
+  inputs.forEach(inp=>{
+    s += `<circle cx="60" cy="${inp.y}" r="18" fill="#f6e7d8" stroke="#bd603a" stroke-width="2"/>`;
+    s += `<text x="60" y="${inp.y+5}" text-anchor="middle" font-family="JetBrains Mono" font-size="12">${inp.label}</text>`;
+    s += arrowLine(78, inp.y, 190, 100, '#8c4426');
+  });
+  s += `<circle cx="220" cy="100" r="30" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>`;
+  s += `<text x="220" y="96" text-anchor="middle" font-family="Pretendard" font-size="11" fill="#8c4426">Σwᵢxᵢ</text>`;
+  s += `<text x="220" y="110" text-anchor="middle" font-family="Pretendard" font-size="9.5" fill="#8c4426">가중합</text>`;
+  s += arrowLine(250, 100, 340, 100, '#8c4426');
+  s += rectBox(340, 70, 100, 60, '#e2ebf2', '#4d6a8a', 'θ 임계값\\n비교', '#3c5a78', 11);
+  s += arrowLine(440, 100, 460, 100, '#8c4426');
+  s += `<text x="470" y="105" font-family="JetBrains Mono" font-size="13" fill="#2c241b">y ∈ {0,1}</text>`;
+  document.getElementById('svg-mcp').innerHTML = s.replace('가중합\\n가중합','가중합');
+}
+buildMCP();
+
+// ---------- Figure 2: Perceptron ----------
+function buildPerceptron(){
+  let s = ARROW_DEFS;
+  const inputs = [{y:40,label:'x1'},{y:90,label:'x2'},{y:140,label:'x3'}];
+  inputs.forEach(inp=>{
+    s += `<circle cx="50" cy="${inp.y}" r="16" fill="#f6e7d8" stroke="#bd603a" stroke-width="2"/>`;
+    s += `<text x="50" y="${inp.y+5}" text-anchor="middle" font-family="JetBrains Mono" font-size="11">${inp.label}</text>`;
+    s += arrowLine(66, inp.y, 170, 90, '#8c4426');
+    s += `<text x="105" y="${(inp.y+90)/2 - 5}" font-family="JetBrains Mono" font-size="9.5" fill="#a3937a">wᵢ</text>`;
+  });
+  s += `<circle cx="195" cy="90" r="26" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>`;
+  s += `<text x="195" y="94" text-anchor="middle" font-family="Pretendard" font-size="10.5" fill="#8c4426">Σ</text>`;
+  s += arrowLine(221, 90, 270, 90, '#8c4426');
+  s += rectBox(270, 65, 90, 50, '#e2ebf2', '#4d6a8a', '계단함수', '#3c5a78', 12);
+  s += arrowLine(360, 90, 400, 90, '#8c4426');
+  s += `<text x="405" y="95" font-family="JetBrains Mono" font-size="13">ŷ</text>`;
+
+  // error feedback loop
+  s += `<path d="M418,100 C418,170 100,190 50,160" stroke="#c1523c" stroke-width="1.6" fill="none" stroke-dasharray="5 3" marker-end="url(#ah)"/>`;
+  s += `<text x="230" y="200" text-anchor="middle" font-family="Pretendard" font-size="11.5" fill="#c1523c" font-weight="600">오차(정답−ŷ)만큼 wᵢ 갱신 → 학습</text>`;
+
+  document.getElementById('svg-perceptron').innerHTML = s;
+}
+buildPerceptron();
+
+// ---------- Figure 3: ADALINE ----------
+function buildAdaline(){
+  let s = ARROW_DEFS;
+  const inputs=[{y:40,label:'x1'},{y:80,label:'x2'},{y:120,label:'x3'}];
+  inputs.forEach(inp=>{
+    s += `<circle cx="50" cy="${inp.y}" r="15" fill="#f6e7d8" stroke="#bd603a" stroke-width="2"/>`;
+    s += `<text x="50" y="${inp.y+5}" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5">${inp.label}</text>`;
+    s += arrowLine(65, inp.y, 175, 80, '#8c4426');
+  });
+  s += `<circle cx="200" cy="80" r="25" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>`;
+  s += `<text x="200" y="84" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#8c4426">Σ ŷ</text>`;
+
+  // branch: to step function (final output) and to error comparison (before step)
+  s += arrowLine(225, 80, 300, 40, '#8c4426');
+  s += rectBox(300, 18, 90, 44, '#e2ebf2', '#4d6a8a', '계단함수', '#3c5a78', 11);
+  s += arrowLine(390, 40, 430, 40, '#8c4426');
+  s += `<text x="435" y="45" font-family="JetBrains Mono" font-size="12">최종출력</text>`;
+
+  s += arrowLine(225, 90, 300, 130, '#c1523c', '4 3');
+  s += rectBox(300, 108, 120, 46, '#fbeeea', '#c1523c', 'LMS 오차 계산\\n(정답−ŷ, 활성화 전)', '#a8422f', 10);
+  s += `<text x="230" y="165" font-family="Pretendard" font-size="11" fill="#c1523c">→ 이 오차로 wᵢ를 경사하강법처럼 갱신</text>`;
+
+  document.getElementById('svg-adaline').innerHTML = s.replace(/\\n/g,' ');
+}
+buildAdaline();
+
+// ---------- Figure 4: XOR ----------
+function buildXOR(){
+  let s = ARROW_DEFS;
+  function plot(cx, title, points, separable){
+    s += `<text x="${cx}" y="20" text-anchor="middle" font-family="Pretendard" font-size="13" fill="#8c4426" font-weight="600">${title}</text>`;
+    s += `<rect x="${cx-70}" y="35" width="140" height="140" fill="none" stroke="#dcdcdc"/>`;
+    points.forEach(p=>{
+      const px = cx-70 + p.x*130 + 5, py = 35+140 - (p.y*130+5);
+      s += `<circle cx="${px}" cy="${py}" r="9" fill="${p.c===1?'#bd603a':'#5c7a99'}" stroke="#fff" stroke-width="1.5"/>`;
+      s += `<text x="${px}" y="${py+4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">${p.c}</text>`;
+    });
+    if(separable){
+      s += `<line x1="${cx-60}" y1="145" x2="${cx+60}" y2="55" stroke="#4c6b3c" stroke-width="2.2"/>`;
+      s += `<text x="${cx}" y="195" text-anchor="middle" font-family="Pretendard" font-size="11" fill="#4c6b3c">직선 하나로 분리 가능</text>`;
+    } else {
+      s += `<line x1="${cx-60}" y1="60" x2="${cx+60}" y2="150" stroke="#c1523c" stroke-width="2" stroke-dasharray="5 3"/>`;
+      s += `<line x1="${cx-60}" y1="150" x2="${cx+60}" y2="60" stroke="#c1523c" stroke-width="2" stroke-dasharray="5 3"/>`;
+      s += `<text x="${cx}" y="195" text-anchor="middle" font-family="Pretendard" font-size="11" fill="#c1523c" font-weight="600">어떤 직선도 분리 불가</text>`;
+    }
+  }
+  plot(140, 'AND (선형분리 가능)', [{x:0,y:0,c:0},{x:0,y:1,c:0},{x:1,y:0,c:0},{x:1,y:1,c:1}], true);
+  plot(420, 'XOR (선형분리 불가능)', [{x:0,y:0,c:0},{x:0,y:1,c:1},{x:1,y:0,c:1},{x:1,y:1,c:0}], false);
+  document.getElementById('svg-xor').innerHTML = s;
+}
+buildXOR();
+
+// ---------- Figure 5: Backprop network ----------
+function buildBackprop(){
+  let s = ARROW_DEFS;
+  const inL = [60,120,180], hidL=[40,90,140,190], outL=[90,140];
+  const ix=80, hx=300, ox=520;
+  function layer(xs, x, color, stroke){
+    return xs.map(y=>({x,y}));
+  }
+  const inN = inL.map(y=>({x:ix,y})), hidN = hidL.map(y=>({x:hx,y})), outN = outL.map(y=>({x:ox,y}));
+
+  // forward arrows (blue, top half visual weight)
+  inN.forEach(a=> hidN.forEach(b=> s += arrowLine(a.x+14,a.y,b.x-14,b.y,'#4d6a8a')));
+  hidN.forEach(a=> outN.forEach(b=> s += arrowLine(a.x+14,a.y,b.x-14,b.y,'#4d6a8a')));
+
+  inN.forEach(p=> s += `<circle cx="${p.x}" cy="${p.y}" r="14" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>`);
+  hidN.forEach(p=> s += `<circle cx="${p.x}" cy="${p.y}" r="14" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>`);
+  outN.forEach(p=> s += `<circle cx="${p.x}" cy="${p.y}" r="14" fill="#e9edda" stroke="#6b7d4f" stroke-width="2"/>`);
+
+  s += `<text x="${ix}" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#3c5a78" font-weight="600">입력층</text>`;
+  s += `<text x="${hx}" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#8c4426" font-weight="600">은닉층</text>`;
+  s += `<text x="${ox}" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#4a5a33" font-weight="600">출력층</text>`;
+
+  // backward dashed arrows below
+  s += `<path d="M${ox},210 C${ox},250 ${hx},250 ${hx},225" stroke="#c1523c" stroke-width="1.8" fill="none" stroke-dasharray="5 3" marker-end="url(#ah)"/>`;
+  s += `<path d="M${hx},225 C${hx},260 ${ix},260 ${ix},225" stroke="#c1523c" stroke-width="1.8" fill="none" stroke-dasharray="5 3" marker-end="url(#ah)"/>`;
+  s += `<text x="${(ix+ox)/2}" y="275" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#c1523c" font-weight="600">오차 역전파(연쇄법칙) — 출력층 → 은닉층 → 입력층 방향으로 가중치 갱신</text>`;
+
+  document.getElementById('svg-backprop').innerHTML = s;
+}
+buildBackprop();
+
+// ---------- Figure 6: Boltzmann Machine ----------
+function buildBoltzmann(){
+  let s = '';
+  const visible = [80,140,200].map(y=>({x:100,y}));
+  const hidden = [60,110,160,210].map(y=>({x:300,y}));
+  visible.forEach(v=> hidden.forEach(h=>{
+    s += `<line x1="${v.x+16}" y1="${v.y}" x2="${h.x-16}" y2="${h.y}" stroke="#bd603a" stroke-width="1.1" opacity="0.55"/>`;
+  }));
+  // intra-hidden and intra-visible connections (fully connected within layer too, Boltzmann is unrestricted)
+  for(let i=0;i<visible.length;i++) for(let j=i+1;j<visible.length;j++){
+    s += `<path d="M${visible[i].x-20},${visible[i].y} C${visible[i].x-45},${(visible[i].y+visible[j].y)/2} ${visible[j].x-20},${visible[j].y} ${visible[j].x-20},${visible[j].y}" stroke="#8c4426" stroke-width="1" fill="none" opacity="0.4"/>`;
+  }
+  for(let i=0;i<hidden.length;i++) for(let j=i+1;j<hidden.length;j++){
+    s += `<path d="M${hidden[i].x+20},${hidden[i].y} C${hidden[i].x+45},${(hidden[i].y+hidden[j].y)/2} ${hidden[j].x+20},${hidden[j].y} ${hidden[j].x+20},${hidden[j].y}" stroke="#4d6a8a" stroke-width="1" fill="none" opacity="0.4"/>`;
+  }
+  visible.forEach(v=> s += `<circle cx="${v.x}" cy="${v.y}" r="16" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="2"/>`);
+  hidden.forEach(h=> s += `<circle cx="${h.x}" cy="${h.y}" r="16" fill="#dfe8f0" stroke="#4d6a8a" stroke-width="2"/>`);
+  s += `<text x="100" y="240" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#8c4426" font-weight="600">가시층(visible)</text>`;
+  s += `<text x="300" y="240" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#3c5a78" font-weight="600">은닉층(hidden)</text>`;
+  document.getElementById('svg-boltzmann').innerHTML = s;
+}
+buildBoltzmann();
+
+// ---------- Figure 7: LeNet-5 ----------
+function buildLeNet(){
+  let s = ARROW_DEFS;
+  const blocks = [
+    {w:60,h:60,label:'INPUT\\n32×32',fill:'#f5f5f5',stroke:'#999'},
+    {w:55,h:55,label:'C1\\nconv',fill:'#fbe9d8',stroke:'#bd5a2e'},
+    {w:42,h:42,label:'S2\\npool',fill:'#f8ded0',stroke:'#bd5a2e'},
+    {w:35,h:35,label:'C3\\nconv',fill:'#fbe9d8',stroke:'#bd5a2e'},
+    {w:26,h:26,label:'S4\\npool',fill:'#f8ded0',stroke:'#bd5a2e'},
+    {w:24,h:70,label:'C5\\nFC',fill:'#e9edda',stroke:'#6b7d4f'},
+    {w:24,h:50,label:'F6\\nFC',fill:'#e9edda',stroke:'#6b7d4f'},
+    {w:24,h:34,label:'출력\\n(0-9)',fill:'#dfe8f0',stroke:'#4d6a8a'}
+  ];
+  let x = 20;
+  const midY = 110;
+  blocks.forEach((b,i)=>{
+    const y = midY - b.h/2;
+    s += `<rect x="${x}" y="${y}" width="${b.w}" height="${b.h}" fill="${b.fill}" stroke="${b.stroke}" stroke-width="1.8" rx="4"/>`;
+    const lines = b.label.split('\\n');
+    lines.forEach((ln,li)=>{
+      s += `<text x="${x+b.w/2}" y="${y+b.h/2+ (li-((lines.length-1)/2))*12 + 4}" text-anchor="middle" font-family="Pretendard" font-size="9.5" fill="#2c241b">${ln}</text>`;
+    });
+    if(i<blocks.length-1){
+      s += arrowLine(x+b.w+3, midY, x+b.w+22, midY, '#8c4426');
+    }
+    x += b.w + 25;
+  });
+  document.getElementById('svg-lenet').innerHTML = s;
+}
+buildLeNet();
+
+// ---------- Figure 8: DBN / Deep Autoencoder ----------
+function buildDBN(){
+  let s = ARROW_DEFS;
+  s += `<text x="140" y="20" text-anchor="middle" font-family="Pretendard" font-size="12.5" fill="#8c4426" font-weight="600">① RBM 층별 비지도 사전학습</text>`;
+  const layers = [180, 150, 120, 90];
+  let ly = 40;
+  layers.forEach((w,i)=>{
+    s += rectBox(140-w/2, ly, w, 22, i%2===0?'#fbe9d8':'#dfe8f0', i%2===0?'#bd5a2e':'#4d6a8a', `층 ${layers.length-i}`, null, 10);
+    ly += 30;
+  });
+  s += `<text x="140" y="${ly+15}" text-anchor="middle" font-family="Pretendard" font-size="10.5" fill="#6b5f51">RBM을 한 층씩 쌓아가며 사전학습(pretraining)</text>`;
+
+  s += arrowLine(300, 130, 360, 130, '#8c4426');
+  s += `<text x="330" y="118" text-anchor="middle" font-family="Pretendard" font-size="10.5" fill="#8c4426">미세조정</text>`;
+
+  // hourglass autoencoder
+  s += `<text x="500" y="20" text-anchor="middle" font-family="Pretendard" font-size="12.5" fill="#8c4426" font-weight="600">② 오토인코더로 미세조정(fine-tuning)</text>`;
+  s += `<polygon points="410,40 590,40 520,100 480,100" fill="#f6e7d8" opacity="0.7" stroke="#ecd3bf"/>`;
+  s += `<rect x="480" y="100" width="40" height="26" fill="#bd603a"/>`;
+  s += `<text x="500" y="117" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#fff" font-weight="700">code</text>`;
+  s += `<polygon points="480,126 520,126 590,186 410,186" fill="#f6e7d8" opacity="0.7" stroke="#ecd3bf"/>`;
+  s += `<text x="500" y="35" text-anchor="middle" font-family="Pretendard" font-size="9.5" fill="#8c4426">인코더</text>`;
+  s += `<text x="500" y="200" text-anchor="middle" font-family="Pretendard" font-size="9.5" fill="#8c4426">디코더</text>`;
+  s += `<text x="500" y="220" text-anchor="middle" font-family="Pretendard" font-size="10.5" fill="#6b5f51">저차원 code가 원본을 잘 복원하도록 미세조정</text>`;
+
+  document.getElementById('svg-dbn').innerHTML = s;
+}
+buildDBN();
+
+// ---------- Figure 9: AlexNet ----------
+function buildAlexNet(){
+  let s = ARROW_DEFS;
+  const convs = [
+    {w:50,h:80,label:'Conv1\\n+ReLU'},{w:44,h:70,label:'Conv2\\n+ReLU'},
+    {w:38,h:60,label:'Conv3\\n+ReLU'},{w:34,h:54,label:'Conv4\\n+ReLU'},{w:30,h:48,label:'Conv5\\n+ReLU'}
+  ];
+  const fcs = [{w:22,h:90,label:'FC6\\nDropout'},{w:22,h:90,label:'FC7\\nDropout'},{w:22,h:60,label:'FC8\\n1000-way'}];
+  let x=20; const midY=110;
+  convs.forEach((b,i)=>{
+    const y=midY-b.h/2;
+    s += `<rect x="${x}" y="${y}" width="${b.w}" height="${b.h}" fill="#fbe9d8" stroke="#bd5a2e" stroke-width="1.8" rx="4"/>`;
+    b.label.split('\\n').forEach((ln,li)=> s += `<text x="${x+b.w/2}" y="${y+b.h/2+(li-0.5)*12+4}" text-anchor="middle" font-family="Pretendard" font-size="9" fill="#2c241b">${ln}</text>`);
+    s += arrowLine(x+b.w+3, midY, x+b.w+18, midY, '#8c4426');
+    x += b.w+21;
+  });
+  fcs.forEach((b,i)=>{
+    const y=midY-b.h/2;
+    s += `<rect x="${x}" y="${y}" width="${b.w}" height="${b.h}" fill="#e9edda" stroke="#6b7d4f" stroke-width="1.8" rx="4"/>`;
+    b.label.split('\\n').forEach((ln,li)=> s += `<text x="${x+b.w/2}" y="${y+b.h/2+(li-0.5)*11+4}" text-anchor="middle" font-family="Pretendard" font-size="8.5" fill="#2c241b">${ln}</text>`);
+    if(i<fcs.length-1) s += arrowLine(x+b.w+3, midY, x+b.w+18, midY, '#8c4426');
+    x += b.w+21;
+  });
+  s += `<text x="340" y="25" text-anchor="middle" font-family="Pretendard" font-size="10.5" fill="#6b5f51">GTX580 GPU 2장에 병렬 분산 학습 · 총 8개 학습층(5 Conv + 3 FC) · 약 6천만 파라미터</text>`;
+  document.getElementById('svg-alexnet').innerHTML = s;
+}
+buildAlexNet();
+
+// ---------- Figure 10: Transformer ----------
+function buildTransformer(){
+  let s = ARROW_DEFS;
+  function stack(x, title, color, stroke){
+    let ss = `<text x="${x+70}" y="20" text-anchor="middle" font-family="Pretendard" font-size="13" fill="${stroke}" font-weight="600">${title}</text>`;
+    ss += `<rect x="${x}" y="30" width="140" height="230" fill="${color}" opacity="0.4" stroke="${stroke}" stroke-width="1.5" rx="10"/>`;
+    const subs = ['Multi-Head\\nSelf-Attention','Add & Norm','Feed\\nForward','Add & Norm'];
+    let y = 45;
+    subs.forEach(lbl=>{
+      ss += `<rect x="${x+15}" y="${y}" width="110" height="42" fill="#fff" stroke="${stroke}" stroke-width="1.3" rx="5"/>`;
+      lbl.split('\\n').forEach((ln,li)=> ss += `<text x="${x+70}" y="${y+21+(li-((lbl.split('\\n').length-1)/2))*12}" text-anchor="middle" font-family="Pretendard" font-size="9.5" fill="#2c241b">${ln}</text>`);
+      y += 50;
+    });
+    ss += `<text x="${x+70}" y="270" text-anchor="middle" font-family="Pretendard" font-size="10" fill="${stroke}">× N=6</text>`;
+    return ss;
+  }
+  s += stack(30, '인코더', '#e2ebf2', '#3c5a78');
+  s += stack(390, '디코더', '#f6e7d8', '#8c4426');
+  s += arrowLine(170, 90, 385, 140, '#4c6b3c');
+  s += `<text x="270" y="105" text-anchor="middle" font-family="Pretendard" font-size="9.5" fill="#4c6b3c">인코더-디코더 어텐션</text>`;
+  s += `<text x="100" y="280" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#3c5a78">입력 임베딩 + 위치인코딩</text>`;
+  s += `<text x="460" y="280" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#8c4426">출력(우측이동) + 위치인코딩</text>`;
+  document.getElementById('svg-transformer').innerHTML = s;
+}
+buildTransformer();
+
+// ---------- Figure 11: Genealogy ----------
+function buildGenealogy(){
+  let s = ARROW_DEFS;
+  const nodes = {
+    mcp:{x:80,y:40,label:'McCulloch\\n-Pitts 1943',color:'#f6e7d8',stroke:'#bd603a'},
+    rosen:{x:80,y:130,label:'Rosenblatt\\n1958',color:'#f6e7d8',stroke:'#bd603a'},
+    widrow:{x:80,y:220,label:'Widrow-Hoff\\n1960',color:'#f6e7d8',stroke:'#bd603a'},
+    minsky:{x:80,y:310,label:'Minsky-Papert\\n1969',color:'#ececec',stroke:'#888'},
+    rumelhart:{x:300,y:220,label:'Rumelhart\\nWilliams 1986',color:'#e2ebf2',stroke:'#3c5a78'},
+    hinton:{x:300,y:60,label:'Hinton\\n(중심 인물)',color:'#f0e3ea',stroke:'#8a5a78'},
+    boltzmann:{x:300,y:140,label:'Boltzmann\\nMachine 1985',color:'#e2ebf2',stroke:'#3c5a78'},
+    lecun:{x:520,y:80,label:'LeCun\\nCNN 1989/98',color:'#e9edda',stroke:'#6b7d4f'},
+    hintonruslan:{x:520,y:220,label:'Hinton·\\nSalakhutdinov 2006',color:'#e2ebf2',stroke:'#3c5a78'},
+    krizhevsky:{x:520,y:310,label:'Krizhevsky\\nAlexNet 2012',color:'#f6e7d8',stroke:'#bd603a'},
+    vaswani:{x:740,y:220,label:'Vaswani 등\\nTransformer 2017',color:'#ece3f2',stroke:'#6a4a8a'}
+  };
+  function edge(a,b,dash,color){
+    const A=nodes[a], B=nodes[b];
+    s += `<line x1="${A.x+65}" y1="${A.y+22}" x2="${B.x-5}" y2="${B.y+22}" stroke="${color||'#8c4426'}" stroke-width="1.6" ${dash?`stroke-dasharray="${dash}"`:''} marker-end="url(#ah)"/>`;
+  }
+  // idea lineage (dashed)
+  edge('mcp','rosen','4 3','#bd603a');
+  edge('rosen','widrow','4 3','#bd603a');
+  edge('widrow','minsky','4 3','#bd603a');
+  edge('minsky','rumelhart','4 3','#bd603a');
+  // direct mentorship / coauthorship (solid)
+  s += `<line x1="365" y1="82" x2="365" y2="140" stroke="#8a5a78" stroke-width="1.6" marker-end="url(#ah)"/>`;
+  s += `<line x1="365" y1="82" x2="365" y2="220" stroke="#8a5a78" stroke-width="1.6" marker-end="url(#ah)"/>`;
+  s += `<path d="M365,82 C440,82 460,80 455,80" stroke="#8a5a78" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>`;
+  s += `<path d="M365,82 C440,150 460,220 455,220" stroke="#8a5a78" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>`;
+  s += `<path d="M365,82 C440,230 460,310 455,310" stroke="#8a5a78" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>`;
+  edge('hintonruslan','krizhevsky',null,'#3c5a78');
+  edge('rumelhart','hintonruslan','4 3','#3c5a78');
+  edge('krizhevsky','vaswani','4 3','#6a4a8a');
+
+  Object.values(nodes).forEach(n=>{
+    s += `<rect x="${n.x-65}" y="${n.y}" width="130" height="44" rx="8" fill="${n.color}" stroke="${n.stroke}" stroke-width="1.6"/>`;
+    const lines = n.label.split('\\n');
+    lines.forEach((ln,li)=> s += `<text x="${n.x}" y="${n.y+22+(li-((lines.length-1)/2))*13+3}" text-anchor="middle" font-family="Pretendard" font-size="10.5" fill="#2c241b" font-weight="600">${ln}</text>`);
+  });
+
+  s += `<text x="80" y="400" font-family="Pretendard" font-size="10.5" fill="#bd603a">— — 점선: 아이디어의 계승</text>`;
+  s += `<text x="300" y="400" font-family="Pretendard" font-size="10.5" fill="#8a5a78">━━ 실선(자주색): Hinton의 직접 지도/공동연구</text>`;
+  document.getElementById('svg-genealogy').innerHTML = s;
+}
+buildGenealogy();
+
+// Scrollspy
+const links = document.querySelectorAll('#navList a');
+const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href')));
+function onScroll(){
+  let idx = 0;
+  const scrollPos = window.scrollY + 120;
+  sections.forEach((sec,i) => { if(sec && sec.offsetTop <= scrollPos) idx = i; });
+  links.forEach(l => l.classList.remove('active'));
+  if(links[idx]) links[idx].classList.add('active');
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+  document.getElementById('progressBar').style.width = progress + '%';
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+</script>
+</body>
+</html>

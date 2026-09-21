@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 모델 아키텍처의 계보 — MLP에서 Attention까지</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>
+  window.MathJax = { tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+  :root{
+    --paper:#faf6ef;
+    --paper-card:#fffdf8;
+    --ink:#2b2620;
+    --ink-soft:#5c5548;
+    --accent:#b5502f;
+    --accent-soft:#f1e0d3;
+    --accent2:#7a6a4f;
+    --line:#e6dcc9;
+    --code-bg:#2e2a22;
+    --code-ink:#f5efe1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Pretendard', sans-serif; line-height:1.75; font-size:16px;
+  }
+  h1,h2,h3,h4{ font-family:'Spectral', serif; color:#3a2f22; }
+  code, .mono { font-family:'JetBrains Mono', monospace; }
+
+  .layout{ display:flex; max-width:1280px; margin:0 auto; }
+  aside{
+    width:260px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+    padding:28px 18px; border-right:1px solid var(--line); background:var(--paper);
+  }
+  aside h2{ font-size:.95rem; letter-spacing:.03em; color:var(--accent2); margin:0 0 14px; text-transform:uppercase; }
+  aside ol{ list-style:none; padding:0; margin:0; counter-reset:ch; }
+  aside li{ counter-increment: ch; margin-bottom:4px; }
+  aside a{
+    display:block; padding:7px 10px; border-radius:8px; text-decoration:none;
+    color:var(--ink-soft); font-size:.88rem; transition:.15s;
+  }
+  aside a::before{ content: counter(ch) ". "; color:var(--accent); font-weight:600; }
+  aside a:hover, aside a.active{ background:var(--accent-soft); color:var(--accent); }
+
+  main{ flex:1; min-width:0; padding:40px 48px 100px; }
+
+  header.hero{
+    background:linear-gradient(135deg,#3a2f22,#6b4226 60%,#b5502f);
+    color:#fdf6ec; border-radius:18px; padding:44px 40px; margin-bottom:34px;
+  }
+  header.hero h1{ color:#fff; font-size:2rem; margin:0 0 10px; }
+  header.hero p{ margin:4px 0; opacity:.92; font-size:.95rem; }
+  .badge-row{ margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; }
+  .badge{ background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); border-radius:999px; padding:4px 12px; font-size:.78rem; }
+
+  section{
+    background:var(--paper-card); border:1px solid var(--line); border-radius:14px;
+    padding:32px 36px; margin-bottom:26px; box-shadow:0 3px 10px rgba(90,70,40,.05);
+  }
+  section h2{
+    font-size:1.5rem; margin-top:0; padding-bottom:12px; border-bottom:2px solid var(--accent-soft);
+    display:flex; align-items:center; gap:10px;
+  }
+  section h2 .num{
+    display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
+    background:var(--accent); color:#fff; border-radius:9px; font-size:1rem; font-family:'JetBrains Mono';
+  }
+  section h3{ font-size:1.15rem; margin-top:28px; color:var(--accent2); }
+  p{ color:var(--ink); }
+
+  .callout{
+    background:var(--accent-soft); border-left:4px solid var(--accent); border-radius:8px;
+    padding:14px 18px; margin:16px 0; font-size:.94rem;
+  }
+  .callout strong{ color:var(--accent); }
+
+  ul.plain, ol.plain{ padding-left:22px; }
+  ul.plain li, ol.plain li{ margin-bottom:8px; }
+
+  figure{ margin:22px 0; text-align:center; }
+  figure svg{ max-width:100%; height:auto; background:var(--paper-card); }
+  figcaption{ font-size:.83rem; color:var(--ink-soft); margin-top:8px; }
+
+  table{ width:100%; border-collapse:collapse; margin:18px 0; font-size:.92rem; }
+  th, td{ border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top; }
+  th{ background:var(--accent-soft); color:#3a2f22; font-family:'Spectral'; font-weight:600; }
+  tr:nth-child(even) td{ background:#fbf7ef; }
+
+  .formula-box{
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px 20px; margin:16px 0;
+    text-align:center; overflow-x:auto;
+  }
+
+  .checklist{ list-style:none; padding:0; }
+  .checklist li{
+    padding:10px 14px; margin-bottom:8px; background:#fbf7ef; border:1px solid var(--line);
+    border-radius:8px; display:flex; gap:10px; align-items:flex-start; font-size:.93rem;
+  }
+  .checklist li::before{ content:"✓"; color:var(--accent); font-weight:700; }
+
+  .foot{ text-align:center; color:var(--ink-soft); font-size:.82rem; padding:30px 0 60px; }
+  .foot a{ color:var(--accent); }
+
+  @media (max-width: 900px){
+    .layout{ flex-direction:column; }
+    aside{ position:relative; width:100%; height:auto; border-right:none; border-bottom:1px solid var(--line); }
+    main{ padding:24px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <aside>
+    <h2>목차</h2>
+    <ol>
+      <li><a href="#s1">왜 아키텍처는 계속 바뀌는가</a></li>
+      <li><a href="#s2">MLP — 최초의 신경망</a></li>
+      <li><a href="#s3">MLP의 한계</a></li>
+      <li><a href="#s4">CNN — 이미지를 위한 구조</a></li>
+      <li><a href="#s5">RNN 등장 배경 — 텍스트 문제</a></li>
+      <li><a href="#s6">RNN 구조와 순환 메커니즘</a></li>
+      <li><a href="#s7">RNN의 두 가지 한계</a></li>
+      <li><a href="#s8">Attention 메커니즘</a></li>
+      <li><a href="#s9">아키텍처 계보 종합비교</a></li>
+      <li><a href="#s10">체크리스트</a></li>
+    </ol>
+  </aside>
+
+  <main>
+    <header class="hero">
+      <h1>AI 모델 아키텍처의 계보</h1>
+      <p>MLP → CNN → RNN → Attention까지, "왜" 구조가 바뀌었는가를 중심으로</p>
+      <p style="font-size:.82rem; opacity:.75;">원문: Yang Kewen, "A Brief History Of AI Models — Part I" (Medium, 2023.09) 내용을 재구성·확장한 학습서</p>
+      <div class="badge-row">
+        <span class="badge">MLP · GLM</span>
+        <span class="badge">CNN · Convolution</span>
+        <span class="badge">RNN · Unrolling</span>
+        <span class="badge">Bahdanau Attention</span>
+      </div>
+    </header>
+
+    <!-- 1. 서론 -->
+    <section id="s1">
+      <h2><span class="num">1</span>왜 아키텍처는 계속 바뀌는가</h2>
+      <p>딥러닝 모델의 역사를 처음 접하면 MLP, CNN, RNN, Attention, Transformer 같은 용어들이 각각 독립적으로 등장한 것처럼 느껴지기 쉽습니다. 하지만 실제로는 <strong>이전 구조가 특정 데이터(이미지, 텍스트)를 처리할 때 부딪힌 구체적인 한계를 해결하기 위해</strong> 다음 구조가 순차적으로 고안된, 하나의 연속된 이야기입니다.</p>
+      <p>이 학습서는 그 흐름을 "무엇이 문제였고, 그래서 무엇을 새로 도입했는가"라는 질문을 축으로 따라갑니다:</p>
+      <div class="callout">
+        <strong>핵심 흐름</strong><br>
+        MLP (모든 입력을 평평하게 처리) → 이미지에서 한계 → <strong>CNN</strong> (공간 정보 보존) → 텍스트에서 한계 → <strong>RNN</strong> (순서 정보 처리) → 장기 의존성 문제 → <strong>Attention</strong> (문맥에 따라 가중치 부여)
+      </div>
+    </section>
+
+    <!-- 2. MLP -->
+    <section id="s2">
+      <h2><span class="num">2</span>MLP — 최초의 신경망</h2>
+      <p>다층 퍼셉트론(Multilayer Perceptron, MLP)은 전통적인 통계·머신러닝 모델(다중선형회귀, 그래디언트 부스팅 등)보다 훨씬 복잡하고 연산량이 많은 구조로, 딥러닝의 출발점으로 꼽힙니다.</p>
+
+      <h3>2-1. 통계학적 관점: GLM과의 유사성</h3>
+      <p>통계학을 공부한 사람의 시각에서 보면, MLP의 뉴런 하나는 <strong>일반화선형모형(Generalized Linear Model, GLM)</strong>과 구조적으로 닮아 있습니다. GLM은 1972년에 처음 제안된 개념으로, 선형결합의 결과를 연결함수(link function)를 통해 비선형 반응변수로 변환합니다.</p>
+      <div class="formula-box">
+        $$ g(E[y]) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_n x_n $$
+      </div>
+      <p>여기서 연결함수 $g(\cdot)$의 역함수가 바로 MLP 뉴런의 <strong>활성화 함수(activation function)</strong>에 대응합니다. 즉 "선형결합 + 비선형변환"이라는 골격 자체는 GLM 시대부터 이미 있었고, MLP는 이 구조를 여러 층으로 쌓아 올린 것으로 이해할 수 있습니다.</p>
+
+      <h3>2-2. 순전파 (Forward Propagation)</h3>
+      <p>MLP의 뉴런 하나를 특징 추출기(feature extractor)로 볼 수 있습니다. 입력 변수 $x_1, x_2, x_3$가 들어오면:</p>
+      <ol class="plain">
+        <li>먼저 선형결합으로 입력들의 <strong>선형적 특성</strong>을 포착합니다.</li>
+        <li>이어서 활성화 함수가 그 결과의 <strong>비선형적 특성</strong>을 포착해 최종 출력 $\hat{y}$(y-hat)을 만듭니다.</li>
+      </ol>
+      <p>통계학에서 "hat" 기호는 관례적으로 확률변수의 추정값을 의미합니다 — 즉 $\hat{y}$는 신경망이 내놓은 예측값입니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg">
+          <text x="20" y="26" font-family="JetBrains Mono" font-size="12" fill="#5c5548">입력층</text>
+          <text x="270" y="26" font-family="JetBrains Mono" font-size="12" fill="#5c5548">은닉층</text>
+          <text x="500" y="26" font-family="JetBrains Mono" font-size="12" fill="#5c5548">출력층</text>
+
+          <!-- input nodes -->
+          <g fill="#f1e0d3" stroke="#b5502f" stroke-width="1.5">
+            <circle cx="60" cy="70" r="18"/><circle cx="60" cy="140" r="18"/><circle cx="60" cy="210" r="18"/>
+          </g>
+          <g font-family="JetBrains Mono" font-size="13" fill="#3a2f22" text-anchor="middle">
+            <text x="60" y="75">x1</text><text x="60" y="145">x2</text><text x="60" y="215">x3</text>
+          </g>
+
+          <!-- hidden nodes -->
+          <g fill="#fbf7ef" stroke="#7a6a4f" stroke-width="1.5">
+            <circle cx="300" cy="55" r="20"/><circle cx="300" cy="120" r="20"/><circle cx="300" cy="185" r="20"/><circle cx="300" cy="245" r="20"/>
+          </g>
+          <g font-family="JetBrains Mono" font-size="10" fill="#3a2f22" text-anchor="middle">
+            <text x="300" y="52">Σ→f</text><text x="300" y="117">Σ→f</text><text x="300" y="182">Σ→f</text><text x="300" y="242">Σ→f</text>
+          </g>
+
+          <!-- output node -->
+          <circle cx="540" cy="150" r="22" fill="#b5502f"/>
+          <text x="540" y="155" font-family="JetBrains Mono" font-size="12" fill="#fff" text-anchor="middle">ŷ</text>
+
+          <!-- connections input-hidden -->
+          <g stroke="#e6dcc9" stroke-width="1">
+            <line x1="78" y1="70" x2="280" y2="55"/><line x1="78" y1="70" x2="280" y2="120"/><line x1="78" y1="70" x2="280" y2="185"/><line x1="78" y1="70" x2="280" y2="245"/>
+            <line x1="78" y1="140" x2="280" y2="55"/><line x1="78" y1="140" x2="280" y2="120"/><line x1="78" y1="140" x2="280" y2="185"/><line x1="78" y1="140" x2="280" y2="245"/>
+            <line x1="78" y1="210" x2="280" y2="55"/><line x1="78" y1="210" x2="280" y2="120"/><line x1="78" y1="210" x2="280" y2="185"/><line x1="78" y1="210" x2="280" y2="245"/>
+          </g>
+          <!-- connections hidden-output -->
+          <g stroke="#e6dcc9" stroke-width="1.5">
+            <line x1="320" y1="55" x2="520" y2="150"/><line x1="320" y1="120" x2="520" y2="150"/><line x1="320" y1="185" x2="520" y2="150"/><line x1="320" y1="245" x2="520" y2="150"/>
+          </g>
+
+          <text x="300" y="275" font-family="Pretendard" font-size="12" fill="#5c5548" text-anchor="middle">순전파: 선형결합(Σ) → 활성화함수(f) → 다음 층으로 전달</text>
+        </svg>
+        <figcaption>그림 1. 기본 MLP 네트워크 — 입력 x1,x2,x3가 은닉층의 Σ→f 과정을 거쳐 예측값 ŷ로 이어짐</figcaption>
+      </figure>
+
+      <h3>2-3. 역전파 (Backward Propagation)</h3>
+      <p>예측값 $\hat{y}$을 얻으면 실제값 $y$와 비교해 오차를 계산합니다. MLP의 목표는 이 오차를 최소화하는 것이므로, <strong>경사하강법(gradient descent)</strong>으로 손실함수의 전역 최소점을 찾아갑니다. 이 과정에서 오차를 출력층에서 입력층 방향으로 거슬러 전파하며 각 가중치의 기울기를 계산하는 절차가 역전파입니다.</p>
+    </section>
+
+    <!-- 3. MLP 한계 -->
+    <section id="s3">
+      <h2><span class="num">3</span>MLP의 한계</h2>
+      <p>MLP는 전통적인 머신러닝 모델보다 나은 성능을 보여줬지만, 연구자들은 곧 다음과 같은 구조적 약점을 발견했습니다.</p>
+      <table>
+        <tr><th>한계</th><th>구체적 설명</th></tr>
+        <tr><td>이미지 처리에 취약</td><td>객체 간 공간적 관계를 학습하기 어렵고, 픽셀 수가 많아지면 연산 효율이 급격히 떨어짐</td></tr>
+        <tr><td>이동 불변성(translation invariance) 부재</td><td>같은 고양이라도 이미지 상단/하단 어디에 있는지에 따라 예측 결과가 달라짐</td></tr>
+        <tr><td>문맥 이해 부족</td><td>입력을 순서 없는 평평한 벡터로 취급하므로 단어/픽셀 간 맥락을 반영하지 못함</td></tr>
+        <tr><td>고정된 입력 크기</td><td>가변 길이 문장이나 가변 해상도 이미지를 다루기 어려움</td></tr>
+      </table>
+      <p>이 중 앞의 두 가지(공간 관계, 이동 불변성)를 해결하기 위해 등장한 것이 <strong>CNN</strong>이고, 뒤의 두 가지(문맥, 가변 길이)를 해결하기 위해 등장한 것이 <strong>RNN</strong>입니다 — 즉 하나의 문제의식이 두 갈래의 구조로 갈라져 발전했다고 볼 수 있습니다.</p>
+    </section>
+
+    <!-- 4. CNN -->
+    <section id="s4">
+      <h2><span class="num">4</span>CNN — 이미지를 위한 구조</h2>
+      <p>CNN(합성곱 신경망)의 핵심은 <strong>합성곱 층(convolutional layer)</strong>으로, 시각적 특징을 추출하는 역할을 합니다. 커널(kernel)이라는 작은 필터가 이미지 위를 일정한 보폭(stride)으로 이동하며, 그때마다 겹치는 픽셀 영역의 정보를 하나의 값으로 요약합니다. 이 과정을 거치면 원본 이미지보다 작은 <strong>특성 맵(feature map)</strong>이 만들어집니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 620 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- input grid -->
+          <text x="90" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#5c5548">입력 이미지</text>
+          <g stroke="#7a6a4f" stroke-width="1" fill="#fbf7ef">
+            <!-- 6x6 grid -->
+            <rect x="10" y="30" width="160" height="160"/>
+          </g>
+          <g stroke="#e6dcc9" stroke-width="1">
+            <line x1="36.7" y1="30" x2="36.7" y2="190"/><line x1="63.3" y1="30" x2="63.3" y2="190"/>
+            <line x1="90" y1="30" x2="90" y2="190"/><line x1="116.7" y1="30" x2="116.7" y2="190"/><line x1="143.3" y1="30" x2="143.3" y2="190"/>
+            <line x1="10" y1="56.7" x2="170" y2="56.7"/><line x1="10" y1="83.3" x2="170" y2="83.3"/><line x1="10" y1="110" x2="170" y2="110"/>
+            <line x1="10" y1="136.7" x2="170" y2="136.7"/><line x1="10" y1="163.3" x2="170" y2="163.3"/>
+          </g>
+          <!-- kernel highlight -->
+          <rect x="36.7" y="56.7" width="80" height="80" fill="none" stroke="#b5502f" stroke-width="3"/>
+          <text x="76" y="150" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#b5502f">커널(3×3)</text>
+
+          <!-- arrow -->
+          <path d="M195 110 L245 110" stroke="#3a2f22" stroke-width="2" marker-end="url(#arrowh)"/>
+          <defs><marker id="arrowh" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#3a2f22"/></marker></defs>
+          <text x="220" y="95" text-anchor="middle" font-family="Pretendard" font-size="11" fill="#5c5548">합성곱</text>
+
+          <!-- feature map -->
+          <text x="480" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#5c5548">특성 맵 (Feature Map)</text>
+          <g stroke="#2563eb" stroke-width="1" fill="#eef2ff">
+            <rect x="420" y="30" width="120" height="120"/>
+          </g>
+          <g stroke="#c7d2fe" stroke-width="1">
+            <line x1="450" y1="30" x2="450" y2="150"/><line x1="480" y1="30" x2="480" y2="150"/><line x1="510" y1="30" x2="510" y2="150"/>
+            <line x1="420" y1="60" x2="540" y2="60"/><line x1="420" y1="90" x2="540" y2="90"/><line x1="420" y1="120" x2="540" y2="120"/>
+          </g>
+          <rect x="450" y="60" width="30" height="30" fill="#93c5fd" opacity="0.7"/>
+
+          <text x="310" y="210" text-anchor="middle" font-family="Pretendard" font-size="11" fill="#5c5548">커널이 고정된 보폭(stride)으로 이동하며 픽셀 영역을 요약 → 더 작은 특성 맵 생성</text>
+        </svg>
+        <figcaption>그림 2. 합성곱 연산 개념도 — 커널이 원본 이미지를 훑으며 특성 맵으로 압축</figcaption>
+      </figure>
+
+      <p>이미지의 정보를 더 폭넓게 포착하기 위해, 보통 하나의 이미지에 <strong>여러 개의 커널</strong>을 동시에 적용해 여러 장의 특성 맵을 만듭니다. 이렇게 얻어진 특성 맵들을 평탄화(flatten)한 뒤 피드포워드 층(사실상 MLP)에 입력해 분류나 회귀 작업을 수행합니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="40" width="70" height="70" fill="#fbf7ef" stroke="#7a6a4f"/>
+          <text x="45" y="80" text-anchor="middle" font-family="Pretendard" font-size="11">이미지</text>
+
+          <path d="M85 75 L120 75" stroke="#3a2f22" stroke-width="2" marker-end="url(#arrowh2)"/>
+          <defs><marker id="arrowh2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#3a2f22"/></marker></defs>
+
+          <g>
+            <rect x="125" y="20" width="50" height="50" fill="#dbeafe" stroke="#2563eb"/>
+            <rect x="135" y="32" width="50" height="50" fill="#bfdbfe" stroke="#2563eb"/>
+            <rect x="145" y="44" width="50" height="50" fill="#93c5fd" stroke="#2563eb"/>
+          </g>
+          <text x="160" y="115" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">복수 커널 → 복수 특성맵</text>
+
+          <path d="M220 75 L255 75" stroke="#3a2f22" stroke-width="2" marker-end="url(#arrowh2)"/>
+
+          <rect x="260" y="55" width="90" height="40" fill="#fef3c7" stroke="#f59e0b"/>
+          <text x="305" y="79" text-anchor="middle" font-family="Pretendard" font-size="10">Flatten</text>
+
+          <path d="M355 75 L390 75" stroke="#3a2f22" stroke-width="2" marker-end="url(#arrowh2)"/>
+
+          <g fill="#f1e0d3" stroke="#b5502f">
+            <circle cx="420" cy="45" r="12"/><circle cx="420" cy="75" r="12"/><circle cx="420" cy="105" r="12"/>
+            <circle cx="470" cy="60" r="12"/><circle cx="470" cy="90" r="12"/>
+          </g>
+          <g stroke="#e6dcc9">
+            <line x1="432" y1="45" x2="458" y2="60"/><line x1="432" y1="45" x2="458" y2="90"/>
+            <line x1="432" y1="75" x2="458" y2="60"/><line x1="432" y1="75" x2="458" y2="90"/>
+            <line x1="432" y1="105" x2="458" y2="60"/><line x1="432" y1="105" x2="458" y2="90"/>
+          </g>
+          <rect x="510" y="60" width="70" height="30" fill="#b5502f"/>
+          <text x="545" y="80" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#fff">분류/회귀</text>
+          <path d="M482 75 L505 75" stroke="#3a2f22" stroke-width="2" marker-end="url(#arrowh2)"/>
+          <text x="450" y="130" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">Feed-forward layer (=MLP)</text>
+        </svg>
+        <figcaption>그림 3. CNN의 전체 파이프라인 — 합성곱으로 특성 추출 → 평탄화 → MLP로 최종 예측</figcaption>
+      </figure>
+    </section>
+
+    <!-- 5. RNN 배경 -->
+    <section id="s5">
+      <h2><span class="num">5</span>RNN 등장 배경 — 텍스트 문제</h2>
+      <p>합성곱 층 덕분에 이미지 처리에서의 MLP 한계는 상당 부분 해소되었지만, <strong>자연어 처리(NLP)</strong>에서는 여전히 다른 종류의 문제가 남아 있었습니다.</p>
+      <ul class="plain">
+        <li>문장 속 단어들 사이의 <strong>문맥</strong>은 기계 독해에서 매우 중요한데, MLP나 CNN은 이를 제대로 포착하지 못함</li>
+        <li>기계 번역과 같은 작업에서는 입력과 출력의 <strong>길이가 고정되어 있지 않음</strong> — 문장마다 단어 수가 다름</li>
+      </ul>
+      <p>이 문제들을 풀기 위해 연구자들이 도입한 것이 <strong>순환 신경망(Recurrent Neural Network, RNN)</strong>입니다.</p>
+    </section>
+
+    <!-- 6. RNN 구조 -->
+    <section id="s6">
+      <h2><span class="num">6</span>RNN 구조와 순환 메커니즘</h2>
+      <p>RNN 한 층은 이름과 달리 여러 개의 뉴런이 아니라 <strong>단 하나의 뉴런(셀)</strong>으로 구성되며, 이 셀이 시간 축을 따라 반복적으로 재사용됩니다. 많은 자료에서 RNN을 "펼친(unrolled)" 형태로 그리는데, 이는 시계열 순환 구조를 시간 순서에 따라 하나의 일직선 그래프로 풀어서 표현한 것일 뿐, 실제로 뉴런이 여러 개 있는 것은 아닙니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+          <text x="90" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#5c5548">순환 표현 (Recurrent)</text>
+          <circle cx="90" cy="100" r="34" fill="#f1e0d3" stroke="#b5502f" stroke-width="2"/>
+          <text x="90" y="105" text-anchor="middle" font-family="JetBrains Mono" font-size="12">RNN cell</text>
+          <path d="M120 80 A 30 30 0 0 1 120 120" fill="none" stroke="#b5502f" stroke-width="2" marker-end="url(#arrowh3)"/>
+          <defs><marker id="arrowh3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#b5502f"/></marker></defs>
+          <text x="150" y="80" font-family="Pretendard" font-size="10" fill="#5c5548">자기 자신에 순환</text>
+          <path d="M20 100 L56 100" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#arrowh4)"/>
+          <path d="M124 100 L160 100" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#arrowh4)"/>
+          <defs><marker id="arrowh4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#3a2f22"/></marker></defs>
+          <text x="15" y="130" font-family="JetBrains Mono" font-size="10">x&lt;t&gt;</text>
+          <text x="165" y="130" font-family="JetBrains Mono" font-size="10">y&lt;t&gt;</text>
+
+          <path d="M230 100 L270 100" stroke="#3a2f22" stroke-width="2" marker-end="url(#arrowh4)"/>
+          <text x="250" y="90" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">펼치면</text>
+
+          <text x="440" y="20" text-anchor="middle" font-family="Pretendard" font-size="12" fill="#5c5548">펼친 표현 (Unrolled)</text>
+          <g font-family="JetBrains Mono" font-size="10">
+            <circle cx="300" cy="100" r="22" fill="#fbf7ef" stroke="#7a6a4f"/>
+            <circle cx="370" cy="100" r="22" fill="#fbf7ef" stroke="#7a6a4f"/>
+            <circle cx="440" cy="100" r="22" fill="#fbf7ef" stroke="#7a6a4f"/>
+            <circle cx="510" cy="100" r="22" fill="#fbf7ef" stroke="#7a6a4f"/>
+            <text x="300" y="104" text-anchor="middle">t-1</text><text x="370" y="104" text-anchor="middle">t</text>
+            <text x="440" y="104" text-anchor="middle">t+1</text><text x="510" y="104" text-anchor="middle">t+2</text>
+          </g>
+          <g stroke="#b5502f" stroke-width="2">
+            <path d="M322 100 L348 100" marker-end="url(#arrowh3)"/>
+            <path d="M392 100 L418 100" marker-end="url(#arrowh3)"/>
+            <path d="M462 100 L488 100" marker-end="url(#arrowh3)"/>
+          </g>
+          <text x="440" y="145" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">은닉상태 a&lt;t&gt;가 다음 시점으로 계속 전달됨</text>
+        </svg>
+        <figcaption>그림 4. RNN 셀 하나가 시간 축을 따라 재사용되는 구조 (좌: 순환 표현, 우: 펼친 표현)</figcaption>
+      </figure>
+
+      <p>RNN의 순환 구조를 좌에서 우로 읽으면, 이전 시점의 입력 텍스트 $x^{\langle t-1\rangle}$와 이전 은닉상태 $a^{\langle t-1\rangle}$가 현재 시점의 출력 텍스트 $y^{\langle t\rangle}$와 은닉상태 $a^{\langle t\rangle}$를 만드는 데 사용됩니다. 여기서 "시간 스텝(time step)"은 문장 속 단어의 위치 인덱스라고 이해하면 됩니다.</p>
+
+      <div class="callout">
+        <strong>정리</strong> — 단순 RNN은 입력 크기 제약과 문맥 이해 문제를 어느 정도 해결했지만, 완벽하지 않습니다. 다음 절에서 남은 두 가지 한계를 다룹니다.
+      </div>
+    </section>
+
+    <!-- 7. RNN 한계 -->
+    <section id="s7">
+      <h2><span class="num">7</span>RNN의 두 가지 한계</h2>
+      <table>
+        <tr><th>한계</th><th>설명</th></tr>
+        <tr>
+          <td><strong>망각 문제 (Forgetting Problem)</strong></td>
+          <td>은닉상태는 이전의 모든 단어 정보를 이론상 담고 있지만, 그 문맥 표현이 상대적으로 약하고 비효율적입니다. 문장이 길어질수록 앞부분의 정보가 점점 희석되어 "잊히는" 경향이 나타납니다.</td>
+        </tr>
+        <tr>
+          <td><strong>병렬 연산 불가</strong></td>
+          <td>출력 $y^{\langle t\rangle}$를 계산하려면 이전 은닉상태 $a^{\langle t-1\rangle}$와 현재 입력 $x^{\langle t\rangle}$가 모두 필요합니다. 즉 연산이 한 단어씩 순차적으로만 진행될 수 있어 GPU의 병렬 연산 이점을 활용하기 어렵고, 학습 속도가 느려집니다.</td>
+        </tr>
+      </table>
+      <p>이 중 망각 문제를 해결하기 위해 2014년 Bahdanau가 제안한 것이 <strong>Attention 메커니즘</strong>입니다.</p>
+    </section>
+
+    <!-- 8. Attention -->
+    <section id="s8">
+      <h2><span class="num">8</span>Attention 메커니즘</h2>
+      <p>Attention은 단순 RNN(또는 LSTM) 위에 추가되는 개선 장치로, 텍스트의 문맥 정보를 훨씬 효과적으로 포착할 수 있게 해줍니다. 기계 번역을 예로 들어 작동 원리를 살펴보겠습니다.</p>
+
+      <figure>
+        <svg viewBox="0 0 640 260" xmlns="http://www.w3.org/2000/svg">
+          <text x="150" y="24" text-anchor="middle" font-family="Pretendard" font-size="13" fill="#5c5548">인코더 (입력 텍스트 처리)</text>
+          <text x="480" y="24" text-anchor="middle" font-family="Pretendard" font-size="13" fill="#5c5548">디코더 (번역 출력 생성)</text>
+
+          <g font-family="JetBrains Mono" font-size="10">
+            <rect x="40" y="50" width="60" height="34" rx="6" fill="#dbeafe" stroke="#2563eb"/><text x="70" y="71" text-anchor="middle">Key</text>
+            <rect x="110" y="50" width="60" height="34" rx="6" fill="#fef3c7" stroke="#f59e0b"/><text x="140" y="71" text-anchor="middle">Value</text>
+
+            <rect x="40" y="110" width="60" height="34" rx="6" fill="#dbeafe" stroke="#2563eb"/><text x="70" y="131" text-anchor="middle">Key</text>
+            <rect x="110" y="110" width="60" height="34" rx="6" fill="#fef3c7" stroke="#f59e0b"/><text x="140" y="131" text-anchor="middle">Value</text>
+
+            <rect x="40" y="170" width="60" height="34" rx="6" fill="#dbeafe" stroke="#2563eb"/><text x="70" y="191" text-anchor="middle">Key</text>
+            <rect x="110" y="170" width="60" height="34" rx="6" fill="#fef3c7" stroke="#f59e0b"/><text x="140" y="191" text-anchor="middle">Value</text>
+          </g>
+          <text x="90" y="225" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">입력 단어마다 Key·Value 벡터 생성 (②)</text>
+
+          <rect x="440" y="110" width="80" height="34" rx="6" fill="#ede9fe" stroke="#7c3aed"/>
+          <text x="480" y="131" text-anchor="middle" font-family="JetBrains Mono" font-size="10">Query</text>
+          <text x="480" y="165" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">출력 단어마다 Query 벡터 생성 (①)</text>
+
+          <!-- weighted lines -->
+          <g stroke="#b5502f">
+            <line x1="170" y1="67" x2="440" y2="125" stroke-width="1" opacity="0.4"/>
+            <line x1="170" y1="127" x2="440" y2="125" stroke-width="3" opacity="0.9"/>
+            <line x1="170" y1="187" x2="440" y2="125" stroke-width="1.5" opacity="0.6"/>
+          </g>
+          <text x="300" y="90" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">Query·Key 유사도 → softmax 가중치 (③, 합=1)</text>
+
+          <rect x="440" y="200" width="150" height="34" rx="6" fill="#b5502f"/>
+          <text x="515" y="221" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#fff">Context Vector = Σ(가중치·Value)</text>
+          <path d="M480 144 L515 200" stroke="#3a2f22" stroke-width="1.5" marker-end="url(#arrowh5)"/>
+          <defs><marker id="arrowh5" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#3a2f22"/></marker></defs>
+          <text x="480" y="250" text-anchor="middle" font-family="Pretendard" font-size="10" fill="#5c5548">가중치×Value의 내적으로 문맥벡터 계산 (④)</text>
+        </svg>
+        <figcaption>그림 5. Attention의 Query–Key–Value 흐름 — 굵은 선일수록 해당 입력 단어에 더 높은 가중치가 부여됨을 의미</figcaption>
+      </figure>
+
+      <p>전체 과정을 4단계로 정리하면:</p>
+      <ol class="plain">
+        <li><strong>Query 생성</strong> — 디코더가 매 출력 단어를 하나의 쿼리(query) 벡터로 변환합니다.</li>
+        <li><strong>Key·Value 생성</strong> — 인코더는 각 입력 단어를 키(key) 벡터와 값(value) 벡터 한 쌍으로 분해합니다.</li>
+        <li><strong>가중치 계산</strong> — 특정 쿼리가 주어지면, 인코더는 각 입력 단어에 가중치를 부여합니다. 이때 softmax를 적용하므로 한 쿼리에 대한 가중치의 합은 항상 1이 됩니다.</li>
+        <li><strong>문맥 벡터 계산</strong> — 3단계에서 구한 가중치와 대응하는 value 벡터들의 내적(dot product)을 통해, 디코더는 각 출력 단어에 대한 문맥 벡터(context vector)를 계산합니다.</li>
+      </ol>
+      <div class="callout">
+        <strong>핵심 아이디어</strong> — 계산 과정 자체는 다소 복잡해 보이지만, 본질은 간단합니다: <em>특정 출력 단어를 기준으로 각 입력 단어에 얼마만큼의 중요도(가중치)를 부여할 것인가</em>를 학습하는 것입니다. 입력 단어별 중요도를 구분함으로써, 모델은 상황에 따라 다른 부분에 다른 정도로 "주의(attention)"를 기울일 수 있게 됩니다.
+      </div>
+
+      <h3>8-1. Attention이 남긴 과제</h3>
+      <p>Attention은 RNN의 망각 문제를 효과적으로 완화했습니다. 하지만 여전히 단순 RNN 구조 위에 얹혀 동작하기 때문에, attention 계산 자체의 연산 부담으로 학습 시간이 길어지고, RNN 특유의 순차 처리 방식 때문에 GPU 병렬화의 이점도 제대로 누리지 못합니다. 이 문제는 이후 RNN을 아예 걷어내고 Attention만으로 구성한 <strong>Transformer</strong> 구조로 이어집니다 (Part II에서 다룰 주제).</p>
+    </section>
+
+    <!-- 9. 종합 비교 -->
+    <section id="s9">
+      <h2><span class="num">9</span>아키텍처 계보 종합비교</h2>
+      <figure>
+        <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg">
+          <line x1="30" y1="80" x2="670" y2="80" stroke="#e6dcc9" stroke-width="3"/>
+          <g font-family="Pretendard" font-size="12" text-anchor="middle">
+            <circle cx="90" cy="80" r="9" fill="#b5502f"/><text x="90" y="60" fill="#3a2f22" font-weight="600">MLP</text><text x="90" y="105" fill="#5c5548" font-size="10">GLM의 심화판</text>
+            <circle cx="250" cy="80" r="9" fill="#2563eb"/><text x="250" y="60" fill="#3a2f22" font-weight="600">CNN</text><text x="250" y="105" fill="#5c5548" font-size="10">공간 정보 보존</text>
+            <circle cx="410" cy="80" r="9" fill="#16a34a"/><text x="410" y="60" fill="#3a2f22" font-weight="600">RNN</text><text x="410" y="105" fill="#5c5548" font-size="10">순서·문맥 처리</text>
+            <circle cx="570" cy="80" r="9" fill="#7c3aed"/><text x="570" y="60" fill="#3a2f22" font-weight="600">Attention</text><text x="570" y="105" fill="#5c5548" font-size="10">가중치 기반 문맥</text>
+          </g>
+          <text x="350" y="140" text-anchor="middle" font-family="Pretendard" font-size="11" fill="#7a6a4f">다음 편: Attention만 남기고 RNN을 제거한 Transformer, 그리고 BERT·GPT 계열</text>
+        </svg>
+        <figcaption>그림 6. MLP → CNN / RNN → Attention 계보 요약</figcaption>
+      </figure>
+
+      <table>
+        <tr><th>구조</th><th>해결한 문제</th><th>핵심 메커니즘</th><th>남은 한계</th></tr>
+        <tr><td>MLP</td><td>비선형 패턴 학습 (전통 통계모델 대비)</td><td>선형결합 + 활성화함수 (GLM의 확장)</td><td>이미지 공간정보·가변입력·문맥 처리 불가</td></tr>
+        <tr><td>CNN</td><td>이미지의 공간적 관계, 연산 효율</td><td>합성곱 커널로 지역 특징 추출 → 특성맵</td><td>텍스트의 순서·문맥·가변 길이 문제는 미해결</td></tr>
+        <tr><td>RNN</td><td>가변 길이 입력, 순서 정보 처리</td><td>은닉상태를 시간축을 따라 순환 전달</td><td>망각 문제, 순차 처리로 인한 GPU 병렬화 불가</td></tr>
+        <tr><td>Attention (RNN 기반)</td><td>장기 의존성·망각 문제</td><td>Query-Key-Value 유사도 기반 가중치 + 문맥벡터</td><td>여전히 RNN 위에서 동작 → 느린 학습, 병렬화 제약 지속</td></tr>
+      </table>
+    </section>
+
+    <!-- 10. 체크리스트 -->
+    <section id="s10">
+      <h2><span class="num">10</span>학습 체크리스트</h2>
+      <ul class="checklist">
+        <li>MLP 뉴런의 구조(선형결합 + 활성화함수)가 GLM의 연결함수 개념과 어떻게 대응하는지 설명할 수 있다</li>
+        <li>순전파와 역전파의 역할 차이(예측 생성 vs. 오차를 이용한 가중치 갱신)를 설명할 수 있다</li>
+        <li>MLP가 이미지 처리에서 겪는 4가지 한계를 나열할 수 있다</li>
+        <li>합성곱 연산에서 커널·스트라이드·특성맵의 관계를 설명할 수 있다</li>
+        <li>왜 하나의 이미지에 여러 커널을 적용하는지 이유를 설명할 수 있다</li>
+        <li>RNN 한 층이 여러 뉴런이 아니라 하나의 셀이 시간축으로 재사용되는 구조임을 이해하고 있다</li>
+        <li>RNN의 망각 문제와 병렬 연산 불가 문제를 구분해서 설명할 수 있다</li>
+        <li>Attention의 Query·Key·Value 각각이 무엇을 나타내는지, softmax가 어디에 쓰이는지 설명할 수 있다</li>
+        <li>Attention이 RNN의 어떤 한계를 해결했고, 어떤 한계는 그대로 남겼는지 구분할 수 있다</li>
+        <li>MLP→CNN/RNN→Attention 전체 계보를 "문제→해결책" 흐름으로 요약해서 말할 수 있다</li>
+      </ul>
+    </section>
+
+    <p class="foot">
+      원문: <a href="https://medium.com/@yangkewenvigorous/evolving-minds-the-metamorphosis-of-ai-models-from-mlp-to-transformer-part-1-11db8ef3ac8d" target="_blank" rel="noopener">Yang Kewen, "A Brief History Of AI Models — Part I" (Medium, 2023)</a><br>
+      이 학습서는 원문의 핵심 개념을 재구성·확장하여 작성한 것으로, 모든 다이어그램은 원문의 그림을 재현한 것이 아니라 본 학습서를 위해 새로 제작한 오리지널 일러스트입니다.
+    </p>
+
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('aside a');
+  const sections = document.querySelectorAll('main section');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const id = e.target.id;
+        const match = document.querySelector(`aside a[href="#${id}"]`);
+        if(match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s=>io.observe(s));
+</script>
+
+</body>
+</html>

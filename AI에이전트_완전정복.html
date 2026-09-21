@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 에이전트 완전정복 — 역사·원리·현재</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pretendard/1.3.9/static/pretendard.min.css">
+<style>
+:root{
+  --paper:#f6f1e8;
+  --paper-warm:#efe6d8;
+  --ink:#2b2420;
+  --ink-soft:#5a4f45;
+  --line:#ded2bf;
+  --terracotta:#b8562f;
+  --terracotta-soft:#e7c3ac;
+  --teal:#3c6e6b;
+  --teal-soft:#cfe0dd;
+  --gold:#a9822c;
+  --code-bg:#fbf8f2;
+  --card-bg:#fffdf8;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Pretendard', -apple-system, sans-serif;
+  line-height:1.75;
+  font-size:16px;
+}
+::selection{background:var(--terracotta-soft);}
+
+.layout{display:flex; max-width:1320px; margin:0 auto;}
+
+/* Sidebar */
+.sidebar{
+  width:270px;
+  flex-shrink:0;
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow-y:auto;
+  padding:34px 20px 40px 28px;
+  border-right:1px solid var(--line);
+}
+.sidebar::-webkit-scrollbar{width:6px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--terracotta-soft); border-radius:3px;}
+.brand{
+  font-family:'Spectral', serif;
+  font-weight:600;
+  font-size:1.05rem;
+  color:var(--terracotta);
+  margin-bottom:4px;
+}
+.brand-sub{
+  font-size:0.78rem;
+  color:var(--ink-soft);
+  margin-bottom:26px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--line);
+}
+nav.toc a{
+  display:block;
+  font-size:0.86rem;
+  color:var(--ink-soft);
+  text-decoration:none;
+  padding:6px 10px;
+  border-radius:6px;
+  margin-bottom:1px;
+  transition:background .15s, color .15s;
+  line-height:1.4;
+}
+nav.toc a .num{
+  color:var(--gold);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;
+  margin-right:6px;
+}
+nav.toc a:hover{background:var(--paper-warm); color:var(--ink);}
+nav.toc a.active{background:var(--terracotta); color:#fff;}
+nav.toc a.active .num{color:#fce6d8;}
+nav.toc .group-label{
+  font-size:0.7rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--ink-soft);
+  opacity:.55;
+  margin:16px 10px 6px;
+}
+
+/* Main content */
+main{flex:1; min-width:0; padding:48px 56px 120px;}
+@media (max-width: 900px){
+  .sidebar{display:none;}
+  main{padding:28px 20px 80px;}
+}
+
+header.cover{
+  padding:10px 0 40px;
+  border-bottom:2px solid var(--ink);
+  margin-bottom:48px;
+}
+.cover .kicker{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.78rem;
+  color:var(--terracotta);
+  letter-spacing:.03em;
+  margin-bottom:14px;
+}
+.cover h1{
+  font-family:'Spectral', serif;
+  font-size:2.7rem;
+  font-weight:700;
+  line-height:1.25;
+  margin:0 0 18px;
+}
+.cover p.lead{
+  font-size:1.05rem;
+  color:var(--ink-soft);
+  max-width:640px;
+  margin:0;
+}
+.cover .meta-row{
+  display:flex; gap:22px; margin-top:26px; flex-wrap:wrap;
+}
+.cover .meta-item{
+  font-size:0.82rem; color:var(--ink-soft);
+  border-left:2px solid var(--terracotta-soft);
+  padding-left:10px;
+}
+.cover .meta-item b{display:block; color:var(--ink); font-size:0.92rem;}
+
+section.chapter{
+  margin-bottom:64px;
+  scroll-margin-top:24px;
+}
+section.chapter h2{
+  font-family:'Spectral', serif;
+  font-size:1.85rem;
+  font-weight:700;
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+  margin:0 0 6px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+}
+section.chapter h2 .chnum{
+  font-family:'JetBrains Mono',monospace;
+  font-size:1rem;
+  color:var(--terracotta);
+  font-weight:500;
+}
+section.chapter .subhead{
+  color:var(--ink-soft);
+  font-size:0.92rem;
+  margin:10px 0 26px;
+}
+h3{
+  font-family:'Spectral', serif;
+  font-size:1.28rem;
+  font-weight:600;
+  margin:34px 0 12px;
+  color:var(--ink);
+}
+h4{
+  font-size:1.02rem;
+  font-weight:700;
+  margin:22px 0 8px;
+  color:var(--terracotta);
+}
+p{margin:0 0 15px;}
+ul, ol{margin:0 0 16px; padding-left:22px;}
+li{margin-bottom:6px;}
+strong{color:var(--ink); font-weight:700;}
+em.term{font-style:normal; color:var(--terracotta); font-weight:600;}
+
+.callout{
+  background:var(--card-bg);
+  border:1px solid var(--line);
+  border-left:4px solid var(--terracotta);
+  border-radius:8px;
+  padding:16px 20px;
+  margin:20px 0;
+  font-size:0.93rem;
+}
+.callout.teal{border-left-color:var(--teal);}
+.callout .callout-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--terracotta);
+  margin-bottom:6px;
+  display:block;
+}
+.callout.teal .callout-label{color:var(--teal);}
+
+.figure{
+  margin:26px 0;
+  background:var(--card-bg);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:22px;
+}
+.figure svg{width:100%; height:auto; display:block;}
+.figure .cap{
+  margin-top:12px;
+  font-size:0.82rem;
+  color:var(--ink-soft);
+  text-align:center;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin:20px 0;
+  font-size:0.9rem;
+  background:var(--card-bg);
+  border:1px solid var(--line);
+  border-radius:8px;
+  overflow:hidden;
+}
+th, td{
+  text-align:left;
+  padding:10px 14px;
+  border-bottom:1px solid var(--line);
+  vertical-align:top;
+}
+th{
+  background:var(--paper-warm);
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.76rem;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  color:var(--ink-soft);
+}
+tr:last-child td{border-bottom:none;}
+
+.code-pair{margin:20px 0;}
+pre{
+  margin:0;
+  background:var(--code-bg);
+  border:1px solid var(--line);
+  border-radius:8px 8px 0 0;
+  padding:16px 18px;
+  overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.83rem;
+  line-height:1.65;
+}
+pre.only{border-radius:8px;}
+.code-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;
+  color:#fff;
+  background:var(--ink-soft);
+  padding:5px 12px;
+  border-radius:8px 8px 0 0;
+  display:inline-block;
+}
+.output-block{
+  background:#fdf6ec;
+  border:1px solid var(--gold);
+  border-top:none;
+  border-radius:0 0 8px 8px;
+  padding:12px 18px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.8rem;
+  color:#6b551e;
+}
+.kw{color:var(--terracotta);}
+.str{color:var(--teal);}
+.cm{color:var(--ink-soft); font-style:italic;}
+
+.timeline-history{list-style:none; padding:0; margin:20px 0;}
+.timeline-history li{
+  position:relative;
+  padding:0 0 20px 28px;
+  border-left:2px solid var(--terracotta-soft);
+}
+.timeline-history li:last-child{border-left-color:transparent;}
+.timeline-history li::before{
+  content:'';
+  position:absolute; left:-6px; top:2px;
+  width:10px; height:10px; border-radius:50%;
+  background:var(--terracotta);
+}
+.timeline-history .yr{
+  font-family:'JetBrains Mono',monospace;
+  color:var(--terracotta);
+  font-weight:600;
+  font-size:0.85rem;
+}
+
+.checklist{list-style:none; padding:0; margin:20px 0;}
+.checklist li{
+  display:flex; gap:10px; align-items:flex-start;
+  padding:9px 0; border-bottom:1px dashed var(--line);
+  font-size:0.94rem;
+}
+.checklist li:last-child{border-bottom:none;}
+.checklist .box{
+  flex-shrink:0; width:17px; height:17px; margin-top:3px;
+  border:2px solid var(--terracotta); border-radius:4px;
+}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin:20px 0;}
+@media (max-width:700px){.grid2{grid-template-columns:1fr;}}
+.pattern-card{
+  background:var(--card-bg); border:1px solid var(--line); border-radius:10px; padding:18px 20px;
+}
+.pattern-card h4{margin-top:0;}
+
+.chap-nav{
+  display:flex; justify-content:space-between; gap:20px;
+  margin-top:60px; padding-top:24px; border-top:1px solid var(--line);
+}
+.chap-nav a{
+  color:var(--ink-soft); text-decoration:none; font-size:0.86rem;
+  border:1px solid var(--line); border-radius:8px; padding:10px 16px;
+  transition:border-color .15s, color .15s;
+}
+.chap-nav a:hover{border-color:var(--terracotta); color:var(--terracotta);}
+
+footer.end{
+  text-align:center; padding:50px 0 10px; color:var(--ink-soft); font-size:0.82rem;
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+  <div class="brand">AI 에이전트 완전정복</div>
+  <div class="brand-sub">역사 · 원리 · 아키텍처 · 2026년 현재</div>
+  <nav class="toc" id="toc">
+    <div class="group-label">Part I. 개념과 역사</div>
+    <a href="#ch1"><span class="num">01</span>AI 에이전트란 무엇인가</a>
+    <a href="#ch2"><span class="num">02</span>역사 — 규칙에서 LLM 에이전트까지</a>
+    <div class="group-label">Part II. 동작 원리</div>
+    <a href="#ch3"><span class="num">03</span>지각·추론·행동 루프</a>
+    <a href="#ch4"><span class="num">04</span>핵심 추론 패턴 (ReAct 등)</a>
+    <a href="#ch5"><span class="num">05</span>도구 사용과 함수 호출</a>
+    <a href="#ch6"><span class="num">06</span>메모리 시스템</a>
+    <a href="#ch7"><span class="num">07</span>계획(Planning)</a>
+    <div class="group-label">Part III. 확장과 표준</div>
+    <a href="#ch8"><span class="num">08</span>멀티 에이전트 시스템</a>
+    <a href="#ch9"><span class="num">09</span>프로토콜 표준 — MCP·A2A·ACP</a>
+    <a href="#ch10"><span class="num">10</span>대표 프레임워크</a>
+    <div class="group-label">Part IV. 실무와 현재</div>
+    <a href="#ch11"><span class="num">11</span>평가·안전성·거버넌스</a>
+    <a href="#ch12"><span class="num">12</span>2026년 현재의 활용 사례</a>
+    <a href="#ch13"><span class="num">13</span>종합 체크리스트</a>
+  </nav>
+</aside>
+
+<main>
+
+<header class="cover">
+  <div class="kicker">AI AGENT · COMPLETE STUDY GUIDE</div>
+  <h1>AI 에이전트 완전정복<br>역사, 원리, 그리고 2026년 지금</h1>
+  <p class="lead">규칙 기반 시스템에서 LLM 기반 자율 에이전트까지 — AI 에이전트가 어떻게 등장했고, 어떤 원리로 작동하며, 오늘날 실무에서 어떻게 쓰이는지를 한 편의 학습서로 정리했다.</p>
+  <div class="meta-row">
+    <div class="meta-item"><b>13개 챕터</b>개념·역사·원리·아키텍처·표준·실무</div>
+    <div class="meta-item"><b>다이어그램 6종</b>SVG로 직접 제작</div>
+    <div class="meta-item"><b>2026년 기준</b>MCP·A2A 등 최신 표준 반영</div>
+  </div>
+</header>
+
+<!-- ================= CHAPTER 1 ================= -->
+<section class="chapter" id="ch1">
+  <h2><span class="chnum">01</span>AI 에이전트란 무엇인가</h2>
+  <p class="subhead">정의, 핵심 속성, 그리고 가장 단순한 프로그램과 에이전트를 가르는 기준</p>
+
+  <p>가장 넓은 의미에서 <em class="term">AI 에이전트</em>는 <strong>환경을 인식(perceive)하고, 그 인식을 바탕으로 추론(reason)하여, 목표를 달성하기 위해 환경에 행동(act)을 가하는 소프트웨어 시스템</strong>이다. 이 정의는 인공지능 교과서의 고전(Russell & Norvig, <em>Artificial Intelligence: A Modern Approach</em>)에서부터 2026년의 LLM 기반 에이전트까지 변하지 않고 이어져 온 핵심 골격이다. 달라진 것은 "추론"을 누가 담당하느냐다 — 과거에는 사람이 작성한 규칙이었고, 지금은 대규모 언어모델(LLM)이다.</p>
+
+  <h3>단순 프로그램과 에이전트의 차이</h3>
+  <p>단순히 입력을 받아 출력을 내는 함수와 에이전트를 가르는 기준은 다음 네 가지로 요약된다.</p>
+
+  <div class="grid2">
+    <div class="pattern-card">
+      <h4>자율성 (Autonomy)</h4>
+      <p style="margin:0;">매 단계마다 사람의 지시를 받지 않고, 스스로 다음 행동을 결정한다. 사람은 목표만 주고 개입하지 않는다.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>반응성 (Reactivity)</h4>
+      <p style="margin:0;">환경의 변화를 실시간으로 인식하고, 계획이 틀어지면 그에 맞게 대응한다.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>능동성 (Proactiveness)</h4>
+      <p style="margin:0;">단순히 요청에 반응만 하는 것이 아니라, 목표 달성을 위해 스스로 행동을 시작하고 하위 목표를 세운다.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>사회성 (Social ability)</h4>
+      <p style="margin:0;">다른 에이전트·사람·도구와 상호작용하며 협업하거나 정보를 교환한다.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="callout-label">핵심 구분</span>
+    챗봇에게 "이 문서를 요약해줘"라고 하면 <strong>한 번의 응답</strong>으로 끝난다. 반면 에이전트에게 "이 프로젝트의 버그를 찾아서 고쳐줘"라고 하면, 에이전트는 <strong>스스로 파일을 탐색하고, 코드를 실행해 보고, 실패하면 다른 방법을 시도하는 여러 단계의 루프</strong>를 거친다. 이 "여러 단계를 스스로 오가는 루프"가 에이전트의 본질이다.
+  </div>
+
+  <h3>에이전트의 5단계 분류 (고전적 관점)</h3>
+  <p>Russell & Norvig의 분류는 에이전트가 세상과 상호작용하는 방식을 다섯 단계로 나눈다. LLM 에이전트는 대부분 4~5단계에 해당한다.</p>
+  <table>
+    <tr><th>유형</th><th>동작 방식</th><th>예시</th></tr>
+    <tr><td>단순 반사 에이전트</td><td>현재 지각(perception)에만 반응하는 if-then 규칙</td><td>온도조절기, 초기 룰베이스 챗봇</td></tr>
+    <tr><td>모델 기반 반사 에이전트</td><td>보이지 않는 부분까지 포함한 내부 세계 모델을 유지</td><td>로봇 청소기의 지도 기반 주행</td></tr>
+    <tr><td>목표 기반 에이전트</td><td>목표 달성 여부를 기준으로 행동을 탐색·선택</td><td>경로탐색 알고리즘(A*) 기반 내비게이션</td></tr>
+    <tr><td>효용 기반 에이전트</td><td>여러 목표 사이의 우선순위(효용)를 비교해 최적 행동 선택</td><td>강화학습 기반 게임 에이전트(AlphaGo)</td></tr>
+    <tr><td>학습 에이전트</td><td>경험/피드백으로부터 스스로 정책을 개선</td><td>RLHF로 다듬어진 LLM 기반 에이전트</td></tr>
+  </table>
+
+  <h3>2026년 실무에서의 정의</h3>
+  <p>오늘날 업계에서 "AI 에이전트"라는 말은 조금 더 구체적으로 쓰인다. 대체로 다음 세 요소를 모두 갖춘 시스템을 가리킨다.</p>
+  <ol>
+    <li><strong>LLM이 추론 엔진 역할을 한다</strong> — 다음에 무엇을 할지를 규칙이 아니라 모델이 그때그때 판단한다.</li>
+    <li><strong>도구(tool)를 호출할 수 있다</strong> — 코드 실행, 웹 검색, API 호출, 파일 조작 등 외부 세계에 실제로 영향을 미친다.</li>
+    <li><strong>여러 스텝에 걸친 루프를 스스로 관리한다</strong> — 한 번의 응답이 아니라, 목표가 끝났다고 판단할 때까지 "생각 → 행동 → 관찰"을 반복한다.</li>
+  </ol>
+  <p>이 정의는 단순 챗봇, RAG 파이프라인, 그리고 진짜 에이전트를 가르는 실무적 기준으로 널리 쓰인다.</p>
+</section>
+
+<!-- ================= CHAPTER 2 ================= -->
+<section class="chapter" id="ch2">
+  <h2><span class="chnum">02</span>역사 — 규칙에서 LLM 에이전트까지</h2>
+  <p class="subhead">70여 년에 걸친 "스스로 행동하는 소프트웨어"를 향한 여정</p>
+
+  <p>AI 에이전트라는 개념 자체는 최근의 발명이 아니다. LLM 기반 에이전트가 폭발적으로 주목받기 시작한 2022~2023년 이전에도, 에이전트라는 아이디어는 사이버네틱스·전문가시스템·강화학습을 거치며 꾸준히 발전해 왔다.</p>
+
+  <div class="figure">
+    <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
+      <line x1="40" y1="130" x2="860" y2="130" stroke="#ded2bf" stroke-width="3"/>
+      <!-- nodes -->
+      <g font-family="Pretendard, sans-serif">
+        <!-- 1950s -->
+        <circle cx="80" cy="130" r="7" fill="#a9822c"/>
+        <text x="80" y="105" font-size="11" fill="#b8562f" text-anchor="middle" font-weight="700">1950s</text>
+        <text x="80" y="155" font-size="11" fill="#5a4f45" text-anchor="middle">사이버네틱스</text>
+        <text x="80" y="170" font-size="11" fill="#5a4f45" text-anchor="middle">되먹임 제어</text>
+
+        <circle cx="220" cy="130" r="7" fill="#a9822c"/>
+        <text x="220" y="105" font-size="11" fill="#b8562f" text-anchor="middle" font-weight="700">1970s-80s</text>
+        <text x="220" y="155" font-size="11" fill="#5a4f45" text-anchor="middle">전문가 시스템</text>
+        <text x="220" y="170" font-size="11" fill="#5a4f45" text-anchor="middle">규칙기반 추론</text>
+
+        <circle cx="360" cy="130" r="7" fill="#a9822c"/>
+        <text x="360" y="105" font-size="11" fill="#b8562f" text-anchor="middle" font-weight="700">1990s</text>
+        <text x="360" y="155" font-size="11" fill="#5a4f45" text-anchor="middle">BDI 모델</text>
+        <text x="360" y="170" font-size="11" fill="#5a4f45" text-anchor="middle">다중에이전트시스템</text>
+
+        <circle cx="480" cy="130" r="7" fill="#a9822c"/>
+        <text x="480" y="105" font-size="11" fill="#b8562f" text-anchor="middle" font-weight="700">2013-16</text>
+        <text x="480" y="155" font-size="11" fill="#5a4f45" text-anchor="middle">심층강화학습</text>
+        <text x="480" y="170" font-size="11" fill="#5a4f45" text-anchor="middle">DQN · AlphaGo</text>
+
+        <circle cx="600" cy="130" r="8" fill="#b8562f"/>
+        <text x="600" y="100" font-size="11" fill="#b8562f" text-anchor="middle" font-weight="700">2022</text>
+        <text x="600" y="155" font-size="11" fill="#2b2420" text-anchor="middle" font-weight="700">ReAct 논문</text>
+        <text x="600" y="170" font-size="11" fill="#5a4f45" text-anchor="middle">추론+행동 결합</text>
+
+        <circle cx="710" cy="130" r="8" fill="#b8562f"/>
+        <text x="710" y="100" font-size="11" fill="#b8562f" text-anchor="middle" font-weight="700">2023</text>
+        <text x="710" y="155" font-size="11" fill="#2b2420" text-anchor="middle" font-weight="700">AutoGPT 열풍</text>
+        <text x="710" y="170" font-size="11" fill="#5a4f45" text-anchor="middle">함수 호출 표준화</text>
+
+        <circle cx="830" cy="130" r="9" fill="#b8562f"/>
+        <text x="830" y="95" font-size="11" fill="#b8562f" text-anchor="middle" font-weight="700">2024-26</text>
+        <text x="830" y="155" font-size="11" fill="#2b2420" text-anchor="middle" font-weight="700">MCP · A2A</text>
+        <text x="830" y="170" font-size="11" fill="#5a4f45" text-anchor="middle">표준 프로토콜 정착</text>
+      </g>
+    </svg>
+    <div class="cap">그림 2-1. AI 에이전트 개념의 70년 타임라인 (규칙 기반 → 학습 기반 → LLM 기반)</div>
+  </div>
+
+  <h3>2-1. 선사시대: 규칙과 목표의 시대 (1950s~2010s)</h3>
+  <ul>
+    <li><strong>사이버네틱스(1950년대)</strong> — 노버트 위너의 되먹임(feedback) 제어 이론은 "환경을 감지하고 오차를 줄이는 방향으로 행동을 조정한다"는 에이전트의 원형적 아이디어를 제공했다.</li>
+    <li><strong>SHRDLU(1970)</strong> — 자연어 명령으로 가상의 블록 세계를 조작하는 초기 시스템으로, 언어 이해와 행동 실행을 연결한 선구적 사례로 꼽힌다.</li>
+    <li><strong>전문가 시스템(1970s~80s)</strong> — MYCIN 같은 시스템은 "IF 증상 A이고 B이면 THEN 진단 C" 형태의 규칙 수천 개로 전문가의 의사결정을 모사했다. 확장성과 유지보수의 한계로 1980년대 말 "AI 겨울"의 한 원인이 되기도 했다.</li>
+    <li><strong>BDI 모델과 다중에이전트시스템(1990s)</strong> — 신념(Belief)-욕구(Desire)-의도(Intention) 구조로 에이전트의 내부 상태를 형식화했고, 여러 에이전트가 협상·경쟁하는 다중에이전트시스템(MAS) 연구가 본격화됐다.</li>
+    <li><strong>심층강화학습(2013~2016)</strong> — DeepMind의 DQN이 아타리 게임을, 이어 AlphaGo가 바둑에서 인간 최고수를 이기면서 "시행착오를 통해 스스로 정책을 학습하는 에이전트"가 실증됐다. 다만 이 시기의 에이전트는 좁은 도메인에 특화돼 있었다.</li>
+  </ul>
+
+  <h3>2-2. 전환점: LLM이 추론 엔진이 되다 (2022)</h3>
+  <p>2022년은 에이전트 역사의 분수령이다. 두 가지 사건이 맞물렸다.</p>
+  <ul>
+    <li><strong>ReAct(Reasoning + Acting, 2022)</strong> — "생각을 말로 표현한 뒤 행동하고, 그 결과를 관찰해 다시 생각한다"는 패턴을 논문으로 정식화했다. 이는 이후 거의 모든 LLM 에이전트 프레임워크의 기본 루프가 됐다(4장 참고).</li>
+    <li><strong>InstructGPT / ChatGPT</strong> — 인간 피드백 기반 강화학습(RLHF)으로 다듬어진 LLM이 자연어 지시를 안정적으로 따르기 시작하면서, "규칙을 사람이 일일이 짤 필요 없이 모델이 알아서 판단"하는 것이 현실이 됐다.</li>
+  </ul>
+
+  <h3>2-3. 열풍과 표준화 (2023~2024)</h3>
+  <ul>
+    <li><strong>AutoGPT · BabyAGI(2023 초)</strong> — LLM이 스스로 하위 목표를 만들고, 도구를 호출하고, 결과를 평가해 다음 목표를 다시 세우는 완전 자율 루프를 대중에게 처음 보여줬다. 다만 무한 루프, 비용 폭증, 환각 누적 등 한계도 뚜렷했다.</li>
+    <li><strong>함수 호출(Function calling) 표준화</strong> — LLM이 JSON 스키마 형태로 "어떤 도구를, 어떤 인자로 호출할지"를 안정적으로 출력할 수 있게 되면서, 에이전트의 도구 사용이 실험적 수준에서 상용 수준으로 올라섰다.</li>
+    <li><strong>컴퓨터 사용 에이전트(2024)</strong> — 화면을 직접 보고 마우스·키보드를 조작하는 에이전트가 등장하면서, API가 없는 환경에서도 에이전트가 동작할 수 있는 길이 열렸다.</li>
+    <li><strong>MCP(Model Context Protocol) 발표(2024)</strong> — 에이전트가 외부 도구·데이터에 연결되는 방식을 표준화한 개방형 프로토콜이 등장했다(9장 참고).</li>
+  </ul>
+
+  <h3>2-4. 정착기 (2025~2026)</h3>
+  <p>2026년 현재 업계는 AI 에이전트를 <strong>"규칙을 실행하는 프로그램"에서 "환경을 이해하고 스스로 계획해 행동을 설계하는 시스템"으로의 전환이 완료된 단계</strong>로 본다. 몇 가지 흐름이 뚜렷하다.</p>
+  <ul>
+    <li>MCP가 "에이전트-도구" 연결의 사실상 표준으로 자리 잡았고, A2A(Agent-to-Agent)가 "에이전트-에이전트" 협업 프로토콜로 빠르게 채택되는 중이다.</li>
+    <li>단일 에이전트에서 <strong>멀티 에이전트 오케스트레이션</strong>(Supervisor/Swarm 구조)으로 무게중심이 이동했다.</li>
+    <li>고성능 모델을 모든 작업에 쓰는 대신, 작업 난이도에 맞춰 모델을 라우팅하는 <strong>추론 경제성(Inference Economics)</strong>이 화두로 떠올랐다 — 초기 에이전트 도입 사례들이 비용 대비 성과(ROI)에서 기대에 못 미쳤던 경험이 반영된 결과다.</li>
+    <li>에이전트가 실제로 프로덕션 시스템에 쓰기 작업(배포, 삭제 등)을 수행하게 되면서, 에이전트 신원 관리(Agent Identity)·감사 로그·승인 게이트 같은 거버넌스 요구가 커지고 있다.</li>
+  </ul>
+
+  <div class="callout teal">
+    <span class="callout-label">한 줄 요약</span>
+    AI 에이전트의 역사는 "누가 추론을 담당하는가"의 역사다. 규칙(사람이 작성) → 정책 함수(강화학습으로 학습) → LLM(사전학습 + RLHF)으로 추론의 주체가 이동해 왔고, 2022년 ReAct 이후로는 그 추론 엔진에 실제 도구를 쥐여주는 방향으로 발전이 집중되고 있다.
+  </div>
+</section>
+
+<!-- ================= CHAPTER 3 ================= -->
+<section class="chapter" id="ch3">
+  <h2><span class="chnum">03</span>지각·추론·행동 루프</h2>
+  <p class="subhead">모든 에이전트가 공유하는 가장 기본적인 골격</p>
+
+  <p>구현 방식이 아무리 다양해도, 모든 에이전트는 결국 다음 세 단계를 순환한다.</p>
+
+  <div class="figure">
+    <svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#b8562f"/>
+        </marker>
+      </defs>
+      <!-- Environment box -->
+      <rect x="270" y="15" width="160" height="46" rx="8" fill="#cfe0dd" stroke="#3c6e6b" stroke-width="1.5"/>
+      <text x="350" y="43" text-anchor="middle" font-size="14" fill="#1f3f3d" font-weight="700" font-family="Pretendard">환경 (Environment)</text>
+
+      <!-- three nodes -->
+      <circle cx="140" cy="200" r="66" fill="#fffdf8" stroke="#b8562f" stroke-width="2"/>
+      <text x="140" y="196" text-anchor="middle" font-size="14" fill="#2b2420" font-weight="700" font-family="Pretendard">지각</text>
+      <text x="140" y="215" text-anchor="middle" font-size="11" fill="#5a4f45" font-family="Pretendard">Perceive</text>
+
+      <circle cx="350" cy="240" r="66" fill="#fffdf8" stroke="#b8562f" stroke-width="2"/>
+      <text x="350" y="236" text-anchor="middle" font-size="14" fill="#2b2420" font-weight="700" font-family="Pretendard">추론</text>
+      <text x="350" y="255" text-anchor="middle" font-size="11" fill="#5a4f45" font-family="Pretendard">Reason / Plan</text>
+
+      <circle cx="560" cy="200" r="66" fill="#fffdf8" stroke="#b8562f" stroke-width="2"/>
+      <text x="560" y="196" text-anchor="middle" font-size="14" fill="#2b2420" font-weight="700" font-family="Pretendard">행동</text>
+      <text x="560" y="215" text-anchor="middle" font-size="11" fill="#5a4f45" font-family="Pretendard">Act</text>
+
+      <!-- arrows -->
+      <path d="M200,175 Q270,150 285,150" fill="none" stroke="#b8562f" stroke-width="2" marker-end="url(#arrow1)"/>
+      <path d="M200,220 Q270,255 292,248" fill="none" stroke="#b8562f" stroke-width="2" marker-end="url(#arrow1)"/>
+      <path d="M413,232 Q470,215 498,205" fill="none" stroke="#b8562f" stroke-width="2" marker-end="url(#arrow1)"/>
+      <path d="M560,134 Q460,60 350,61" fill="none" stroke="#3c6e6b" stroke-width="2" marker-end="url(#arrow1)"/>
+      <path d="M140,134 Q210,70 270,45" fill="none" stroke="#3c6e6b" stroke-width="2" marker-end="url(#arrow1)"/>
+      <text x="480" y="95" font-size="10.5" fill="#3c6e6b" font-family="Pretendard">행동이 환경을 변화시킴</text>
+      <text x="185" y="90" font-size="10.5" fill="#3c6e6b" font-family="Pretendard">환경이 지각 신호를 제공</text>
+    </svg>
+    <div class="cap">그림 3-1. 지각–추론–행동 루프. 행동은 환경을 바꾸고, 바뀐 환경은 다시 새로운 지각으로 돌아온다.</div>
+  </div>
+
+  <h3>환경(Environment)의 성질이 에이전트 설계를 결정한다</h3>
+  <p>같은 루프라도 환경의 성질에 따라 필요한 복잡도가 크게 달라진다. 아래 네 축은 에이전트를 설계할 때 가장 먼저 점검해야 할 질문들이다.</p>
+  <table>
+    <tr><th>축</th><th>구분</th><th>의미</th></tr>
+    <tr><td>관측 가능성</td><td>완전 관측 vs 부분 관측</td><td>에이전트가 환경의 전체 상태를 볼 수 있는가, 일부만 볼 수 있는가 (예: 웹 브라우징 에이전트는 현재 페이지 외 나머지를 볼 수 없다 — 부분 관측)</td></tr>
+    <tr><td>결정성</td><td>결정적 vs 확률적</td><td>같은 행동이 항상 같은 결과를 내는가 (API 호출은 대체로 결정적, 사용자 반응은 확률적)</td></tr>
+    <tr><td>연속성</td><td>에피소드형 vs 순차형</td><td>각 행동이 독립적인가, 이전 행동이 이후에 영향을 주는가 (코딩 에이전트는 전형적인 순차형)</td></tr>
+    <tr><td>동적성</td><td>정적 vs 동적</td><td>에이전트가 생각하는 동안 환경이 스스로 바뀌는가 (실시간 주가는 동적, 정적 문서는 정적)</td></tr>
+  </table>
+  <p>LLM 기반 에이전트가 다루는 실무 환경(코드베이스, 웹, 사내 시스템)은 대체로 <strong>부분 관측 · 확률적 · 순차형 · 동적</strong>인 가장 어려운 조합에 속한다. 이것이 "한 번에 완벽한 계획"보다 "짧은 루프를 반복하며 계속 관찰하고 수정하는" 설계가 선호되는 이유다.</p>
+</section>
+
+<!-- ================= CHAPTER 4 ================= -->
+<section class="chapter" id="ch4">
+  <h2><span class="chnum">04</span>핵심 추론 패턴</h2>
+  <p class="subhead">ReAct, Reflexion, Plan-and-Execute, Tree of Thoughts — LLM이 "어떻게 생각하게 만들 것인가"</p>
+
+  <h3>4-1. ReAct — Reasoning + Acting</h3>
+  <p>ReAct는 2022년 논문에서 제안된 패턴으로, 오늘날 거의 모든 LLM 에이전트 프레임워크의 기본 루프다. 핵심은 모델이 <strong>생각(Thought)</strong>을 자연어로 먼저 출력하게 한 뒤, 그 생각을 바탕으로 <strong>행동(Action)</strong>을 취하고, 행동의 결과인 <strong>관찰(Observation)</strong>을 다시 다음 생각의 입력으로 넣는 것이다.</p>
+
+  <div class="figure">
+    <svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#b8562f"/>
+        </marker>
+      </defs>
+      <rect x="20" y="80" width="150" height="60" rx="10" fill="#fffdf8" stroke="#b8562f" stroke-width="2"/>
+      <text x="95" y="106" text-anchor="middle" font-size="13" font-weight="700" fill="#2b2420" font-family="Pretendard">Thought</text>
+      <text x="95" y="124" text-anchor="middle" font-size="10.5" fill="#5a4f45" font-family="Pretendard">무엇을 해야 할지 추론</text>
+
+      <rect x="270" y="80" width="150" height="60" rx="10" fill="#fffdf8" stroke="#b8562f" stroke-width="2"/>
+      <text x="345" y="106" text-anchor="middle" font-size="13" font-weight="700" fill="#2b2420" font-family="Pretendard">Action</text>
+      <text x="345" y="124" text-anchor="middle" font-size="10.5" fill="#5a4f45" font-family="Pretendard">도구/함수 호출</text>
+
+      <rect x="510" y="80" width="150" height="60" rx="10" fill="#cfe0dd" stroke="#3c6e6b" stroke-width="2"/>
+      <text x="585" y="106" text-anchor="middle" font-size="13" font-weight="700" fill="#1f3f3d" font-family="Pretendard">Observation</text>
+      <text x="585" y="124" text-anchor="middle" font-size="10.5" fill="#1f3f3d" font-family="Pretendard">행동 결과를 관찰</text>
+
+      <path d="M170,110 L265,110" stroke="#b8562f" stroke-width="2" marker-end="url(#arrow2)"/>
+      <path d="M420,110 L505,110" stroke="#b8562f" stroke-width="2" marker-end="url(#arrow2)"/>
+      <path d="M585,140 Q585,190 345,190 Q95,190 95,145" fill="none" stroke="#3c6e6b" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arrow2)"/>
+      <text x="340" y="205" text-anchor="middle" font-size="10.5" fill="#3c6e6b" font-family="Pretendard">목표 달성까지 반복</text>
+    </svg>
+    <div class="cap">그림 4-1. ReAct 루프 — Thought → Action → Observation을 목표 달성까지 반복</div>
+  </div>
+
+  <div class="code-pair">
+    <span class="code-label">PSEUDOCODE · ReAct 루프</span>
+    <pre class="only"><span class="cm"># 매우 단순화한 ReAct 루프 의사코드</span>
+messages = [system_prompt, user_goal]
+
+<span class="kw">while</span> not done:
+    response = llm.generate(messages)          <span class="cm"># Thought + 다음 Action 결정</span>
+
+    <span class="kw">if</span> response.wants_tool_call:
+        result = call_tool(response.tool_name, response.args)  <span class="cm"># Action</span>
+        messages.append(observation(result))    <span class="cm"># Observation을 다시 컨텍스트에 추가</span>
+    <span class="kw">else</span>:
+        done = <span class="kw">True</span>                          <span class="cm"># 최종 답변 도달</span>
+        final_answer = response.text</pre>
+  </div>
+
+  <h3>4-2. 그 외 핵심 패턴</h3>
+  <div class="grid2">
+    <div class="pattern-card">
+      <h4>Reflexion (자기 반성)</h4>
+      <p style="margin:0;">행동이 실패하면 그 실패 원인을 언어로 스스로 비평(self-critique)하고, 그 반성을 다음 시도의 컨텍스트에 포함시켜 같은 실수를 반복하지 않도록 한다. 별도의 파라미터 업데이트 없이 "언어적 강화학습"처럼 작동한다.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>Plan-and-Execute</h4>
+      <p style="margin:0;">ReAct처럼 매 스텝마다 다시 생각하는 대신, 처음에 전체 계획을 한 번에 세우고 하위 작업들을 순서대로 실행한다. 스텝 수가 많은 작업에서 토큰 비용을 줄이고 일관성을 높인다.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>Tree of Thoughts</h4>
+      <p style="margin:0;">한 줄의 사고 흐름이 아니라 여러 후보 사고 경로를 트리 형태로 동시에 탐색하고, 유망한 가지를 평가해 선택한다. 퍼즐처럼 탐색 공간이 넓은 문제에 유리하다.</p>
+    </div>
+    <div class="pattern-card">
+      <h4>Chain-of-Thought (CoT)</h4>
+      <p style="margin:0;">행동 없이 추론 그 자체를 여러 단계로 풀어쓰게 하는 가장 기본적인 프롬프팅 기법. ReAct의 "Thought" 부분이 바로 CoT를 행동과 엮은 것이다.</p>
+    </div>
+  </div>
+
+  <h3>4-3. 패턴 선택 가이드</h3>
+  <table>
+    <tr><th>상황</th><th>적합한 패턴</th></tr>
+    <tr><td>작업이 짧고 환경이 예측불가(웹 탐색 등)</td><td>ReAct — 매 스텝 재평가</td></tr>
+    <tr><td>작업 절차가 비교적 명확하고 스텝이 많음</td><td>Plan-and-Execute — 비용·일관성 유리</td></tr>
+    <tr><td>같은 실수를 반복하는 문제</td><td>Reflexion 결합</td></tr>
+    <tr><td>정답이 여러 경로 중 하나(퍼즐, 코드 최적화)</td><td>Tree of Thoughts</td></tr>
+  </table>
+</section>
+
+<!-- ================= CHAPTER 5 ================= -->
+<section class="chapter" id="ch5">
+  <h2><span class="chnum">05</span>도구 사용과 함수 호출</h2>
+  <p class="subhead">LLM이 세상에 실제로 손을 대는 방법</p>
+
+  <p>LLM 자체는 텍스트를 생성할 뿐 아무것도 "실행"하지 못한다. 에이전트가 실제 세계에 영향을 미치려면 <em class="term">도구(tool)</em>가 필요하다. 오늘날 표준은 각 도구를 이름·설명·입력 스키마(JSON Schema)로 정의해 모델에게 제공하고, 모델은 자연어 대신 <strong>구조화된 JSON</strong>으로 "이 도구를, 이 인자로 불러달라"는 요청을 출력하는 방식이다.</p>
+
+  <div class="code-pair">
+    <span class="code-label">JSON · 도구 정의 예시</span>
+    <pre class="only">{
+  <span class="str">"name"</span>: <span class="str">"get_weather"</span>,
+  <span class="str">"description"</span>: <span class="str">"주어진 도시의 현재 날씨를 조회한다"</span>,
+  <span class="str">"input_schema"</span>: {
+    <span class="str">"type"</span>: <span class="str">"object"</span>,
+    <span class="str">"properties"</span>: {
+      <span class="str">"city"</span>: { <span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"description"</span>: <span class="str">"도시 이름"</span> },
+      <span class="str">"unit"</span>: { <span class="str">"type"</span>: <span class="str">"string"</span>, <span class="str">"enum"</span>: [<span class="str">"celsius"</span>, <span class="str">"fahrenheit"</span>] }
+    },
+    <span class="str">"required"</span>: [<span class="str">"city"</span>]
+  }
+}</pre>
+  </div>
+
+  <div class="code-pair">
+    <span class="code-label">JSON · 모델이 생성하는 도구 호출 요청</span>
+    <pre class="only">{
+  <span class="str">"tool_use"</span>: {
+    <span class="str">"name"</span>: <span class="str">"get_weather"</span>,
+    <span class="str">"input"</span>: { <span class="str">"city"</span>: <span class="str">"서울"</span>, <span class="str">"unit"</span>: <span class="str">"celsius"</span> }
+  }
+}</pre>
+    <div class="output-block">→ 실제 실행은 모델이 아니라 <strong>에이전트를 감싸는 호스트 프로그램</strong>이 담당한다. 모델은 "무엇을 어떻게 부를지"만 결정하고, 실행 권한과 부작용은 항상 호스트 쪽에 있다.</div>
+  </div>
+
+  <h3>도구 설계 원칙</h3>
+  <ul>
+    <li><strong>설명이 곧 인터페이스다</strong> — 도구의 이름과 설명이 모호하면 모델이 잘못된 도구를 고르거나 잘못된 인자를 채운다. 사람이 읽어도 오해가 없어야 한다.</li>
+    <li><strong>도구 수는 적을수록 좋다</strong> — 비슷한 도구가 많으면 모델의 선택 정확도가 떨어진다. 필요할 때만 관련 도구를 컨텍스트에 로드하는 방식(지연 로딩)이 선호된다.</li>
+    <li><strong>실패를 텍스트로 돌려줘야 한다</strong> — 도구가 실패하면 예외를 던지고 끝내는 대신, "왜 실패했는지"를 관찰(Observation)로 모델에게 알려줘야 스스로 복구를 시도할 수 있다.</li>
+    <li><strong>위험한 도구는 승인 게이트를 둔다</strong> — 삭제·배포·결제처럼 되돌리기 어려운 행동은 사람의 확인을 거치도록 설계한다(11장 참고).</li>
+  </ul>
+</section>
+
+<!-- ================= CHAPTER 6 ================= -->
+<section class="chapter" id="ch6">
+  <h2><span class="chnum">06</span>메모리 시스템</h2>
+  <p class="subhead">에이전트는 무엇을, 얼마나 오래 기억해야 하는가</p>
+
+  <p>LLM은 기본적으로 컨텍스트 윈도우 밖의 것을 기억하지 못한다. 긴 작업이나 여러 세션에 걸친 작업을 수행하려면 메모리를 별도로 설계해야 한다.</p>
+
+  <table>
+    <tr><th>메모리 유형</th><th>범위</th><th>구현 방식</th></tr>
+    <tr><td>단기 메모리 (Working memory)</td><td>현재 작업/세션 동안</td><td>컨텍스트 윈도우 자체, 또는 대화 요약(summarization)으로 압축</td></tr>
+    <tr><td>장기 의미 메모리 (Semantic memory)</td><td>세션을 넘어 영구</td><td>벡터 데이터베이스 + 검색증강생성(RAG)으로 필요할 때 불러옴</td></tr>
+    <tr><td>에피소드 메모리 (Episodic memory)</td><td>과거 특정 사건/대화 기록</td><td>타임스탬프가 있는 로그 저장소, 유사 사건 검색</td></tr>
+    <tr><td>절차 메모리 (Procedural memory)</td><td>"어떻게 하는지"에 대한 노하우</td><td>시스템 프롬프트, 학습된 스킬/체크리스트 파일</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="callout-label">실무 팁</span>
+    컨텍스트 윈도우가 커졌다고 메모리 설계가 필요 없어지는 것은 아니다. 관련 없는 정보가 컨텍스트에 쌓이면 모델의 주의가 분산되고 비용도 커진다("context rot"). 그래서 2026년 현재는 <strong>필요한 만큼만 그때그때 불러오는(retrieval) 구조</strong>가 "모든 걸 컨텍스트에 넣는" 구조보다 선호된다.
+  </div>
+</section>
+
+<!-- ================= CHAPTER 7 ================= -->
+<section class="chapter" id="ch7">
+  <h2><span class="chnum">07</span>계획(Planning)</h2>
+  <p class="subhead">큰 목표를 실행 가능한 단계로 쪼개기</p>
+
+  <p>사람에게 "회사 웹사이트를 새로 만들어줘"라고 하면 사람은 자연스럽게 이를 디자인, 프론트엔드, 백엔드, 배포 같은 하위 작업으로 쪼갠다. 에이전트도 같은 능력이 필요하다 — 이를 <em class="term">작업 분해(task decomposition)</em>라 부른다.</p>
+
+  <h3>계획 수립의 두 접근</h3>
+  <ul>
+    <li><strong>정적 계획</strong> — 시작할 때 전체 계획(할 일 목록)을 한 번에 세우고 순서대로 실행. 예측 가능하지만 중간에 상황이 바뀌면 취약하다.</li>
+    <li><strong>동적/적응형 계획</strong> — 매 스텝의 관찰 결과에 따라 계획을 다시 세운다(re-planning). 예측 불가능한 환경에 강하지만 비용이 더 든다.</li>
+  </ul>
+  <p>실무에서는 두 방식을 섞는 경우가 많다: 상위 계획(할 일 목록, TODO)은 정적으로 유지하되, 각 하위 작업을 실행하는 방식은 ReAct처럼 동적으로 조정한다.</p>
+
+  <div class="callout teal">
+    <span class="callout-label">참고</span>
+    많은 코딩 에이전트가 채택하는 "TODO 리스트 먼저 작성 → 하나씩 체크하며 실행" 패턴은 정적 계획과 동적 실행을 결합한 대표적인 예다. 사람이 중간에 계획을 눈으로 확인하고 수정할 수 있다는 부가적 장점도 있다.
+  </div>
+</section>
+
+<!-- ================= CHAPTER 8 ================= -->
+<section class="chapter" id="ch8">
+  <h2><span class="chnum">08</span>멀티 에이전트 시스템</h2>
+  <p class="subhead">하나의 에이전트로 안 되면, 여러 에이전트를 조직하라</p>
+
+  <p>단일 에이전트에게 너무 많은 도구와 책임을 몰아주면 판단 정확도가 떨어진다. 이를 해결하기 위해 여러 개의 전문화된 에이전트를 조직해 협업시키는 <em class="term">멀티 에이전트 시스템(Multi-Agent System, MAS)</em>이 2025~2026년 사이 빠르게 확산됐다.</p>
+
+  <div class="figure">
+    <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+          <path d="M0,0 L8,3 L0,6 Z" fill="#5a4f45"/>
+        </marker>
+      </defs>
+      <!-- Supervisor pattern -->
+      <text x="150" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#2b2420" font-family="Pretendard">Supervisor 구조</text>
+      <rect x="95" y="40" width="110" height="44" rx="8" fill="#e7c3ac" stroke="#b8562f" stroke-width="1.5"/>
+      <text x="150" y="67" text-anchor="middle" font-size="12" fill="#2b2420" font-family="Pretendard" font-weight="700">Supervisor</text>
+      <rect x="20" y="150" width="90" height="40" rx="8" fill="#fffdf8" stroke="#5a4f45" stroke-width="1.3"/>
+      <text x="65" y="174" text-anchor="middle" font-size="11" fill="#2b2420" font-family="Pretendard">Agent A</text>
+      <rect x="120" y="150" width="90" height="40" rx="8" fill="#fffdf8" stroke="#5a4f45" stroke-width="1.3"/>
+      <text x="165" y="174" text-anchor="middle" font-size="11" fill="#2b2420" font-family="Pretendard">Agent B</text>
+      <rect x="70" y="215" width="90" height="40" rx="8" fill="#fffdf8" stroke="#5a4f45" stroke-width="1.3"/>
+      <text x="115" y="239" text-anchor="middle" font-size="11" fill="#2b2420" font-family="Pretendard">Agent C</text>
+      <path d="M130,84 L75,150" stroke="#5a4f45" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <path d="M160,84 L165,150" stroke="#5a4f45" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <path d="M150,84 L120,215" stroke="#5a4f45" stroke-width="1.5" marker-end="url(#arrow3)"/>
+
+      <!-- Swarm pattern -->
+      <text x="530" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#2b2420" font-family="Pretendard">Swarm(수평) 구조</text>
+      <rect x="480" y="90" width="90" height="40" rx="8" fill="#cfe0dd" stroke="#3c6e6b" stroke-width="1.3"/>
+      <text x="525" y="114" text-anchor="middle" font-size="11" fill="#1f3f3d" font-family="Pretendard">Agent X</text>
+      <rect x="600" y="90" width="90" height="40" rx="8" fill="#cfe0dd" stroke="#3c6e6b" stroke-width="1.3"/>
+      <text x="645" y="114" text-anchor="middle" font-size="11" fill="#1f3f3d" font-family="Pretendard">Agent Y</text>
+      <rect x="540" y="180" width="90" height="40" rx="8" fill="#cfe0dd" stroke="#3c6e6b" stroke-width="1.3"/>
+      <text x="585" y="204" text-anchor="middle" font-size="11" fill="#1f3f3d" font-family="Pretendard">Agent Z</text>
+      <path d="M570,110 L600,110" stroke="#3c6e6b" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <path d="M600,120 L570,110" stroke="#3c6e6b" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <path d="M540,130 L575,180" stroke="#3c6e6b" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <path d="M570,190 L535,135" stroke="#3c6e6b" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <path d="M630,130 L595,180" stroke="#3c6e6b" stroke-width="1.5" marker-end="url(#arrow3)"/>
+      <path d="M625,190 L655,135" stroke="#3c6e6b" stroke-width="1.5" marker-end="url(#arrow3)"/>
+    </svg>
+    <div class="cap">그림 8-1. Supervisor(감독자가 하위 에이전트를 호출·조정) vs Swarm(에이전트끼리 수평적으로 직접 넘겨줌)</div>
+  </div>
+
+  <table>
+    <tr><th>구조</th><th>특징</th><th>적합한 상황</th></tr>
+    <tr><td>Supervisor(감독자)</td><td>중앙 에이전트가 작업을 분배하고 결과를 취합</td><td>역할이 명확히 구분되고 최종 책임 소재가 분명해야 할 때</td></tr>
+    <tr><td>Swarm(수평)</td><td>에이전트끼리 직접 작업을 주고받으며 자율 협업</td><td>역할 경계가 유동적이고 빠른 핸드오프가 필요할 때</td></tr>
+    <tr><td>Sequential(순차)</td><td>파이프라인처럼 정해진 순서로 한 에이전트씩 처리</td><td>단계가 고정된 워크플로우(리서치→작성→검토)</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="callout-label">왜 나누는가</span>
+    하나의 거대한 프롬프트에 모든 지시와 모든 도구를 몰아넣으면 모델의 판단이 흐려진다. 역할별로 에이전트를 쪼개면 각 에이전트의 프롬프트와 도구 세트를 작게 유지할 수 있고, 실패 지점을 더 쉽게 특정할 수 있다. 대신 에이전트 간 통신·조정 비용이라는 새로운 복잡도가 생긴다.
+  </div>
+</section>
+
+<!-- ================= CHAPTER 9 ================= -->
+<section class="chapter" id="ch9">
+  <h2><span class="chnum">09</span>프로토콜 표준 — MCP · A2A · ACP</h2>
+  <p class="subhead">2026년 에이전트 생태계를 떠받치는 세 개의 표준 계층</p>
+
+  <p>에이전트가 여러 종류의 도구·다른 에이전트·복잡한 협업 상황과 연결되면서, "누가 무엇을 어떻게 호출하는가"를 표준화하려는 개방형 프로토콜들이 자리를 잡았다. 세 계층은 서로 경쟁 관계가 아니라 <strong>보완 관계</strong>에 가깝다.</p>
+
+  <div class="figure">
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="20" width="580" height="50" rx="8" fill="#e7c3ac" stroke="#b8562f" stroke-width="1.5"/>
+      <text x="350" y="40" text-anchor="middle" font-size="13" font-weight="700" fill="#2b2420" font-family="Pretendard">MCP — 에이전트 ↔ 도구/데이터</text>
+      <text x="350" y="58" text-anchor="middle" font-size="10.5" fill="#5a4f45" font-family="Pretendard">에이전트가 외부 도구·DB·API에 연결되는 방식을 표준화</text>
+
+      <rect x="60" y="85" width="580" height="50" rx="8" fill="#cfe0dd" stroke="#3c6e6b" stroke-width="1.5"/>
+      <text x="350" y="105" text-anchor="middle" font-size="13" font-weight="700" fill="#1f3f3d" font-family="Pretendard">A2A — 에이전트 ↔ 에이전트</text>
+      <text x="350" y="123" text-anchor="middle" font-size="10.5" fill="#1f3f3d" font-family="Pretendard">서로 다른 조직·플랫폼의 에이전트가 작업을 주고받는 방식을 표준화</text>
+
+      <rect x="60" y="150" width="580" height="50" rx="8" fill="#f3e6c8" stroke="#a9822c" stroke-width="1.5"/>
+      <text x="350" y="170" text-anchor="middle" font-size="13" font-weight="700" fill="#5c4a17" font-family="Pretendard">ACP — 복잡한 다중 에이전트 협업 (발전 초기)</text>
+      <text x="350" y="188" text-anchor="middle" font-size="10.5" fill="#5c4a17" font-family="Pretendard">여러 에이전트가 얽힌 협업 시나리오를 위한 상위 계층, 아직 형태를 잡아가는 단계</text>
+    </svg>
+    <div class="cap">그림 9-1. 세 프로토콜은 대체 관계가 아니라 서로 다른 계층을 담당하는 보완 관계다.</div>
+  </div>
+
+  <table>
+    <tr><th>프로토콜</th><th>담당 영역</th><th>2026년 기준 상태</th></tr>
+    <tr><td><strong>MCP</strong> (Model Context Protocol)</td><td>에이전트가 도구·데이터 소스에 연결되는 방식</td><td>사실상의 표준으로 정착. 다수의 엔터프라이즈 팀이 이미 도입해 사용 중이며, 관련 SDK 다운로드도 활발하다.</td></tr>
+    <tr><td><strong>A2A</strong> (Agent-to-Agent)</td><td>서로 다른 벤더/조직의 에이전트끼리 작업을 위임·협업</td><td>빠르게 채택이 늘고 있는 성장 단계. 멀티 에이전트 협업이 늘수록 중요도가 커지는 "경쟁 우위" 요소로 평가된다.</td></tr>
+    <tr><td><strong>ACP</strong> (Agent Communication Protocol)</td><td>보다 복잡한 다중 에이전트 협업의 상위 계층</td><td>아직 초기 단계로, 일부 플랫폼이 주도하며 형태를 잡아가는 중이다.</td></tr>
+  </table>
+
+  <div class="callout teal">
+    <span class="callout-label">실무 시사점</span>
+    2026년 현재 에이전트 플랫폼을 만든다면 MCP 지원은 "기본 요건"으로 취급되고, A2A 지원은 "차별화 요소"로 여겨진다. ACP는 아직 지켜볼 단계이지만 무시할 수는 없는 흐름이다. 세 계층을 양자택일이 아니라 겹쳐 쌓는 레이어로 설계하는 팀이 결국 더 유연한 에이전트 시스템을 만든다.
+  </div>
+
+  <h3>MCP의 기본 구조</h3>
+  <p>MCP는 클라이언트(에이전트를 실행하는 호스트)와 서버(도구·데이터를 제공하는 쪽) 사이의 표준 통신 방식을 정의한다. 서버는 자신이 제공하는 도구 목록·설명·스키마를 표준화된 방식으로 노출하고, 클라이언트는 이를 그대로 모델의 컨텍스트에 등록한다. 덕분에 매번 새로운 통합을 맞춤 개발할 필요 없이, "MCP를 말하는" 도구라면 어떤 에이전트에도 꽂아 쓸 수 있다.</p>
+</section>
+
+<!-- ================= CHAPTER 10 ================= -->
+<section class="chapter" id="ch10">
+  <h2><span class="chnum">10</span>대표 프레임워크</h2>
+  <p class="subhead">직접 루프를 짤 필요 없이 표준 부품을 조립하는 도구들</p>
+
+  <table>
+    <tr><th>프레임워크</th><th>성격</th><th>특징</th></tr>
+    <tr><td>LangChain / LangGraph</td><td>컴포넌트 라이브러리 + 그래프 실행 엔진</td><td>LangChain이 LLM·프롬프트·도구 등 컴포넌트를 표준 인터페이스로 제공하고, 그 위에서 LangGraph가 상태 그래프 기반 실행 엔진 역할을 한다. 체크포인터를 통한 단기 메모리, 스토어를 통한 장기 메모리, Human-in-the-loop용 인터럽트를 지원한다.</td></tr>
+    <tr><td>CrewAI</td><td>역할 기반 멀티 에이전트 오케스트레이션</td><td>"리서처", "작가"처럼 역할(role)과 목표(goal)를 부여한 에이전트들을 팀(crew)으로 묶어 협업시키는 데 특화돼 있다.</td></tr>
+    <tr><td>AutoGPT 계열</td><td>완전 자율 루프의 원조</td><td>2023년 초 완전 자율 에이전트 개념을 대중화시킨 원조. 이후 등장한 프레임워크 대부분이 이 시기의 시행착오(무한 루프, 비용 폭증)를 반면교사로 삼아 더 통제된 루프를 설계했다.</td></tr>
+    <tr><td>Claude Agent SDK</td><td>에이전트 실행 런타임</td><td>도구 사용·서브에이전트·MCP 연결·장기 실행 태스크 관리를 위한 런타임을 제공하며, Claude Code를 비롯한 여러 에이전트 제품의 기반이 된다.</td></tr>
+    <tr><td>OpenAI Agents SDK</td><td>경량 에이전트 오케스트레이션</td><td>에이전트 정의, 핸드오프(다른 에이전트로 작업 위임), 가드레일을 표준 패턴으로 제공한다.</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="callout-label">주의</span>
+    이 분야는 API 변화가 매우 빠르다. 예를 들어 LangChain 생태계에서는 한때 표준이었던 <code>initialize_agent</code>, <code>AgentExecutor</code> 방식이 지금은 지원 종료(deprecated)되고, 훨씬 단순화된 에이전트 생성 함수가 새 표준으로 자리 잡는 식의 전환이 반복돼 왔다. 프레임워크를 배울 때는 항상 공식 문서에서 "현재 권장되는 방식"을 확인하는 습관이 중요하다.
+  </div>
+</section>
+
+<!-- ================= CHAPTER 11 ================= -->
+<section class="chapter" id="ch11">
+  <h2><span class="chnum">11</span>평가·안전성·거버넌스</h2>
+  <p class="subhead">에이전트가 "잘" 작동하는지, "안전하게" 작동하는지 확인하기</p>
+
+  <h3>Human-in-the-loop (HITL)</h3>
+  <p>에이전트가 되돌리기 어려운 행동(삭제, 결제, 프로덕션 배포)을 하려 할 때, 실행 직전에 사람의 승인을 받도록 흐름을 멈추는 설계다. 최근 프로토콜 차원에서도 "실행 전에 사람에게 물어볼 수 있는" 표준적인 방법을 마련하려는 시도가 이어지고 있다 — 이는 에이전트 자율성과 안전성 사이의 균형을 프로토콜 수준에서 다루려는 흐름을 보여준다.</p>
+
+  <h3>가드레일(Guardrails)</h3>
+  <ul>
+    <li><strong>입력 가드레일</strong> — 악의적이거나 정책 위반적인 요청을 사전에 걸러낸다.</li>
+    <li><strong>출력 가드레일</strong> — 에이전트가 만들어낸 행동·텍스트가 정책을 위반하지 않는지 사후 검사한다.</li>
+    <li><strong>도구 권한 스코핑</strong> — 에이전트가 필요한 최소한의 도구·권한만 갖도록 제한한다(최소 권한 원칙).</li>
+  </ul>
+
+  <h3>에이전트 아이덴티티와 감사</h3>
+  <p>여러 에이전트가 실제 시스템에 쓰기 작업을 수행하게 되면서, "어떤 에이전트가, 누구를 대신해서, 어떤 도구를, 어떤 순서로 호출했는가"를 추적하는 것이 보안·거버넌스의 핵심 과제로 떠올랐다. 엔터프라이즈 환경에서는 에이전트별 고유 신원(Agent Identity)을 부여하고, MCP 서버 연결에 접근 정책과 인증을 일관되게 적용하며, 모든 도구 호출을 실시간으로 기록하는 방식이 표준적인 대응으로 자리 잡고 있다.</p>
+
+  <h3>평가(Evaluation) 지표</h3>
+  <table>
+    <tr><th>관점</th><th>지표 예시</th></tr>
+    <tr><td>작업 성공률</td><td>목표를 실제로 달성했는가 (End-to-end task success)</td></tr>
+    <tr><td>효율성</td><td>목표 달성까지의 스텝 수, 토큰/비용, 소요 시간</td></tr>
+    <tr><td>도구 사용 정확도</td><td>올바른 도구를, 올바른 인자로 호출했는가</td></tr>
+    <tr><td>안전성</td><td>금지된 행동을 시도하지 않는가, 위험한 행동 전에 확인을 구하는가</td></tr>
+    <tr><td>복구력</td><td>도구 실패·예외 상황에서 스스로 회복하는가</td></tr>
+  </table>
+</section>
+
+<!-- ================= CHAPTER 12 ================= -->
+<section class="chapter" id="ch12">
+  <h2><span class="chnum">12</span>2026년 현재의 활용 사례</h2>
+  <p class="subhead">실험실을 벗어나 실무에 자리 잡은 에이전트들</p>
+
+  <h3>코딩 에이전트</h3>
+  <p>파일을 탐색하고, 코드를 작성·실행·테스트하고, 실패하면 스스로 원인을 추적해 수정하는 루프를 반복하는 에이전트가 실무 개발 워크플로우에 깊이 자리 잡았다. 터미널, 에디터, 데스크톱 앱 등 다양한 형태로 제공되며, 저장소 전체 맥락을 이해하고 여러 파일에 걸친 변경을 스스로 계획해 수행하는 수준까지 발전했다.</p>
+
+  <h3>컴퓨터 사용 에이전트</h3>
+  <p>API가 제공되지 않는 애플리케이션도, 사람처럼 화면을 보고 마우스와 키보드를 조작해 처리하는 에이전트다. 레거시 시스템이나 API가 없는 사내 도구를 자동화할 때 특히 유용하다.</p>
+
+  <h3>엔터프라이즈 업무 자동화</h3>
+  <p>반복적인 의사결정과 다단계 워크플로우 — 예를 들어 인보이스 처리, 고객 문의 라우팅, 데이터 파이프라인 모니터링 — 를 에이전트가 담당하는 사례가 늘고 있다. 다만 초기 도입 사례들에서 모든 작업에 고성능 모델을 무분별하게 투입하다 비용 대비 성과가 기대에 못 미치는 경우가 많았고, 이 경험은 작업 난이도별로 적절한 모델을 선택하는 "추론 경제성" 설계로 이어지고 있다.</p>
+
+  <h3>인프라·데브옵스 에이전트</h3>
+  <p>배포 로그를 분석해 근본 원인을 진단하는 데까지는 상당히 성숙했지만, 실제 수정을 자동으로 배포하는 단계는 아직 사람의 승인을 거치는 경우가 많다 — "진단은 자동, 실행은 승인 후"라는 경계가 2026년 현재 인프라 에이전트의 일반적인 운영 원칙으로 자리 잡고 있다.</p>
+
+  <div class="callout">
+    <span class="callout-label">공통된 패턴</span>
+    분야를 막론하고 2026년 성공적인 에이전트 도입 사례들은 한 가지 원칙을 공유한다: <strong>되돌릴 수 있는 행동은 에이전트가 자유롭게, 되돌리기 어려운 행동은 사람의 승인을 거쳐서.</strong> 이 경계선을 어디에 그을지가 에이전트 설계에서 가장 중요한 실무적 판단이다.
+  </div>
+</section>
+
+<!-- ================= CHAPTER 13 ================= -->
+<section class="chapter" id="ch13">
+  <h2><span class="chnum">13</span>종합 체크리스트</h2>
+  <p class="subhead">AI 에이전트를 이해하고 설계할 때 스스로 점검할 목록</p>
+
+  <ul class="checklist">
+    <li><span class="box"></span>에이전트와 단순 챗봇의 차이(자율성·반응성·능동성·사회성)를 설명할 수 있다</li>
+    <li><span class="box"></span>지각–추론–행동 루프와, 환경의 네 가지 축(관측성·결정성·연속성·동적성)을 구분할 수 있다</li>
+    <li><span class="box"></span>ReAct 루프(Thought → Action → Observation)를 그릴 수 있다</li>
+    <li><span class="box"></span>Reflexion, Plan-and-Execute, Tree of Thoughts를 상황에 맞게 구분해 선택할 수 있다</li>
+    <li><span class="box"></span>도구(함수 호출)가 JSON 스키마로 어떻게 정의·호출되는지 이해한다</li>
+    <li><span class="box"></span>단기/장기/에피소드/절차 메모리의 차이와 각각의 구현 방식을 안다</li>
+    <li><span class="box"></span>Supervisor 구조와 Swarm 구조의 트레이드오프를 설명할 수 있다</li>
+    <li><span class="box"></span>MCP·A2A·ACP가 각각 어떤 계층을 담당하는지 구분할 수 있다</li>
+    <li><span class="box"></span>Human-in-the-loop과 가드레일이 왜 필요한지, 어디에 배치해야 하는지 안다</li>
+    <li><span class="box"></span>"되돌릴 수 있는 행동은 자동, 되돌리기 어려운 행동은 승인 후"라는 설계 원칙을 실제 사례에 적용할 수 있다</li>
+  </ul>
+
+  <div class="callout teal">
+    <span class="callout-label">마무리</span>
+    AI 에이전트는 하나의 완성된 기술이라기보다, 70년에 걸쳐 쌓여 온 "환경을 인식하고 스스로 행동을 설계하는 시스템"이라는 아이디어가 LLM이라는 강력한 추론 엔진을 만나 실용화되는 과정에 있다. 프레임워크와 프로토콜의 이름은 계속 바뀌겠지만, 이 학습서에서 다룬 지각-추론-행동 루프, 도구 사용, 메모리, 멀티 에이전트 협업이라는 골격은 당분간 크게 변하지 않을 것이다.
+  </div>
+</section>
+
+<footer class="end">AI 에이전트 완전정복 — 역사 · 원리 · 2026년 현재</footer>
+
+</main>
+</div>
+
+<script>
+(function(){
+  const links = Array.from(document.querySelectorAll('nav.toc a'));
+  const sections = links.map(l => document.querySelector(l.getAttribute('href')));
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((sec, i) => { if(sec && sec.offsetTop <= y) idx = i; });
+    links.forEach(l => l.classList.remove('active'));
+    if(links[idx]) links[idx].classList.add('active');
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+})();
+</script>
+</body>
+</html>
