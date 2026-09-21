@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADP 필기 서술형 완전정복 2 — 제1회~제27회 기출 문제·해설</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']], processEscapes: true },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --bg-2:#f4f9fd;
+  --ink:#1c2b3a; --ink-soft:#4a6178;
+  --accent:#1f6fb2; --accent-2:#2f8fd6; --accent-soft:#dceefb;
+  --line:#cfe3f5;
+  --code-bg:#f4f9fd; --code-border:#cfe3f5;
+  --green:#3f8f6b; --amber:#c98a2c;
+  --card:#ffffff; --shadow: 0 2px 12px rgba(31,111,178,0.08);
+}
+*{box-sizing:border-box;}
+body{ margin:0; font-family:'Noto Sans KR', sans-serif; background:var(--bg); color:var(--ink); line-height:1.75; font-size:16px; }
+.layout{ display:flex; max-width:1380px; margin:0 auto; }
+.sidebar{ width:270px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto; padding:32px 18px; border-right:1px solid var(--line); background:var(--bg-2); }
+.sidebar h1{ font-family:'Spectral',serif; font-size:1.08rem; margin:0 0 4px; color:var(--accent);}
+.sidebar .sub{ font-size:0.76rem; color:var(--ink-soft); margin-bottom:22px; }
+.sidebar nav a{ display:block; padding:6px 10px; margin:2px 0; border-radius:6px; text-decoration:none; color:var(--ink-soft); font-size:0.84rem; border-left:2px solid transparent; transition:.15s; }
+.sidebar nav a:hover{ background:var(--accent-soft); color:var(--accent);}
+.sidebar nav a.active{ background:var(--accent-soft); color:var(--accent); border-left:2px solid var(--accent); font-weight:600;}
+.sidebar nav .part{ font-size:0.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent-2); margin:16px 0 4px 8px; font-weight:700;}
+main{ flex:1; min-width:0; padding:48px 56px 120px; }
+.hero{ margin-bottom:44px; }
+.hero h1{ font-family:'Spectral',serif; font-size:2.15rem; margin:0 0 12px; color:var(--ink);}
+.hero p{ color:var(--ink-soft); font-size:1.03rem; max-width:780px;}
+section{ margin-bottom:56px; scroll-margin-top:24px; }
+h2{ font-family:'Spectral',serif; font-size:1.5rem; color:var(--accent); border-bottom:2px solid var(--accent-soft); padding-bottom:10px; margin-top:0; display:flex; align-items:center; gap:10px;}
+.type-badge{ display:inline-flex; align-items:center; justify-content:center; min-width:64px; height:30px; padding:0 10px; border-radius:16px; background:var(--accent); color:#fff; font-family:'JetBrains Mono',monospace; font-size:0.78rem; font-weight:700;}
+.type-badge.supp{ background:var(--amber); }
+h3{ font-family:'Spectral',serif; font-size:1.13rem; color:var(--ink); margin-top:26px;}
+p{ margin:12px 0; }
+.tag-row{ margin: 4px 0 18px; }
+.tag{ display:inline-block; background:var(--accent-soft); color:var(--accent); font-size:0.74rem; padding:3px 11px; border-radius:12px; font-weight:700; margin-right:6px; }
+.tag.type{ background:#fdf1de; color:var(--amber); }
+.problem-box{ background:var(--bg-2); border:1.5px solid var(--accent-soft); border-left:5px solid var(--accent); border-radius:8px; padding:18px 22px; margin:16px 0; }
+.problem-box .label{ font-family:'JetBrains Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); font-weight:700; margin-bottom:8px; }
+.sub-q{ font-weight:700; color:var(--ink); margin-top:10px; }
+.card{ background:var(--bg-2); border:1px solid var(--line); border-radius:10px; padding:20px 24px; margin:18px 0; box-shadow:var(--shadow); }
+.note{ border-left:4px solid var(--accent); background:var(--bg-2); padding:14px 18px; border-radius:6px; margin:16px 0; font-size:0.94rem;}
+.warn{ border-left:4px solid var(--amber); background:#fdf6ea; padding:14px 18px; border-radius:6px; margin:16px 0; font-size:0.94rem;}
+.example{ border-left:4px solid var(--green); background:#eef8f3; padding:14px 18px; border-radius:6px; margin:16px 0; font-size:0.94rem;}
+.step{ border-left:4px solid var(--accent-2); background:#ffffff; border:1px solid var(--line); padding:14px 20px; border-radius:6px; margin:12px 0; }
+.step-num{ display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; font-weight:700; font-size:0.8rem; margin-right:8px; font-family:'JetBrains Mono',monospace;}
+.answer-box{ background:#ffffff; border:1px solid var(--line); border-radius:8px; padding:16px 20px; margin:14px 0; }
+.answer-box .lbl{ font-family:'JetBrains Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--green); font-weight:700; margin-bottom:8px;}
+table{ width:100%; border-collapse:collapse; margin:18px 0; font-size:0.9rem; box-shadow:var(--shadow); }
+th,td{ border:1px solid var(--line); padding:9px 12px; text-align:left;}
+th{ background:var(--accent-soft); color:var(--accent); font-weight:700;}
+tr:nth-child(even){ background:var(--bg-2); }
+tr:hover td{ background:#eef6fc; }
+code{ font-family:'JetBrains Mono', monospace; background:var(--bg-2); border:1px solid var(--code-border); border-radius:4px; padding:1px 6px; font-size:0.88em; color:var(--accent);}
+.svg-box{ background:#ffffff; border:1px solid var(--line); border-radius:10px; padding:20px; margin:20px 0; text-align:center; box-shadow:var(--shadow);}
+.svg-box svg{ max-width:100%; height:auto;}
+.svg-cap{ font-size:0.82rem; color:var(--ink-soft); margin-top:8px; font-style:italic;}
+.checklist{ list-style:none; padding:0; }
+.checklist li{ padding:8px 0 8px 30px; position:relative; border-bottom:1px dashed var(--line);}
+.checklist li::before{ content:'✓'; position:absolute; left:0; color:var(--accent); font-weight:700;}
+.toc-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:18px 0; }
+.toc-item{ display:block; padding:12px 16px; background:var(--bg-2); border:1px solid var(--line); border-radius:8px; text-decoration:none; color:var(--ink); transition:.15s; }
+.toc-item:hover{ border-color:var(--accent); background:var(--accent-soft); }
+.toc-item b{ color:var(--accent); font-family:'JetBrains Mono',monospace; }
+footer{ text-align:center; color:var(--ink-soft); font-size:0.8rem; padding:30px; border-top:1px solid var(--line);}
+@media (max-width:1000px){ .layout{ flex-direction:column;} .sidebar{ position:relative; height:auto; width:100%;} main{ padding:28px 20px;} .toc-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <h1>ADP 서술형 완전정복 2</h1>
+  <div class="sub">제1회~제27회 기출 문제·해설 + 보충예제</div>
+  <nav id="nav">
+    <a href="#intro">📌 개관</a>
+    <div class="part">원문 기출 4유형</div>
+    <a href="#t1">유형1 — 잔차의 4가지 가정</a>
+    <a href="#t2">유형2 — 연관분석 지표</a>
+    <a href="#t3">유형3 — 혼동행렬 지표</a>
+    <a href="#t4">유형4 — 시계열 정상성</a>
+    <div class="part">보충예제 (요약표 기반 보강)</div>
+    <a href="#s1">보충A — 다중공선성(VIF)</a>
+    <a href="#s2">보충B — 분산분석(ANOVA) 표</a>
+    <a href="#s3">보충C — 계층적 군집·덴드로그램</a>
+    <a href="#s4">보충D — ACF/PACF와 AR/MA</a>
+    <a href="#s5">보충E — 요인분석 vs PCA</a>
+    <div class="part">정리</div>
+    <a href="#summary">요약 테이블</a>
+    <a href="#checklist">학습 체크리스트</a>
+  </nav>
+</aside>
+<main>
+
+<div class="hero">
+  <h1>ADP 필기 서술형 완전정복 2</h1>
+  <p>제1회~제27회 초기 ADP 필기 서술형에서 다빈출된 4개 핵심 유형(잔차 가정 검정, 연관분석 지표, 혼동행렬 지표, 시계열 정상성)을 원문 그대로 단계별로 풀이하고, 요약표에 언급되었으나 구체적 문제 원문이 없는 나머지 주제들(VIF, ANOVA, 덴드로그램, ACF/PACF, 요인분석)은 <b>보충예제</b>로 별도 표시해 같은 형식으로 보강했다.</p>
+</div>
+
+<!-- ================= INTRO ================= -->
+<section id="intro">
+<h2>📌 개관</h2>
+<p>제공된 원문 자료에는 <b>4개의 완전한 문제·해설</b>과, 그 외 초기 회차(1~27회)에서 반복 출제된 주제를 정리한 <b>요약 테이블</b>이 함께 있었다. 이 자료는 두 부분으로 나누어 구성했다.</p>
+<table>
+<tr><th>구분</th><th>내용</th><th>표시</th></tr>
+<tr><td>원문 기출 4유형</td><td>문제 원문과 정답 풀이가 그대로 제공된 것 (잔차가정, 연관분석, 혼동행렬, 시계열 정상성)</td><td><span class="type-badge">원문</span></td></tr>
+<tr><td>보충예제 5개</td><td>요약 테이블에 <b>주제명만</b> 있고 구체적 문제 원문은 없는 것(VIF, ANOVA, 덴드로그램, ACF/PACF, 요인분석 vs PCA) — 같은 형식으로 수치 예제를 구성해 보강</td><td><span class="type-badge supp">보충</span></td></tr>
+</table>
+<div class="warn">
+<b>보충예제에 대한 안내</b> — 아래 "보충" 표시가 붙은 5개 항목은 실제 ADP 시험에 출제된 원문 그대로가 <b>아니라</b>, 요약 테이블의 키워드(예: "다중공선성(VIF)", "덴드로그램")를 바탕으로 같은 개념을 학습할 수 있도록 만든 예제다. 개념과 풀이 절차 자체는 표준적인 통계·머신러닝 방법론을 따르지만, 구체적인 숫자는 실제 기출 문항의 숫자와 다를 수 있다.
+</div>
+
+<h3>전체 구성 한눈에 보기</h3>
+<div class="toc-grid">
+<a class="toc-item" href="#t1"><b>유형1</b> — 잔차의 4가지 가정과 검정방법</a>
+<a class="toc-item" href="#t2"><b>유형2</b> — 지지도·신뢰도·향상도 계산</a>
+<a class="toc-item" href="#t3"><b>유형3</b> — 재현율·정밀도·F1-Score</a>
+<a class="toc-item" href="#t4"><b>유형4</b> — 시계열 정상성 3조건</a>
+<a class="toc-item" href="#s1"><b>보충A</b> — VIF로 다중공선성 진단</a>
+<a class="toc-item" href="#s2"><b>보충B</b> — ANOVA 표에서 F통계량 계산</a>
+<a class="toc-item" href="#s3"><b>보충C</b> — 단일연결법 덴드로그램 작도</a>
+<a class="toc-item" href="#s4"><b>보충D</b> — ACF/PACF로 AR·MA 식별</a>
+<a class="toc-item" href="#s5"><b>보충E</b> — 요인분석과 PCA의 차이</a>
+</div>
+</section>
+
+<!-- ================= TYPE 1 ================= -->
+<section id="t1">
+<h2><span class="type-badge">원문</span> 유형1 — 다중회귀분석의 잔차 가정 검정</h2>
+<div class="tag-row"><span class="tag">회귀분석</span><span class="tag">잔차진단</span><span class="tag">가정검정</span><span class="tag type">이론 서술형</span></div>
+
+<div class="problem-box">
+<div class="label">문제</div>
+선형 회귀모형이 성립하기 위해 만족해야 하는 잔차(Residual)의 4가지 기본 가정을 제시하고, 각 가정을 검정할 수 있는 통계적 분석 방법(그래프 또는 통계량)을 1가지씩 서술하시오.
+</div>
+
+<h3>모범답안 — 4가지 가정과 검정법</h3>
+<table>
+<tr><th>가정</th><th>의미</th><th>검정 방법</th></tr>
+<tr><td>선형성(Linearity)</td><td>독립변수와 종속변수 간 선형 관계가 존재해야 함</td><td>잔차도(Residual Plot) — 잔차가 0을 중심으로 무작위 분포하는지 확인</td></tr>
+<tr><td>독립성(Independence)</td><td>잔차들 사이에 상관관계가 없어야 함 (특히 시계열에서 중요)</td><td>더빈-왓슨(Durbin-Watson) 통계량 — 2에 가까운지 확인</td></tr>
+<tr><td>등분산성(Homoscedasticity)</td><td>잔차의 분산이 모든 독립변수 값에 대해 일정해야 함</td><td>잔차도에서 예측값이 커짐에 따라 깔때기 모양이 나타나는지 확인</td></tr>
+<tr><td>정규성(Normality)</td><td>잔차의 분포가 평균 0인 정규분포를 따라야 함</td><td>Q-Q Plot이 직선을 이루는지, 또는 Shapiro-Wilk/K-S 검정의 p-value 확인</td></tr>
+</table>
+
+<div class="svg-box">
+<svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg">
+<style>.t{font-family:'Noto Sans KR',sans-serif;font-size:11px;fill:#1c2b3a;} .tb{font-family:'Noto Sans KR',sans-serif;font-size:12.5px;fill:#1c2b3a;font-weight:700;}</style>
+
+<text x="110" y="20" text-anchor="middle" class="tb">① 선형성 (양호)</text>
+<line x1="30" y1="150" x2="190" y2="150" stroke="#4a6178" stroke-width="1"/>
+<line x1="110" y1="70" x2="110" y2="150" stroke="#4a6178" stroke-width="1"/>
+<circle cx="50" cy="130" r="2.5" fill="#1f6fb2"/><circle cx="65" cy="160" r="2.5" fill="#1f6fb2"/><circle cx="80" cy="140" r="2.5" fill="#1f6fb2"/><circle cx="95" cy="155" r="2.5" fill="#1f6fb2"/><circle cx="110" cy="145" r="2.5" fill="#1f6fb2"/><circle cx="125" cy="160" r="2.5" fill="#1f6fb2"/><circle cx="140" cy="140" r="2.5" fill="#1f6fb2"/><circle cx="155" cy="155" r="2.5" fill="#1f6fb2"/><circle cx="170" cy="145" r="2.5" fill="#1f6fb2"/>
+<text x="110" y="185" text-anchor="middle" class="t">잔차가 무작위로 흩어짐</text>
+
+<text x="380" y="20" text-anchor="middle" class="tb">② 독립성 (Durbin-Watson)</text>
+<line x1="270" y1="110" x2="490" y2="110" stroke="#4a6178" stroke-width="1.5"/>
+<circle cx="270" cy="110" r="3" fill="#c98a2c"/><text x="270" y="130" text-anchor="middle" class="t">0</text><text x="270" y="145" text-anchor="middle" class="t" font-size="9">양의상관</text>
+<circle cx="380" cy="110" r="4" fill="#3f8f6b"/><text x="380" y="130" text-anchor="middle" class="t" font-weight="700">2</text><text x="380" y="145" text-anchor="middle" class="t" font-size="9">독립(이상적)</text>
+<circle cx="490" cy="110" r="3" fill="#c98a2c"/><text x="490" y="130" text-anchor="middle" class="t">4</text><text x="490" y="145" text-anchor="middle" class="t" font-size="9">음의상관</text>
+
+<text x="110" y="230" text-anchor="middle" class="tb">③ 등분산성 위반 (깔때기형)</text>
+<line x1="30" y1="300" x2="190" y2="300" stroke="#4a6178" stroke-width="1"/>
+<line x1="30" y1="260" x2="30" y2="300" stroke="#4a6178" stroke-width="1"/>
+<circle cx="45" cy="298" r="2" fill="#c98a2c"/><circle cx="55" cy="300" r="2" fill="#c98a2c"/><circle cx="65" cy="297" r="2" fill="#c98a2c"/>
+<circle cx="90" cy="290" r="2" fill="#c98a2c"/><circle cx="95" cy="305" r="2" fill="#c98a2c"/><circle cx="105" cy="282" r="2" fill="#c98a2c"/>
+<circle cx="140" cy="270" r="2" fill="#c98a2c"/><circle cx="150" cy="310" r="2" fill="#c98a2c"/><circle cx="160" cy="260" r="2" fill="#c98a2c"/><circle cx="170" cy="315" r="2" fill="#c98a2c"/>
+<path d="M 30 296 L 190 265 M 30 300 L 190 320" stroke="#c98a2c" stroke-width="1" stroke-dasharray="2 2" fill="none"/>
+<text x="110" y="330" text-anchor="middle" class="t">예측값↑ → 잔차 변동폭↑ (위반)</text>
+
+<text x="380" y="230" text-anchor="middle" class="tb">④ 정규성 (Q-Q Plot)</text>
+<line x1="300" y1="320" x2="460" y2="260" stroke="#3f8f6b" stroke-width="1.5" stroke-dasharray="3 2"/>
+<circle cx="310" cy="315" r="2.5" fill="#1f6fb2"/><circle cx="330" cy="303" r="2.5" fill="#1f6fb2"/><circle cx="350" cy="293" r="2.5" fill="#1f6fb2"/><circle cx="370" cy="288" r="2.5" fill="#1f6fb2"/><circle cx="390" cy="280" r="2.5" fill="#1f6fb2"/><circle cx="410" cy="272" r="2.5" fill="#1f6fb2"/><circle cx="430" cy="265" r="2.5" fill="#1f6fb2"/><circle cx="450" cy="262" r="2.5" fill="#1f6fb2"/>
+<text x="380" y="335" text-anchor="middle" class="t">점들이 대각선에 가까움 → 정규성 만족</text>
+</svg>
+<div class="svg-cap">그림 T1-1. 네 가지 가정의 대표적 진단 그림. ① 잔차도가 무작위면 선형성 만족, ② DW통계량이 2 근처면 독립, ③ 깔때기 모양이면 등분산성 위반, ④ Q-Q Plot이 직선에 가까우면 정규성 만족.</div>
+</div>
+<div class="note">네 가정을 <b>"LINE"</b>(Linearity, Independence, Normality, Equal variance)의 앞글자로 외우면 서술형 답안에서 빠뜨리지 않고 4개를 모두 언급하기 쉽다.</div>
+</section>
+
+<!-- ================= TYPE 2 ================= -->
+<section id="t2">
+<h2><span class="type-badge">원문</span> 유형2 — 연관분석(Association Analysis) 지표 계산</h2>
+<div class="tag-row"><span class="tag">연관분석</span><span class="tag">지지도·신뢰도·향상도</span><span class="tag type">수리 공식 대입 연산형</span></div>
+
+<div class="problem-box">
+<div class="label">문제</div>
+전체 거래 건수 100건 중 상품 A를 포함하는 거래가 40건, 상품 B를 포함하는 거래가 50건, 상품 A와 B를 동시에 포함하는 거래가 20건이다. 연관 규칙 $A\to B$에 대한 지지도(Support), 신뢰도(Confidence), 향상도(Lift)를 각각 계산하시오.
+</div>
+
+<h3>단계별 해설</h3>
+<div class="step"><span class="step-num">1</span><b>주어진 값 정리</b></div>
+<table>
+<tr><th>기호</th><th>의미</th><th>값</th></tr>
+<tr><td>전체 거래</td><td>-</td><td>100건</td></tr>
+<tr><td>$n(A)$</td><td>A 포함 거래</td><td>40건</td></tr>
+<tr><td>$n(B)$</td><td>B 포함 거래</td><td>50건</td></tr>
+<tr><td>$n(A\cap B)$</td><td>A,B 동시 포함 거래</td><td>20건</td></tr>
+</table>
+
+<div class="step"><span class="step-num">2</span><b>지지도(Support) — 전체 중 A,B 동시발생 비율</b></div>
+$$\text{Support}(A\to B) = \frac{P(A\cap B)}{\text{전체}} = \frac{20}{100} = \mathbf{0.2\ (20\%)}$$
+
+<div class="step"><span class="step-num">3</span><b>신뢰도(Confidence) — A 중 B가 함께 나온 비율</b></div>
+$$\text{Confidence}(A\to B) = \frac{P(A\cap B)}{P(A)} = \frac{20}{40} = \mathbf{0.5\ (50\%)}$$
+
+<div class="step"><span class="step-num">4</span><b>향상도(Lift) — A가 주어졌을 때 B 확률이 원래보다 얼마나 늘었나</b></div>
+$$\text{Lift}(A\to B) = \frac{\text{Confidence}(A\to B)}{P(B)} = \frac{0.5}{50/100} = \frac{0.5}{0.5} = \mathbf{1.0}$$
+
+<div class="answer-box"><div class="lbl">정답 요약</div>
+지지도 20%, 신뢰도 50%, 향상도 1.0
+</div>
+
+<div class="svg-box">
+<svg viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg">
+<style>.t{font-family:'Noto Sans KR',sans-serif;font-size:12px;fill:#1c2b3a;} .tb{font-family:'Noto Sans KR',sans-serif;font-size:13px;fill:#1c2b3a;font-weight:700;}</style>
+<rect x="40" y="40" width="560" height="160" rx="10" fill="#ffffff" stroke="#1f6fb2" stroke-width="2"/>
+<text x="60" y="30" class="tb" fill="#1f6fb2">전체 거래 100건</text>
+<rect x="70" y="70" width="220" height="110" fill="#dceefb" stroke="#2f8fd6" stroke-width="1.5" opacity="0.8"/>
+<text x="180" y="90" text-anchor="middle" class="tb" fill="#1f6fb2">A (40건)</text>
+<ellipse cx="330" cy="125" rx="150" ry="70" fill="#eaf6ee" stroke="#3f8f6b" stroke-width="1.5" opacity="0.8"/>
+<text x="440" y="90" text-anchor="middle" class="tb" fill="#3f8f6b">B (50건)</text>
+<text x="255" y="130" text-anchor="middle" class="tb" fill="#c98a2c">A∩B = 20건</text>
+</svg>
+<div class="svg-cap">그림 T2-1. Lift=1.0은 A와 B가 겹치는 부분(20건)이 정확히 "A와 B가 서로 독립일 때 기대되는 수준"과 같다는 뜻이다 — 겹치는 부분이 우연 수준보다 많지도 적지도 않다.</div>
+</div>
+
+<div class="note">
+<b>Lift 해석 기준</b> — $\text{Lift}=1$이면 두 상품이 독립(연관 없음), $\text{Lift}>1$이면 양의 연관(함께 팔릴 가능성이 우연보다 큼), $\text{Lift}<1$이면 음의 연관(함께 팔릴 가능성이 우연보다 작음). 이 문제는 $\text{Lift}=1.0$이므로 "두 상품은 서로 독립적이며, 연관 규칙으로서 의미가 낮다"는 해석까지 답안에 포함해야 만점 포인트를 챙길 수 있다.
+</div>
+</section>
+
+<!-- ================= TYPE 3 ================= -->
+<section id="t3">
+<h2><span class="type-badge">원문</span> 유형3 — 혼동행렬(Confusion Matrix) 평가 지표 연산</h2>
+<div class="tag-row"><span class="tag">혼동행렬</span><span class="tag">Precision·Recall</span><span class="tag">F1-Score</span><span class="tag type">데이터 오차행렬 계산형</span></div>
+
+<div class="problem-box">
+<div class="label">문제</div>
+암(Cancer) 환자를 분류하는 모델의 예측 결과가 다음과 같다. 실제 암 환자 10명 중 8명을 환자로 맞췄고 2명을 정상으로 오분류했다. 실제 정상인 사람 90명 중 10명을 암 환자로 오분류했고 80명을 정상으로 맞췄다.
+<p class="sub-q">소문항 1) 이 모델의 재현율(Recall)과 정밀도(Precision)를 구하시오.</p>
+<p class="sub-q">소문항 2) F1-스코어(F1-Score)의 수식을 적고 조화평균을 이용해 최종 값을 계산하시오.</p>
+</div>
+
+<h3>단계별 해설</h3>
+<div class="step"><span class="step-num">1</span><b>혼동행렬 정리</b></div>
+<table>
+<tr><th></th><th>예측: 암(Positive)</th><th>예측: 정상(Negative)</th></tr>
+<tr><td><b>실제: 암</b></td><td>TP = 8</td><td>FN = 2</td></tr>
+<tr><td><b>실제: 정상</b></td><td>FP = 10</td><td>TN = 80</td></tr>
+</table>
+
+<div class="svg-box">
+<svg viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+<style>.t{font-family:'Noto Sans KR',sans-serif;font-size:12px;fill:#1c2b3a;} .tb{font-family:'JetBrains Mono',monospace;font-size:15px;fill:#1c2b3a;font-weight:700;}</style>
+<rect x="120" y="60" width="140" height="90" fill="#dceefb" stroke="#1f6fb2" stroke-width="1.5"/>
+<text x="190" y="95" text-anchor="middle" class="tb" fill="#1f6fb2">TP=8</text>
+<text x="190" y="115" text-anchor="middle" class="t">암→암 (정확)</text>
+
+<rect x="260" y="60" width="140" height="90" fill="#fdf1de" stroke="#c98a2c" stroke-width="1.5"/>
+<text x="330" y="95" text-anchor="middle" class="tb" fill="#c98a2c">FN=2</text>
+<text x="330" y="115" text-anchor="middle" class="t">암→정상 (놓침)</text>
+
+<rect x="120" y="150" width="140" height="90" fill="#fdf1de" stroke="#c98a2c" stroke-width="1.5"/>
+<text x="190" y="185" text-anchor="middle" class="tb" fill="#c98a2c">FP=10</text>
+<text x="190" y="205" text-anchor="middle" class="t">정상→암 (오탐)</text>
+
+<rect x="260" y="150" width="140" height="90" fill="#eaf6ee" stroke="#3f8f6b" stroke-width="1.5"/>
+<text x="330" y="185" text-anchor="middle" class="tb" fill="#3f8f6b">TN=80</text>
+<text x="330" y="205" text-anchor="middle" class="t">정상→정상 (정확)</text>
+
+<text x="60" y="105" text-anchor="middle" class="t" font-weight="700">실제:암</text>
+<text x="60" y="195" text-anchor="middle" class="t" font-weight="700">실제:정상</text>
+<text x="190" y="45" text-anchor="middle" class="t" font-weight="700">예측:암</text>
+<text x="330" y="45" text-anchor="middle" class="t" font-weight="700">예측:정상</text>
+</svg>
+<div class="svg-cap">그림 T3-1. 재현율은 "실제 암 환자(TP+FN=10명)" 중 TP 비율, 정밀도는 "암이라고 예측한 사람(TP+FP=18명)" 중 TP 비율이다.</div>
+</div>
+
+<div class="step"><span class="step-num">2</span><b>소문항 1 — 재현율·정밀도 계산</b></div>
+$$\text{Recall} = \frac{TP}{TP+FN} = \frac{8}{8+2} = \mathbf{0.8\ (80\%)}$$
+$$\text{Precision} = \frac{TP}{TP+FP} = \frac{8}{8+10} = \frac{8}{18} \approx \mathbf{0.444\ (44.4\%)}$$
+
+<div class="step"><span class="step-num">3</span><b>소문항 2 — F1-Score (조화평균)</b></div>
+$$F_1 = 2\times\frac{\text{Precision}\times\text{Recall}}{\text{Precision}+\text{Recall}}$$
+$$F_1 = 2\times\frac{0.444\times0.8}{0.444+0.8} = 2\times\frac{0.3552}{1.2442} \approx \mathbf{0.571}$$
+
+<div class="answer-box"><div class="lbl">정답 요약</div>
+재현율 80%, 정밀도 ≈44.4%, F1-Score ≈0.571
+</div>
+<div class="example"><b>왜 조화평균인가</b> — 산술평균이 아닌 조화평균을 쓰는 이유는, 두 지표 중 <b>하나라도 매우 작으면</b> F1 전체가 크게 낮아지도록 만들기 위해서다. 이 문제에서 정밀도(44.4%)가 재현율(80%)보다 훨씬 낮으므로, F1(57.1%)은 두 값의 산술평균(62.2%)보다 낮은 쪽으로 당겨진다 — "정밀도가 낮으면 아무리 재현율이 높아도 F1은 그 영향을 강하게 받는다"는 점을 서술하면 가점 요인이 된다.</div>
+</section>
+
+<!-- ================= TYPE 4 ================= -->
+<section id="t4">
+<h2><span class="type-badge">원문</span> 유형4 — 시계열 분석의 정상성 조건</h2>
+<div class="tag-row"><span class="tag">시계열분석</span><span class="tag">정상성</span><span class="tag">ARIMA</span><span class="tag type">이론 서술형</span></div>
+
+<div class="problem-box">
+<div class="label">문제</div>
+시계열 모델(AR, MA, ARIMA 등)을 적용하기 전 데이터가 만족해야 하는 정상성(Stationarity)의 3가지 조건을 서술하시오.
+</div>
+
+<h3>모범답안 — 3가지 조건</h3>
+<table>
+<tr><th>조건</th><th>내용</th><th>위반 시 해결책</th></tr>
+<tr><td>평균의 일정함</td><td>모든 시점에서 시계열의 평균이 일정해야 함</td><td>차분(Differencing)</td></tr>
+<tr><td>분산의 일정함</td><td>모든 시점에서 시계열의 분산이 일정해야 함</td><td>로그 변환(Log Transformation) 등</td></tr>
+<tr><td>공분산의 시차 의존성</td><td>임의의 두 시점 간 공분산은 오직 시차(Lag)에만 의존, 특정 시점 자체에는 의존하지 않아야 함</td><td>(계절성 차분 등으로 시차 구조 자체를 안정화)</td></tr>
+</table>
+
+<div class="svg-box">
+<svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg">
+<style>.t{font-family:'Noto Sans KR',sans-serif;font-size:11.5px;fill:#1c2b3a;} .tb{font-family:'Noto Sans KR',sans-serif;font-size:13px;fill:#1c2b3a;font-weight:700;}</style>
+<text x="170" y="20" text-anchor="middle" class="tb">비정상 시계열 (평균 추세 존재)</text>
+<line x1="30" y1="130" x2="320" y2="130" stroke="#4a6178" stroke-width="1"/>
+<polyline points="30,150 60,140 90,138 120,120 150,115 180,95 210,90 240,70 270,60 300,45" fill="none" stroke="#c98a2c" stroke-width="2"/>
+<text x="170" y="175" text-anchor="middle" class="t">시간에 따라 평균이 계속 상승 → 비정상</text>
+
+<text x="510" y="20" text-anchor="middle" class="tb">정상 시계열 (평균·분산 일정)</text>
+<line x1="370" y1="130" x2="660" y2="130" stroke="#4a6178" stroke-width="1"/>
+<polyline points="370,120 400,145 430,110 460,135 490,115 520,140 550,120 580,110 610,135 640,120" fill="none" stroke="#1f6fb2" stroke-width="2"/>
+<line x1="370" y1="126" x2="660" y2="126" stroke="#3f8f6b" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text x="510" y="175" text-anchor="middle" class="t">평균(초록 점선) 중심으로 일정 폭 진동 → 정상</text>
+</svg>
+<div class="svg-cap">그림 T4-1. 왼쪽은 시간이 지날수록 평균이 계속 커지는 추세(trend)가 있어 정상성을 위반한다. 오른쪽은 평균과 진동 폭이 시간에 따라 변하지 않아 정상성 조건을 만족한다.</div>
+</div>
+<div class="note">세 조건을 한 문장으로 압축하면 <b>"평균·분산·(시차별)공분산이 시간에 따라 변하지 않아야 한다"</b>이다. ARIMA의 'I'(Integrated)가 바로 "차분을 몇 번 해야 정상성을 만족하는가"를 나타내는 항이라는 점까지 연결해서 서술하면 좋은 답안이 된다.</div>
+</section>
+
+<!-- ================= SUPP A: VIF ================= -->
+<section id="s1">
+<h2><span class="type-badge supp">보충</span> 보충예제 A — 다중공선성(VIF) 계산</h2>
+<div class="tag-row"><span class="tag">다중공선성</span><span class="tag">VIF</span><span class="tag">보조회귀</span><span class="tag type">수리 연산형 (보충)</span></div>
+
+<div class="problem-box">
+<div class="label">예제 문제</div>
+학생 5명의 <b>중간고사 점수($X_1$)</b>, <b>출석점수($X_2$)</b>, <b>과제점수($X_3$)</b>가 다음과 같다.
+<table style="margin-top:10px;">
+<tr><th>학생</th><th>$X_1$ (중간고사)</th><th>$X_2$ (출석)</th><th>$X_3$ (과제)</th></tr>
+<tr><td>1</td><td>67</td><td>78</td><td>76</td></tr>
+<tr><td>2</td><td>63</td><td>79</td><td>73</td></tr>
+<tr><td>3</td><td>74</td><td>80</td><td>75</td></tr>
+<tr><td>4</td><td>75</td><td>81</td><td>77</td></tr>
+<tr><td>5</td><td>71</td><td>82</td><td>74</td></tr>
+</table>
+<p class="sub-q">소문항 1) $X_1$을 $X_2,X_3$로 회귀하는 보조회귀식(auxiliary regression)의 결정계수 $R_1^2$을 구하시오.</p>
+<p class="sub-q">소문항 2) $R_1^2$을 바탕으로 $X_1$의 분산팽창계수(VIF)를 구하고, 다중공선성 문제가 있는지 판단하시오.</p>
+</div>
+
+<h3>단계별 해설 — 소문항 1 (R₁² 직접 계산)</h3>
+<div class="step"><span class="step-num">1</span><b>각 변수의 평균 계산</b></div>
+$$\bar{X}_1=\frac{67+63+74+75+71}{5}=70, \quad \bar{X}_2=\frac{78+79+80+81+82}{5}=80, \quad \bar{X}_3=\frac{76+73+75+77+74}{5}=75$$
+
+<div class="step"><span class="step-num">2</span><b>편차(평균으로부터의 차이) 계산</b></div>
+<table>
+<tr><th>학생</th><th>$x_1=X_1-70$</th><th>$x_2=X_2-80$</th><th>$x_3=X_3-75$</th></tr>
+<tr><td>1</td><td>-3</td><td>-2</td><td>1</td></tr>
+<tr><td>2</td><td>-7</td><td>-1</td><td>-2</td></tr>
+<tr><td>3</td><td>4</td><td>0</td><td>0</td></tr>
+<tr><td>4</td><td>5</td><td>1</td><td>2</td></tr>
+<tr><td>5</td><td>1</td><td>2</td><td>-1</td></tr>
+</table>
+
+<div class="step"><span class="step-num">3</span><b>편차제곱합(S)·교차곱합(S) 계산</b></div>
+$$S_{22}=\sum x_2^2 = (-2)^2{+}(-1)^2{+}0^2{+}1^2{+}2^2 = 4{+}1{+}0{+}1{+}4=10$$
+$$S_{33}=\sum x_3^2 = 1^2{+}(-2)^2{+}0^2{+}2^2{+}(-1)^2 = 1{+}4{+}0{+}4{+}1=10$$
+$$S_{23}=\sum x_2x_3 = (-2)(1){+}(-1)(-2){+}0{\cdot}0{+}1{\cdot}2{+}2(-1) = -2{+}2{+}0{+}2{-}2=\mathbf{0}$$
+$$S_{12}=\sum x_1x_2 = (-3)(-2){+}(-7)(-1){+}4{\cdot}0{+}5{\cdot}1{+}1{\cdot}2 = 6{+}7{+}0{+}5{+}2=20$$
+$$S_{13}=\sum x_1x_3 = (-3)(1){+}(-7)(-2){+}4{\cdot}0{+}5{\cdot}2{+}1(-1) = -3{+}14{+}0{+}10{-}2=20$$
+$$S_{11}=\sum x_1^2 = (-3)^2{+}(-7)^2{+}4^2{+}5^2{+}1^2 = 9{+}49{+}16{+}25{+}1=100$$
+
+<div class="note">
+<b>계산이 쉬워지는 이유 — $S_{23}=0$</b>: 출석점수($X_2$)와 과제점수($X_3$)의 편차가 우연히 서로 <b>직교(무상관)</b>하다($S_{23}=0$). 두 설명변수가 서로 상관이 없으면, 보조회귀식의 정규방정식이 서로 <b>독립적으로 분리</b>되어 행렬을 풀 필요 없이 각각 따로 계산할 수 있다.
+</div>
+
+<div class="step"><span class="step-num">4</span><b>회귀계수 계산 (정규방정식)</b></div>
+<p>일반적인 정규방정식은 $S_{22}b_2+S_{23}b_3=S_{12}$, $\ S_{23}b_2+S_{33}b_3=S_{13}$ 인데, $S_{23}=0$이므로 각각 바로 풀린다.</p>
+$$b_2=\frac{S_{12}}{S_{22}}=\frac{20}{10}=2, \qquad b_3=\frac{S_{13}}{S_{33}}=\frac{20}{10}=2$$
+$$b_0 = \bar{X}_1-b_2\bar{X}_2-b_3\bar{X}_3 = 70-2(80)-2(75)=70-160-150=-240$$
+<p>보조회귀식: $\hat{X}_1 = -240+2X_2+2X_3$</p>
+
+<div class="step"><span class="step-num">5</span><b>SSR·SST 계산 및 R₁² 도출</b></div>
+$$SSR = b_2S_{12}+b_3S_{13} = 2(20)+2(20) = 80$$
+$$SST = S_{11} = 100$$
+$$R_1^2 = \frac{SSR}{SST} = \frac{80}{100} = \mathbf{0.8}$$
+
+<div class="answer-box"><div class="lbl">소문항 1 정답</div>
+$R_1^2=0.8$ — 즉 $X_1$(중간고사 점수) 변동의 80%가 $X_2,X_3$(출석·과제 점수)만으로 설명된다.
+</div>
+<div class="example"><b>검산</b> — $SSE=SST-SSR=100-80=20$. 실제로 $\hat X_1$과 $X_1$의 잔차제곱합을 개별 계산해도 정확히 20이 나온다(예: 학생1 예측값 $\hat X_1=-240+2(78)+2(76)=-240+156+152=68$, 잔차 $=67-68=-1$, 잔차제곱 $=1$; 같은 방식으로 5명 모두 계산해 더하면 20이 된다).</div>
+
+<h3>단계별 해설 — 소문항 2 (VIF 계산)</h3>
+<div class="step"><span class="step-num">6</span><b>VIF 공식</b></div>
+$$\text{VIF}_1 = \frac{1}{1-R_1^2}$$
+<p>$R_1^2$은 $X_1$을 종속변수로, 나머지 독립변수들을 설명변수로 하는 보조회귀식(auxiliary regression)의 결정계수다 — $X_1$이 다른 독립변수들로 얼마나 잘 "설명되는지(=중복되는지)"를 나타낸다.</p>
+
+<div class="step"><span class="step-num">7</span><b>수치 대입</b></div>
+$$\text{VIF}_1 = \frac{1}{1-0.8} = \frac{1}{0.2} = \mathbf{5.0}$$
+
+<div class="step"><span class="step-num">8</span><b>판정 기준과 비교</b></div>
+<table>
+<tr><th>VIF 값</th><th>일반적 해석</th></tr>
+<tr><td>VIF < 5</td><td>다중공선성 우려 낮음</td></tr>
+<tr><td>5 ≤ VIF < 10</td><td>다중공선성 존재 가능성 — 주의 필요</td></tr>
+<tr><td>VIF ≥ 10</td><td>심각한 다중공선성 — 변수 제거·PCA 등 조치 필요</td></tr>
+</table>
+<div class="answer-box"><div class="lbl">소문항 2 정답</div>
+$\text{VIF}_1=5.0$으로 "주의가 필요한 경계 수준"의 다중공선성이 의심된다. $R_1^2$이 클수록(=$X_1$이 다른 변수들로 잘 설명될수록) $1-R_1^2$이 0에 가까워져 VIF가 급격히 커진다는 점이 이 공식의 핵심이다.
+</div>
+
+<div class="svg-box">
+<svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg">
+<style>.t{font-family:'Noto Sans KR',sans-serif;font-size:12px;fill:#1c2b3a;} .tb{font-family:'Noto Sans KR',sans-serif;font-size:13px;fill:#1c2b3a;font-weight:700;}</style>
+<text x="260" y="20" text-anchor="middle" class="tb">X₁의 총변동(SST=100) 분해</text>
+<rect x="60" y="50" width="60" height="130" fill="#dceefb" stroke="#1f6fb2" stroke-width="1.5"/>
+<text x="90" y="45" text-anchor="middle" class="t" font-weight="700">SST=100</text>
+<text x="90" y="120" text-anchor="middle" class="t">전체</text>
+<text x="90" y="135" text-anchor="middle" class="t">변동</text>
+
+<text x="180" y="110" class="t" font-size="18" fill="#4a6178">=</text>
+
+<rect x="220" y="154" width="90" height="26" fill="#1f6fb2"/>
+<text x="265" y="171" text-anchor="middle" class="t" fill="white" font-weight="700">SSR=80 (80%)</text>
+<rect x="220" y="50" width="90" height="104" fill="#fdf1de" stroke="#c98a2c" stroke-width="1.5"/>
+<text x="265" y="105" text-anchor="middle" class="t" fill="#c98a2c">SSE=20 (20%)</text>
+<text x="265" y="120" text-anchor="middle" class="t" fill="#c98a2c">(설명 안 됨)</text>
+
+<text x="400" y="100" text-anchor="middle" class="t">R₁² = SSR/SST</text>
+<text x="400" y="120" text-anchor="middle" class="t" font-weight="700" fill="#1f6fb2">= 80/100 = 0.8</text>
+</svg>
+<div class="svg-cap">그림 S1-1. $X_2,X_3$가 $X_1$ 변동의 80%(파란 부분, $SSR$)를 설명하고, 나머지 20%($SSE$, 주황 부분)만 설명하지 못한다 — 이 80%라는 비율이 그대로 $R_1^2=0.8$이 되고, VIF 공식을 거쳐 5.0으로 이어진다.</div>
+</div>
+</section>
+
+<!-- ================= SUPP B: ANOVA ================= -->
+<section id="s2">
+<h2><span class="type-badge supp">보충</span> 보충예제 B — 분산분석(ANOVA) 표 해석</h2>
+<div class="tag-row"><span class="tag">ANOVA</span><span class="tag">F검정</span><span class="tag type">결과 분석형 (보충)</span></div>
+
+<div class="problem-box">
+<div class="label">예제 문제</div>
+3개 그룹(총 관측치 15개)의 평균 차이를 검정하는 일원배치 분산분석(One-way ANOVA)에서 집단간 제곱합 $SSB=60$, 집단내 제곱합 $SSW=40$이었다. F통계량을 계산하시오.
+</div>
+
+<h3>단계별 해설</h3>
+<div class="step"><span class="step-num">1</span><b>자유도 계산</b></div>
+$$df_{between} = k-1 = 3-1 = 2, \qquad df_{within} = n-k = 15-3 = 12$$
+
+<div class="step"><span class="step-num">2</span><b>평균제곱(MS) 계산</b></div>
+$$MSB = \frac{SSB}{df_{between}} = \frac{60}{2} = 30, \qquad MSW = \frac{SSW}{df_{within}} = \frac{40}{12} \approx 3.333$$
+
+<div class="step"><span class="step-num">3</span><b>F통계량</b></div>
+$$F = \frac{MSB}{MSW} = \frac{30}{3.333} \approx \mathbf{9.0}$$
+
+<table>
+<tr><th>변동요인</th><th>제곱합(SS)</th><th>자유도(df)</th><th>평균제곱(MS)</th><th>F</th></tr>
+<tr><td>집단간(Between)</td><td>60</td><td>2</td><td>30.0</td><td rowspan="2" style="vertical-align:middle;"><b>9.0</b></td></tr>
+<tr><td>집단내(Within)</td><td>40</td><td>12</td><td>3.33</td></tr>
+</table>
+<div class="answer-box"><div class="lbl">정답 요약</div>
+$F\approx9.0$. 유의수준 0.05, $df=(2,12)$일 때 F분포의 임계값은 약 3.89이므로 $F(9.0) > F_{crit}(3.89)$ — <b>귀무가설(세 그룹의 평균이 모두 같다)을 기각</b>하고, 적어도 한 그룹의 평균은 다르다고 결론 내릴 수 있다.
+</div>
+<div class="note">F통계량이 크다는 것은 "그룹 간 차이(MSB)"가 "그룹 내 우연에 의한 변동(MSW)"보다 훨씬 크다는 뜻이다 — 즉 관찰된 평균 차이가 단순 표본오차로는 설명되지 않을 만큼 뚜렷하다는 근거가 된다.</div>
+</section>
+
+<!-- ================= SUPP C: Dendrogram ================= -->
+<section id="s3">
+<h2><span class="type-badge supp">보충</span> 보충예제 C — 계층적 군집분석과 덴드로그램</h2>
+<div class="tag-row"><span class="tag">계층적군집</span><span class="tag">단일연결법</span><span class="tag">덴드로그램</span><span class="tag type">시각자료 해석형 (보충)</span></div>
+
+<div class="problem-box">
+<div class="label">예제 문제</div>
+2차원 평면 위 4개의 점 $A(1,1),\ B(2,1),\ C(5,5),\ D(6,5)$에 대해, 단일연결법(Single Linkage, 최단거리법)으로 계층적 군집분석을 수행하고 덴드로그램을 그리시오.
+</div>
+
+<h3>단계별 해설</h3>
+<div class="step"><span class="step-num">1</span><b>모든 점 쌍의 유클리드 거리 계산</b></div>
+<table>
+<tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+<tr><td><b>A</b></td><td>0</td><td>1.00</td><td>5.66</td><td>6.40</td></tr>
+<tr><td><b>B</b></td><td>1.00</td><td>0</td><td>5.00</td><td>5.66</td></tr>
+<tr><td><b>C</b></td><td>5.66</td><td>5.00</td><td>0</td><td>1.00</td></tr>
+<tr><td><b>D</b></td><td>6.40</td><td>5.66</td><td>1.00</td><td>0</td></tr>
+</table>
+
+<div class="step"><span class="step-num">2</span><b>1단계 병합 — 가장 가까운 쌍 찾기</b></div>
+<p>최솟값은 $d(A,B)=1.00$과 $d(C,D)=1.00$으로 동률이다. 먼저 $\{A,B\}$를 높이 1.00에서 병합한다.</p>
+$$d(\{AB\},C)=\min(d(A,C),d(B,C))=\min(5.66,5.00)=5.00$$
+$$d(\{AB\},D)=\min(d(A,D),d(B,D))=\min(6.40,5.66)=5.66$$
+
+<div class="step"><span class="step-num">3</span><b>2단계 병합</b></div>
+<p>다음으로 가장 가까운 쌍은 $d(C,D)=1.00$이므로 $\{C,D\}$를 높이 1.00에서 병합한다.</p>
+$$d(\{AB\},\{CD\}) = \min(d(A,C),d(A,D),d(B,C),d(B,D)) = \min(5.66,6.40,5.00,5.66)=5.00$$
+
+<div class="step"><span class="step-num">4</span><b>3단계 병합 — 전체 통합</b></div>
+<p>마지막으로 남은 두 군집 $\{AB\}$와 $\{CD\}$를 높이 5.00에서 병합해 하나의 군집으로 통합한다.</p>
+
+<div class="svg-box">
+<svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg">
+<style>.t{font-family:'Noto Sans KR',sans-serif;font-size:12px;fill:#1c2b3a;} .tb{font-family:'Noto Sans KR',sans-serif;font-size:13px;fill:#1c2b3a;font-weight:700;} .l{stroke:#1f6fb2;stroke-width:2;fill:none;}</style>
+<text x="250" y="20" text-anchor="middle" class="tb">단일연결법 덴드로그램</text>
+<line x1="60" y1="220" x2="440" y2="220" stroke="#4a6178" stroke-width="1"/>
+<text x="30" y="224" class="t">높이</text>
+<text x="30" y="50" class="t">5.66</text>
+<line x1="55" y1="50" x2="65" y2="50" stroke="#4a6178"/>
+<text x="30" y="140" class="t">1.00</text>
+<line x1="55" y1="140" x2="65" y2="140" stroke="#4a6178"/>
+
+<line x1="100" y1="220" x2="100" y2="140" class="l"/>
+<line x1="160" y1="220" x2="160" y2="140" class="l"/>
+<line x1="100" y1="140" x2="160" y2="140" class="l"/>
+<text x="100" y="235" text-anchor="middle" class="t">A</text>
+<text x="160" y="235" text-anchor="middle" class="t">B</text>
+
+<line x1="340" y1="220" x2="340" y2="140" class="l"/>
+<line x1="400" y1="220" x2="400" y2="140" class="l"/>
+<line x1="340" y1="140" x2="400" y2="140" class="l"/>
+<text x="340" y="235" text-anchor="middle" class="t">C</text>
+<text x="400" y="235" text-anchor="middle" class="t">D</text>
+
+<line x1="130" y1="140" x2="130" y2="75" class="l"/>
+<line x1="370" y1="140" x2="370" y2="75" class="l"/>
+<line x1="130" y1="75" x2="370" y2="75" class="l"/>
+<text x="250" y="68" text-anchor="middle" class="t" fill="#1f6fb2" font-weight="700">높이 5.00에서 전체 통합</text>
+</svg>
+<div class="svg-cap">그림 S3-1. A,B는 높이 1.00에서, C,D도 높이 1.00에서 먼저 묶이고, 마지막으로 {AB}와 {CD}가 훨씬 높은 5.00에서 하나로 합쳐진다. 이 "병합 높이의 큰 차이(1.00 vs 5.00)"가 A,B 군집과 C,D 군집이 뚜렷이 구분된다는 근거다.</div>
+</div>
+<div class="answer-box"><div class="lbl">정답 요약</div>
+{A,B}와 {C,D}가 각각 높이 1.00에서 먼저 묶이고, 이후 높이 5.00에서 전체가 하나로 통합된다. 덴드로그램을 특정 높이(예: 3.0)에서 수평으로 자르면 {A,B}, {C,D} 두 개의 군집으로 나눌 수 있다.
+</div>
+<div class="note"><b>단일연결법(Single Linkage)</b>은 두 군집 사이의 거리를 "가장 가까운 두 점 사이의 거리"로 정의한다 — 그래서 매 단계마다 "지금까지 남은 군집들 사이의 최소 거리"를 찾아 병합하는 것이 핵심 절차다. 완전연결법(Complete Linkage)은 반대로 "가장 먼 두 점 사이의 거리"를, 평균연결법(Average Linkage)은 "모든 점 쌍 거리의 평균"을 사용한다는 점을 비교해서 서술하면 가점 요인이 된다.</div>
+</section>
+
+<!-- ================= SUPP D: ACF/PACF ================= -->
+<section id="s4">
+<h2><span class="type-badge supp">보충</span> 보충예제 D — ACF/PACF로 AR·MA 모형 식별</h2>
+<div class="tag-row"><span class="tag">ACF</span><span class="tag">PACF</span><span class="tag">AR·MA식별</span><span class="tag type">시각자료 해석형 (보충)</span></div>
+
+<div class="problem-box">
+<div class="label">예제 문제</div>
+어떤 정상 시계열의 표본 ACF(자기상관함수)는 시차가 커져도 천천히 감소하는(tail-off) 패턴을 보이고, 표본 PACF(편자기상관함수)는 시차 2 이후 거의 0에 가깝게 뚝 끊기는(cut-off) 패턴을 보였다. 이 시계열에 적합한 모형을 식별하고 근거를 서술하시오.
+</div>
+
+<h3>단계별 해설</h3>
+<div class="step"><span class="step-num">1</span><b>ACF/PACF 패턴과 모형 식별 규칙</b></div>
+<table>
+<tr><th>모형</th><th>ACF 패턴</th><th>PACF 패턴</th></tr>
+<tr><td>$AR(p)$</td><td>천천히 감소(tail off)</td><td>$p$시차 이후 절단(cut off)</td></tr>
+<tr><td>$MA(q)$</td><td>$q$시차 이후 절단(cut off)</td><td>천천히 감소(tail off)</td></tr>
+<tr><td>$ARMA(p,q)$</td><td>천천히 감소</td><td>천천히 감소</td></tr>
+</table>
+
+<div class="step"><span class="step-num">2</span><b>문제 상황에 규칙 적용</b></div>
+<p>ACF가 천천히 감소 + PACF가 시차 2 이후 절단 → 표의 첫 행(AR 패턴)과 정확히 일치하며, PACF가 끊기는 시차가 곧 차수 $p$이다.</p>
+
+<div class="svg-box">
+<svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
+<style>.t{font-family:'Noto Sans KR',sans-serif;font-size:11px;fill:#1c2b3a;} .tb{font-family:'Noto Sans KR',sans-serif;font-size:13px;fill:#1c2b3a;font-weight:700;}</style>
+<text x="160" y="20" text-anchor="middle" class="tb">ACF (천천히 감소)</text>
+<line x1="40" y1="110" x2="290" y2="110" stroke="#4a6178" stroke-width="1"/>
+<line x1="40" y1="40" x2="40" y2="180" stroke="#4a6178" stroke-width="1"/>
+<rect x="55" y="45" width="14" height="65" fill="#1f6fb2"/><rect x="80" y="60" width="14" height="50" fill="#1f6fb2"/><rect x="105" y="72" width="14" height="38" fill="#1f6fb2"/><rect x="130" y="82" width="14" height="28" fill="#1f6fb2"/><rect x="155" y="90" width="14" height="20" fill="#1f6fb2"/><rect x="180" y="96" width="14" height="14" fill="#1f6fb2"/><rect x="205" y="100" width="14" height="10" fill="#1f6fb2"/><rect x="230" y="103" width="14" height="7" fill="#1f6fb2"/>
+<text x="160" y="200" text-anchor="middle" class="t">시차가 커져도 천천히 감소</text>
+
+<text x="480" y="20" text-anchor="middle" class="tb">PACF (시차2 이후 절단)</text>
+<line x1="360" y1="110" x2="610" y2="110" stroke="#4a6178" stroke-width="1"/>
+<line x1="360" y1="40" x2="360" y2="180" stroke="#4a6178" stroke-width="1"/>
+<rect x="375" y="45" width="14" height="65" fill="#3f8f6b"/><rect x="400" y="70" width="14" height="40" fill="#3f8f6b"/>
+<rect x="425" y="107" width="14" height="3" fill="#c98a2c"/><rect x="450" y="108" width="14" height="2" fill="#c98a2c"/><rect x="475" y="109" width="14" height="1" fill="#c98a2c"/><rect x="500" y="108" width="14" height="2" fill="#c98a2c"/><rect x="525" y="109" width="14" height="1" fill="#c98a2c"/><rect x="550" y="110" width="14" height="0.5" fill="#c98a2c"/>
+<text x="480" y="200" text-anchor="middle" class="t">시차2까지만 유의(초록) 이후 거의0(주황)</text>
+</svg>
+<div class="svg-cap">그림 S4-1. ACF는 감쇠하며 천천히 0에 가까워지고, PACF는 시차 2까지만 의미 있는 값을 갖고 이후 거의 0으로 끊긴다 — 전형적인 AR(2) 패턴이다.</div>
+</div>
+
+<div class="answer-box"><div class="lbl">정답 요약</div>
+$\text{AR}(2)$ 모형이 적합하다. PACF가 시차 2 이후 절단된다는 것은, 시계열의 현재 값이 <b>직전 2개 시점</b>까지의 값에는 직접적으로 의존하지만 그 이전 시점과는(다른 시차를 거치지 않고는) 직접적인 관계가 없다는 뜻이며, 이것이 바로 $AR(p)$ 모형에서 차수 $p$를 결정하는 표준적인 식별 방법이다.
+</div>
+</section>
+
+<!-- ================= SUPP E: FA vs PCA ================= -->
+<section id="s5">
+<h2><span class="type-badge supp">보충</span> 보충예제 E — 요인분석(Factor Analysis)과 PCA의 차이</h2>
+<div class="tag-row"><span class="tag">요인분석</span><span class="tag">PCA</span><span class="tag">차원축소</span><span class="tag type">이론 대조형 (보충)</span></div>
+
+<div class="problem-box">
+<div class="label">예제 문제</div>
+차원 축소 기법인 요인분석(Factor Analysis)과 주성분분석(PCA)의 목적과 수학적 구조 차이를 대조하여 서술하시오.
+</div>
+
+<h3>모범답안 — 대조표</h3>
+<table>
+<tr><th>구분</th><th>주성분분석(PCA)</th><th>요인분석(Factor Analysis)</th></tr>
+<tr><td>목적</td><td>데이터의 <b>분산을 최대한 보존</b>하며 차원을 축소</td><td>관측변수들 뒤에 숨은 <b>잠재요인(공통 원인)</b>을 찾아 설명</td></tr>
+<tr><td>수학적 방향</td><td>관측변수 → 주성분 (선형결합으로 요약, 관측변수가 주성분을 만듦)</td><td>잠재요인 → 관측변수 (잠재요인이 관측변수를 만들어낸다고 가정)</td></tr>
+<tr><td>오차항 취급</td><td>오차(고유분산, uniqueness)를 명시적으로 분리하지 않음</td><td>각 변수마다 공통요인으로 설명 안 되는 <b>고유분산(uniqueness)</b>을 별도로 모형화</td></tr>
+<tr><td>성분/요인 개수 해석</td><td>주성분은 임의의 개수를 선택 가능(분산설명력 기준)</td><td>요인 개수는 이론적으로 "의미 있는 잠재 개념"의 개수로 사전에 가정하는 경우가 많음</td></tr>
+<tr><td>대표적 활용</td><td>차원축소, 노이즈제거, 시각화</td><td>심리검사·설문 문항 뒤의 잠재 개념(예: '지능', '만족도') 추출</td></tr>
+</table>
+
+<div class="answer-box"><div class="lbl">핵심 한 줄 요약</div>
+PCA는 "데이터를 잘 요약하는 축"을 찾는 것이고, 요인분석은 "데이터를 만들어낸 원인(잠재요인)"을 찾는 것이다 — 방향이 서로 반대다(관측변수의 결합 vs 잠재요인의 결과).
+</div>
+<div class="note">시험 답안에서는 "PCA는 관측변수의 선형결합으로 주성분을 정의하지만, 요인분석은 반대로 잠재요인이 관측변수를 설명한다고 가정하며 오차항(고유분산)을 명시적으로 분리한다"는 방향성 차이를 강조하면 채점자가 핵심을 파악했다고 판단하기 쉽다.</div>
+</section>
+
+<!-- ================= SUMMARY ================= -->
+<section id="summary">
+<h2>📊 요약 테이블</h2>
+<table>
+<tr><th>출제 영역</th><th>대표 회차 분포</th><th>핵심 출제 주제 및 지표</th><th>서술·계산 요구 유형</th></tr>
+<tr><td>선형 모델 검정</td><td>1회~10회</td><td>다중공선성(VIF), 잔차의 4가지 가정 검정, ANOVA 표 해석</td><td>이론 서술 및 결과 분석형</td></tr>
+<tr><td>연관/군집 규칙</td><td>8회~15회</td><td>계층적 군집분석(덴드로그램), 연관분석의 지지도·신뢰도·향상도</td><td>수리 공식 대입 연산형</td></tr>
+<tr><td>머신러닝 평가</td><td>16회~26회</td><td>혼동행렬 기반 지표(정밀도, 재현율, F1-Score, 특이도), 과적합 진단</td><td>데이터 오차행렬 계산형</td></tr>
+<tr><td>시계열 예측</td><td>12회~22회</td><td>시계열 정상성 조건, ACF/PACF 그래프를 통한 AR/MA 모형 식별</td><td>시각 자료(그래프) 해석형</td></tr>
+<tr><td>차원 축소</td><td>20회~27회</td><td>요인분석(Factor Analysis)과 주성분분석(PCA)의 차이점 대조</td><td>이론 대조형</td></tr>
+</table>
+</section>
+
+<!-- ================= CHECKLIST ================= -->
+<section id="checklist">
+<h2>✅ 학습 체크리스트</h2>
+<ul class="checklist">
+<li>잔차의 4가지 가정(선형성·독립성·등분산성·정규성)과 각각의 검정법(잔차도·DW통계량·잔차도·Q-Q Plot)을 짝지어 설명할 수 있다</li>
+<li>지지도·신뢰도·향상도 공식을 직접 대입해 계산하고, Lift=1이 "독립"을 의미한다는 것을 해석할 수 있다</li>
+<li>혼동행렬에서 TP·FN·FP·TN을 정리하고, Recall·Precision·F1-Score(조화평균)를 계산할 수 있다</li>
+<li>시계열 정상성의 3조건(평균·분산 일정, 공분산의 시차 의존성)을 설명하고 위반 시 해결책(차분·변환)을 제시할 수 있다</li>
+<li>VIF$=1/(1-R^2)$ 공식으로 다중공선성을 진단하고, VIF≥10이면 심각한 문제로 판단하는 기준을 안다 (보충)</li>
+<li>ANOVA 표에서 SSB·SSW로부터 자유도, MS, F통계량을 계산하고 임계값과 비교해 귀무가설 기각 여부를 판단할 수 있다 (보충)</li>
+<li>단일연결법으로 거리행렬을 이용해 매 단계 가장 가까운 군집을 병합하며 덴드로그램을 손으로 작도할 수 있다 (보충)</li>
+<li>ACF가 천천히 감소+PACF가 절단되면 AR(p), 반대면 MA(q)로 식별하는 규칙을 적용할 수 있다 (보충)</li>
+<li>PCA(관측변수→주성분, 분산 최대화)와 요인분석(잠재요인→관측변수, 고유분산 분리)의 방향성 차이를 대조해 설명할 수 있다 (보충)</li>
+<li>"원문" 표시된 4개 문제는 실제 기출 그대로이며, "보충" 표시된 5개는 요약표 키워드를 바탕으로 구성한 연습문제임을 구분해서 학습한다</li>
+</ul>
+</section>
+
+</main>
+</div>
+
+<footer>ADP 필기 서술형 완전정복 2 — 제1회~제27회 기출 문제·해설 + 보충예제</footer>
+
+<script>
+const links = document.querySelectorAll('#nav a');
+const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href')));
+function onScroll(){
+  let idx = 0;
+  const y = window.scrollY + 100;
+  sections.forEach((s,i)=>{ if(s && s.offsetTop <= y) idx = i; });
+  links.forEach(a=>a.classList.remove('active'));
+  if(links[idx]) links[idx].classList.add('active');
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+</script>
+</body>
+</html>
